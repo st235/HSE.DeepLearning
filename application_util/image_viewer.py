@@ -1,4 +1,3 @@
-# vim: expandtab:ts=4:sw=4
 """
 This module contains an image viewer and drawing routines based on OpenCV.
 """

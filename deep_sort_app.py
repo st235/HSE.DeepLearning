@@ -1,4 +1,3 @@
-# vim: expandtab:ts=4:sw=4
 from __future__ import division, print_function, absolute_import
 
 import argparse
@@ -216,7 +215,7 @@ def bool_string(input_string):
     if input_string not in {"True","False"}:
         raise ValueError("Please Enter a valid Ture/False choice")
     else:
-        return (input_string == "True")
+        return input_string == "True"
 
 def parse_args():
     """ Parse command line arguments.
