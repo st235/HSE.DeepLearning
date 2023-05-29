@@ -3,14 +3,14 @@ import argparse
 import show_results
 
 
-def convert(filename_in, filename_out, ffmpeg_executable="ffmpeg"):
+def _convert(filename_in, filename_out, ffmpeg_executable="ffmpeg"):
     import subprocess
     command = [ffmpeg_executable, "-i", filename_in, "-c:v", "libx264",
                "-preset", "slow", "-crf", "21", filename_out]
     subprocess.call(command)
 
 
-def parse_args():
+def _parse_args():
     """ Parse command line arguments.
     """
     parser = argparse.ArgumentParser(description="Siamese Tracking")
@@ -35,7 +35,7 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    args = parse_args()
+    args = _parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
     for sequence_txt in os.listdir(args.result_dir):
@@ -61,4 +61,4 @@ if __name__ == "__main__":
             continue
         filename_in = os.path.join(args.output_dir, "%s.avi" % sequence)
         filename_out = os.path.join(args.output_dir, "%s.mp4" % sequence)
-        convert(filename_in, filename_out)
+        _convert(filename_in, filename_out)

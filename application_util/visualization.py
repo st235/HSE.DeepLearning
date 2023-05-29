@@ -3,7 +3,7 @@ import colorsys
 from .image_viewer import ImageViewer
 
 
-def create_unique_color_float(tag, hue_step=0.41):
+def _create_unique_color_float(tag, hue_step=0.41):
     """Create a unique RGB color code for a given track id (tag).
 
     The color code is generated in HSV color space by moving along the
@@ -28,7 +28,7 @@ def create_unique_color_float(tag, hue_step=0.41):
     return r, g, b
 
 
-def create_unique_color_uchar(tag, hue_step=0.41):
+def _create_unique_color_uchar(tag, hue_step=0.41):
     """Create a unique RGB color code for a given track id (tag).
 
     The color code is generated in HSV color space by moving along the
@@ -48,7 +48,7 @@ def create_unique_color_uchar(tag, hue_step=0.41):
         RGB color code in range [0, 255]
 
     """
-    r, g, b = create_unique_color_float(tag, hue_step)
+    r, g, b = _create_unique_color_float(tag, hue_step)
     return int(255*r), int(255*g), int(255*b)
 
 
@@ -111,7 +111,7 @@ class Visualization(object):
     def draw_groundtruth(self, track_ids, boxes):
         self.viewer.thickness = 2
         for track_id, box in zip(track_ids, boxes):
-            self.viewer.color = create_unique_color_uchar(track_id)
+            self.viewer.color = _create_unique_color_uchar(track_id)
             self.viewer.rectangle(*box.astype(np.int), label=str(track_id))
 
     def draw_detections(self, detections):
@@ -125,7 +125,7 @@ class Visualization(object):
         for track in tracks:
             if not track.is_confirmed() or track.time_since_update > 0:
                 continue
-            self.viewer.color = create_unique_color_uchar(track.track_id)
+            self.viewer.color = _create_unique_color_uchar(track.track_id)
             self.viewer.rectangle(
                 *track.to_tlwh().astype(np.int), label=str(track.track_id))
             # self.viewer.gaussian(track.mean[:2], track.covariance[:2, :2],

@@ -9,7 +9,7 @@ def _batch_norm_fn(x, scope=None):
     return slim.batch_norm(x, scope=scope)
 
 
-def create_link(
+def _create_link(
         incoming, network_builder, scope, nonlinearity=tf.nn.elu,
         weights_initializer=tf.truncated_normal_initializer(stddev=1e-3),
         regularizer=None, is_first=False, summarize_activations=True):
@@ -39,7 +39,7 @@ def create_link(
     return network
 
 
-def create_inner_block(
+def _create_inner_block(
         incoming, scope, nonlinearity=tf.nn.elu,
         weights_initializer=tf.truncated_normal_initializer(1e-3),
         bias_initializer=tf.zeros_initializer(), regularizer=None,
@@ -68,18 +68,18 @@ def create_inner_block(
     return incoming
 
 
-def residual_block(incoming, scope, nonlinearity=tf.nn.elu,
-                   weights_initializer=tf.truncated_normal_initializer(1e3),
-                   bias_initializer=tf.zeros_initializer(), regularizer=None,
-                   increase_dim=False, is_first=False,
-                   summarize_activations=True):
+def _residual_block(incoming, scope, nonlinearity=tf.nn.elu,
+                    weights_initializer=tf.truncated_normal_initializer(1e3),
+                    bias_initializer=tf.zeros_initializer(), regularizer=None,
+                    increase_dim=False, is_first=False,
+                    summarize_activations=True):
 
     def network_builder(x, s):
-        return create_inner_block(
+        return _create_inner_block(
             x, s, nonlinearity, weights_initializer, bias_initializer,
             regularizer, increase_dim, summarize_activations)
 
-    return create_link(
+    return _create_link(
         incoming, network_builder, scope, nonlinearity, weights_initializer,
         regularizer, is_first, summarize_activations)
 
@@ -114,24 +114,24 @@ def _create_network(incoming, reuse=None, weight_decay=1e-8):
     # issue 10 https://github.com/nwojke/deep_sort/issues/10
     network = slim.max_pool2d(network, [3, 3], [2, 2], scope="pool1")
 
-    network = residual_block(
+    network = _residual_block(
         network, "conv2_1", nonlinearity, conv_weight_init, conv_bias_init,
         conv_regularizer, increase_dim=False, is_first=True)
-    network = residual_block(
+    network = _residual_block(
         network, "conv2_3", nonlinearity, conv_weight_init, conv_bias_init,
         conv_regularizer, increase_dim=False)
 
-    network = residual_block(
+    network = _residual_block(
         network, "conv3_1", nonlinearity, conv_weight_init, conv_bias_init,
         conv_regularizer, increase_dim=True)
-    network = residual_block(
+    network = _residual_block(
         network, "conv3_3", nonlinearity, conv_weight_init, conv_bias_init,
         conv_regularizer, increase_dim=False)
 
-    network = residual_block(
+    network = _residual_block(
         network, "conv4_1", nonlinearity, conv_weight_init, conv_bias_init,
         conv_regularizer, increase_dim=True)
-    network = residual_block(
+    network = _residual_block(
         network, "conv4_3", nonlinearity, conv_weight_init, conv_bias_init,
         conv_regularizer, increase_dim=False)
 

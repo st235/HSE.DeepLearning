@@ -80,7 +80,7 @@ def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
     visualizer.run(frame_callback)
 
 
-def parse_args():
+def _parse_args():
     """ Parse command line arguments.
     """
     parser = argparse.ArgumentParser(description="Siamese Tracking")
@@ -107,7 +107,7 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    args = parse_args()
+    args = _parse_args()
     run(
         args.sequence_dir, args.result_file, args.show_false_alarms,
         args.detection_file, args.update_ms, args.output_file)

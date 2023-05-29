@@ -3,7 +3,7 @@ import os
 import deep_sort_app
 
 
-def parse_args():
+def _parse_args():
     """ Parse command line arguments.
     """
     parser = argparse.ArgumentParser(description="MOTChallenge evaluation")
@@ -37,7 +37,7 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    args = parse_args()
+    args = _parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
     sequences = os.listdir(args.mot_dir)

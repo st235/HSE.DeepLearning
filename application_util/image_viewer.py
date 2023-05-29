@@ -6,7 +6,7 @@ import cv2
 import time
 
 
-def is_in_bounds(mat, roi):
+def _is_in_bounds(mat, roi):
     """Check if ROI is fully contained in the image.
 
     Parameters
@@ -30,7 +30,7 @@ def is_in_bounds(mat, roi):
     return True
 
 
-def view_roi(mat, roi):
+def _view_roi(mat, roi):
     """Get sub-array.
 
     The ROI must be valid, i.e., fully contained in the image.
@@ -170,10 +170,10 @@ class ImageViewer(object):
         image_size = int(radius + self.thickness + 1.5)  # actually half size
         roi = int(x - image_size), int(y - image_size), \
             int(2 * image_size), int(2 * image_size)
-        if not is_in_bounds(self.image, roi):
+        if not _is_in_bounds(self.image, roi):
             return
 
-        image = view_roi(self.image, roi)
+        image = _view_roi(self.image, roi)
         center = image.shape[1] // 2, image.shape[0] // 2
         cv2.circle(
             image, center, int(radius + .5), self._color, self.thickness)

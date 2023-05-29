@@ -20,7 +20,7 @@ def _run_in_batches(f, data_dict, out, batch_size):
         out[e:] = f(batch_data_dict)
 
 
-def extract_image_patch(image, bbox, patch_shape):
+def _extract_image_patch(image, bbox, patch_shape):
     """Extract image patch from bounding box.
 
     Parameters
@@ -94,15 +94,15 @@ class ImageEncoder(object):
         return out
 
 
-def create_box_encoder(model_filename, input_name="images",
-                       output_name="features", batch_size=32):
+def _create_box_encoder(model_filename, input_name="images",
+                        output_name="features", batch_size=32):
     image_encoder = ImageEncoder(model_filename, input_name, output_name)
     image_shape = image_encoder.image_shape
 
     def encoder(image, boxes):
         image_patches = []
         for box in boxes:
-            patch = extract_image_patch(image, box, image_shape[:2])
+            patch = _extract_image_patch(image, box, image_shape[:2])
             if patch is None:
                 print("WARNING: Failed to extract image patch: %s." % str(box))
                 patch = np.random.uniform(
@@ -114,7 +114,7 @@ def create_box_encoder(model_filename, input_name="images",
     return encoder
 
 
-def generate_detections(encoder, mot_dir, output_dir, detection_dir=None):
+def _generate_detections(encoder, mot_dir, output_dir, detection_dir=None):
     """Generate detections with features.
 
     Parameters
@@ -180,7 +180,7 @@ def generate_detections(encoder, mot_dir, output_dir, detection_dir=None):
             output_filename, np.asarray(detections_out), allow_pickle=False)
 
 
-def parse_args():
+def _parse_args():
     """Parse command line arguments.
     """
     parser = argparse.ArgumentParser(description="Re-ID feature extractor")
@@ -202,10 +202,10 @@ def parse_args():
 
 
 def main():
-    args = parse_args()
-    encoder = create_box_encoder(args.model, batch_size=32)
-    generate_detections(encoder, args.mot_dir, args.output_dir,
-                        args.detection_dir)
+    args = _parse_args()
+    encoder = _create_box_encoder(args.model, batch_size=32)
+    _generate_detections(encoder, args.mot_dir, args.output_dir,
+                         args.detection_dir)
 
 
 if __name__ == "__main__":

@@ -208,16 +208,17 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
     f = open(output_file, 'w')
     for row in results:
         print('%d,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1' % (
-            row[0], row[1], row[2], row[3], row[4], row[5]),file=f)
+            row[0], row[1], row[2], row[3], row[4], row[5]), file=f)
 
 
-def bool_string(input_string):
-    if input_string not in {"True","False"}:
-        raise ValueError("Please Enter a valid Ture/False choice")
+def _bool_string(input_string):
+    if input_string not in {"True", "False"}:
+        raise ValueError("Please Enter a valid True/False choice")
     else:
         return input_string == "True"
 
-def parse_args():
+
+def _parse_args():
     """ Parse command line arguments.
     """
     parser = argparse.ArgumentParser(description="Deep SORT")
@@ -229,33 +230,33 @@ def parse_args():
         required=True)
     parser.add_argument(
         "--output_file", help="Path to the tracking output file. This file will"
-        " contain the tracking results on completion.",
+                              " contain the tracking results on completion.",
         default="/tmp/hypotheses.txt")
     parser.add_argument(
         "--min_confidence", help="Detection confidence threshold. Disregard "
-        "all detections that have a confidence lower than this value.",
+                                 "all detections that have a confidence lower than this value.",
         default=0.8, type=float)
     parser.add_argument(
         "--min_detection_height", help="Threshold on the detection bounding "
-        "box height. Detections with height smaller than this value are "
-        "disregarded", default=0, type=int)
+                                       "box height. Detections with height smaller than this value are "
+                                       "disregarded", default=0, type=int)
     parser.add_argument(
-        "--nms_max_overlap",  help="Non-maxima suppression threshold: Maximum "
-        "detection overlap.", default=1.0, type=float)
+        "--nms_max_overlap", help="Non-maxima suppression threshold: Maximum "
+                                  "detection overlap.", default=1.0, type=float)
     parser.add_argument(
         "--max_cosine_distance", help="Gating threshold for cosine distance "
-        "metric (object appearance).", type=float, default=0.2)
+                                      "metric (object appearance).", type=float, default=0.2)
     parser.add_argument(
         "--nn_budget", help="Maximum size of the appearance descriptors "
-        "gallery. If None, no budget is enforced.", type=int, default=None)
+                            "gallery. If None, no budget is enforced.", type=int, default=None)
     parser.add_argument(
         "--display", help="Show intermediate tracking results",
-        default=True, type=bool_string)
+        default=True, type=_bool_string)
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    args = parse_args()
+    args = _parse_args()
     run(
         args.sequence_dir, args.detection_file, args.output_file,
         args.min_confidence, args.nms_max_overlap, args.min_detection_height,
