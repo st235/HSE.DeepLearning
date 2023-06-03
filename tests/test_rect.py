@@ -105,7 +105,7 @@ def test_iou_rectsDoNotIntersect_methodReturns0(rect_a, rect_b, expected_interse
 def test_iou_rectsIntersect_methodReturnsCorrectMetric(rect_a, rect_b, expected_intersection):
     one = Rect.from_tlwh(rect_a)
     another = Rect.from_tlwh(rect_b)
-    assert (one.iou(another) - expected_intersection) < 1e-5
+    assert abs(one.iou(another) - expected_intersection) < 1e-5
 
 
 @pytest.mark.parametrize("rect,expected_order", [
