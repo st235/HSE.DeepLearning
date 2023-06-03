@@ -9,7 +9,7 @@ import numpy as np
 from app import preprocessing
 from app import visualization
 from deep_sort import nn_matching
-from deep_sort.detection import Detection
+from deep_sort.detector.detection import Detection
 from utils.geometry.rect import Rect
 from deep_sort.tracker import Tracker
 
