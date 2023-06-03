@@ -6,7 +6,7 @@ import numpy as np
 import deep_sort_app
 from deep_sort.geometry.iou_utils import iou
 from deep_sort.geometry.rect import Rect
-from application_util import visualization
+from app import visualization
 
 
 DEFAULT_UPDATE_MS = 20
