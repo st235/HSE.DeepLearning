@@ -1,8 +1,7 @@
 import pytest
-import numpy as np
 
-from deep_sort.geometry.iou_utils import iou
-from deep_sort.geometry.rect import Rect
+from utils.geometry.iou_utils import iou
+from utils.geometry.rect import Rect
 
 
 @pytest.mark.parametrize("bbox,candidates,expected_iou", [
