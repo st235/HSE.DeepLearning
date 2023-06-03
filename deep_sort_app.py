@@ -173,8 +173,7 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
         detections = [d for d in detections if d.confidence >= min_confidence]
 
         # Run non-maxima suppression.
-        boxes = np.array([[d.origin.left, d.origin.top,
-                           d.origin.width, d.origin.height] for d in detections])
+        boxes = np.array([list(detection.origin) for detection in detections])
         scores = np.array([d.confidence for d in detections])
         indices = preprocessing.non_max_suppression(
             boxes, nms_max_overlap, scores)
