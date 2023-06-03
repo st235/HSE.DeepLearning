@@ -5,6 +5,7 @@ import numpy as np
 
 import deep_sort_app
 from deep_sort.geometry.iou_utils import iou
+from deep_sort.geometry.rect import Rect
 from application_util import visualization
 
 
@@ -59,12 +60,12 @@ def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
         if show_false_alarms:
             groundtruth = seq_info["groundtruth"]
             mask = groundtruth[:, 0].astype(np.int32) == frame_idx
-            gt_boxes = groundtruth[mask, 2:6]
+            gt_boxes = [Rect.from_tlwh(candidate) for candidate in groundtruth[mask, 2:6]]
             for box in boxes:
                 # NOTE(nwojke): This is not strictly correct, because we don't
                 # solve the assignment problem here.
                 min_iou_overlap = 0.5
-                if iou(box, gt_boxes).max() < min_iou_overlap:
+                if iou(Rect.from_tlwh(box), gt_boxes).max() < min_iou_overlap:
                     vis.viewer.color = 0, 0, 255
                     vis.viewer.thickness = 4
                     vis.viewer.rectangle(*box.astype(np.int32))

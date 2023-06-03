@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 
 from deep_sort.geometry.iou_utils import iou
+from deep_sort.geometry.rect import Rect
 
 
 @pytest.mark.parametrize("bbox,candidates,expected_iou", [
@@ -29,4 +30,6 @@ from deep_sort.geometry.iou_utils import iou
      [0.38555692, 0.1314554, 0.]),
 ])
 def test_initIOU_randomBboxAndCandidates_returnsCorrectMetric(bbox, candidates, expected_iou):
-    assert (abs(iou(np.array(bbox), np.array(candidates)) - expected_iou) < 1e-5).all()
+    rect_bbox = Rect.from_tlwh(bbox)
+    rect_candidates = [Rect.from_tlwh(candidate) for candidate in candidates]
+    assert (abs(iou(rect_bbox, rect_candidates) - expected_iou) < 1e-5).all()
