@@ -118,7 +118,9 @@ class Visualization(object):
         self.viewer.thickness = 2
         self.viewer.color = 0, 0, 255
         for i, detection in enumerate(detections):
-            self.viewer.rectangle(*detection.tlwh)
+            detection_origin = detection.origin
+            self.viewer.rectangle(detection_origin.left, detection_origin.top,
+                                  detection_origin.width, detection_origin.height)
 
     def draw_trackers(self, tracks):
         self.viewer.thickness = 2

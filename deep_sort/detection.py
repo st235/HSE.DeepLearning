@@ -1,48 +1,35 @@
 import numpy as np
 
+from deep_sort.geometry.rect import Rect
+
 
 class Detection(object):
     """
     This class represents a bounding box detection in a single image.
 
-    Parameters
+    Properties
     ----------
-    tlwh : array_like
-        Bounding box in format `(x, y, w, h)`.
+    origin : Rect
+        Bounding box origin rect.
     confidence : float
         Detector confidence score.
     feature : array_like
         A feature vector that describes the object contained in this image.
-
-    Attributes
-    ----------
-    tlwh : ndarray
-        Bounding box in format `(top left x, top left y, width, height)`.
-    confidence : ndarray
-        Detector confidence score.
-    feature : ndarray | NoneType
-        A feature vector that describes the object contained in this image.
-
     """
 
-    def __init__(self, tlwh, confidence, feature):
-        self.tlwh = np.asarray(tlwh, dtype=np.float)
-        self.confidence = float(confidence)
-        self.feature = np.asarray(feature, dtype=np.float32)
+    def __init__(self, origin: Rect, confidence, feature):
+        self.__origin = origin
+        self.__confidence = float(confidence)
+        self.__feature = np.asarray(feature, dtype=np.float32)
 
-    def to_tlbr(self):
-        """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
-        `(top left, bottom right)`.
-        """
-        ret = self.tlwh.copy()
-        ret[2:] += ret[:2]
-        return ret
+    @property
+    def origin(self) -> Rect:
+        return self.__origin
 
-    def to_xyah(self):
-        """Convert bounding box to format `(center x, center y, aspect ratio,
-        height)`, where the aspect ratio is `width / height`.
-        """
-        ret = self.tlwh.copy()
-        ret[:2] += ret[2:] / 2
-        ret[2] /= ret[3]
-        return ret
+    @property
+    def confidence(self) -> float:
+        return self.__confidence
+
+    @property
+    def feature(self):
+        return self.__feature

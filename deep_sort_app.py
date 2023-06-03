@@ -10,6 +10,7 @@ from application_util import preprocessing
 from application_util import visualization
 from deep_sort import nn_matching
 from deep_sort.detection import Detection
+from deep_sort.geometry.rect import Rect
 from deep_sort.tracker import Tracker
 
 
@@ -113,7 +114,7 @@ def create_detections(detection_mat, frame_idx, min_height=0):
         Returns detection responses at given frame index.
 
     """
-    frame_indices = detection_mat[:, 0].astype(np.int)
+    frame_indices = detection_mat[:, 0].astype(np.int32)
     mask = frame_indices == frame_idx
 
     detection_list = []
@@ -121,7 +122,8 @@ def create_detections(detection_mat, frame_idx, min_height=0):
         bbox, confidence, feature = row[2:6], row[6], row[10:]
         if bbox[3] < min_height:
             continue
-        detection_list.append(Detection(bbox, confidence, feature))
+        bbox_origin = Rect.from_tlwh(bbox)
+        detection_list.append(Detection(bbox_origin, confidence, feature))
     return detection_list
 
 
@@ -171,7 +173,8 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
         detections = [d for d in detections if d.confidence >= min_confidence]
 
         # Run non-maxima suppression.
-        boxes = np.array([d.tlwh for d in detections])
+        boxes = np.array([[d.origin.left, d.origin.top,
+                           d.origin.width, d.origin.height] for d in detections])
         scores = np.array([d.confidence for d in detections])
         indices = preprocessing.non_max_suppression(
             boxes, nms_max_overlap, scores)

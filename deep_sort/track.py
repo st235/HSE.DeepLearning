@@ -1,3 +1,5 @@
+import numpy as np
+
 class TrackState:
     """
     Enumeration type for the single target track state. Newly created tracks are
@@ -132,8 +134,11 @@ class Track:
             The associated detection.
 
         """
+        xyah = np.array([detection.origin.center_x, detection.origin.center_y,
+                         detection.origin.aspect_ratio, detection.origin.height])
+
         self.mean, self.covariance = kf.update(
-            self.mean, self.covariance, detection.to_xyah())
+            self.mean, self.covariance, xyah)
         self.features.append(detection.feature)
 
         self.hits += 1
