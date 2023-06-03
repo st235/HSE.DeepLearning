@@ -13,7 +13,7 @@ def iou(bbox: Rect, candidates: list[Rect]) -> np.ndarray[float]:
     ----------
     bbox : Rect
         A bounding box.
-    candidates : ndarray
+    candidates : list[Rect]
         A matrix of candidate bounding boxes (one per row).
 
     Returns
