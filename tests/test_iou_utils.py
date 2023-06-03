@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from deep_sort.iou_matching import iou
+from deep_sort.geometry.iou_utils import iou
 
 
 @pytest.mark.parametrize("bbox,candidates,expected_iou", [

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import numpy as np
 from . import kalman_filter
 from . import linear_assignment
-from . import iou_matching
+from .geometry import iou_utils
 from .track import Track
 
 
@@ -122,7 +122,7 @@ class Tracker:
             self.tracks[k].time_since_update != 1]
         matches_b, unmatched_tracks_b, unmatched_detections = \
             linear_assignment.min_cost_matching(
-                iou_matching.iou_cost, self.max_iou_distance, self.tracks,
+                iou_utils.iou_cost, self.max_iou_distance, self.tracks,
                 detections, iou_track_candidates, unmatched_detections)
 
         matches = matches_a + matches_b
