@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 
 import deep_sort_app
+from deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from utils.geometry.iou_utils import iou
 from utils.geometry.rect import Rect
 from app import visualization
@@ -34,6 +35,7 @@ def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
         If not None, a video of the tracking results is written to this file.
 
     """
+    detections_provider = FileDetectionsProvider(detection_file)
     seq_info = deep_sort_app.gather_sequence_info(sequence_dir, detection_file)
     results = np.loadtxt(result_file, delimiter=',')
 
@@ -48,8 +50,7 @@ def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
         vis.set_image(image.copy())
 
         if seq_info["detections"] is not None:
-            detections = deep_sort_app.create_detections(
-                seq_info["detections"], frame_idx)
+            detections = detections_provider.load_detections(frame_idx)
             vis.draw_detections(detections)
 
         mask = results[:, 0].astype(np.int32) == frame_idx

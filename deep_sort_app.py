@@ -10,6 +10,7 @@ from app import preprocessing
 from app import visualization
 from deep_sort import nn_matching
 from deep_sort.detector.detection import Detection
+from deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from utils.geometry.rect import Rect
 from deep_sort.tracker import Tracker
 
@@ -82,7 +83,6 @@ def gather_sequence_info(sequence_dir, detection_file):
     seq_info = {
         "sequence_name": os.path.basename(sequence_dir),
         "image_filenames": image_filenames,
-        "detections": detections,
         "groundtruth": groundtruth,
         "image_size": image_size,
         "min_frame_idx": min_frame_idx,
@@ -91,40 +91,6 @@ def gather_sequence_info(sequence_dir, detection_file):
         "update_ms": update_ms
     }
     return seq_info
-
-
-def create_detections(detection_mat, frame_idx, min_height=0):
-    """Create detections for given frame index from the raw detection matrix.
-
-    Parameters
-    ----------
-    detection_mat : ndarray
-        Matrix of detections. The first 10 columns of the detection matrix are
-        in the standard MOTChallenge detection format. In the remaining columns
-        store the feature vector associated with each detection.
-    frame_idx : int
-        The frame index.
-    min_height : Optional[int]
-        A minimum detection bounding box height. Detections that are smaller
-        than this value are disregarded.
-
-    Returns
-    -------
-    List[tracker.Detection]
-        Returns detection responses at given frame index.
-
-    """
-    frame_indices = detection_mat[:, 0].astype(np.int32)
-    mask = frame_indices == frame_idx
-
-    detection_list = []
-    for row in detection_mat[mask]:
-        bbox, confidence, feature = row[2:6], row[6], row[10:]
-        if bbox[3] < min_height:
-            continue
-        bbox_origin = Rect.from_tlwh(bbox)
-        detection_list.append(Detection(bbox_origin, confidence, feature))
-    return detection_list
 
 
 def run(sequence_dir, detection_file, output_file, min_confidence,
@@ -158,6 +124,8 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
         If True, show visualization of intermediate tracking results.
 
     """
+    detections_provider = FileDetectionsProvider(detections_file_path=detection_file)
+
     seq_info = gather_sequence_info(sequence_dir, detection_file)
     metric = nn_matching.NearestNeighborDistanceMetric(
         "cosine", max_cosine_distance, nn_budget)
@@ -168,8 +136,7 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
         print("Processing frame %05d" % frame_idx)
 
         # Load image and generate detections.
-        detections = create_detections(
-            seq_info["detections"], frame_idx, min_detection_height)
+        detections = detections_provider.load_detections(frame_idx, min_detection_height)
         detections = [d for d in detections if d.confidence >= min_confidence]
 
         # Run non-maxima suppression.

@@ -7,7 +7,7 @@ class Detection(object):
     """
     This class represents a bounding box detection in a single image.
 
-    Properties
+    Attributes
     ----------
     origin : Rect
         Bounding box origin rect.
