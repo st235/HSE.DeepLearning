@@ -95,7 +95,7 @@ def gather_sequence_info(sequence_dir, detection_file):
 
 def run(sequence_dir, detection_file, output_file, min_confidence,
         nms_max_overlap, min_detection_height, max_cosine_distance,
-        nn_budget, display):
+        nn_budget):
     """Run multi-target tracker on a particular sequence.
 
     Parameters
@@ -154,10 +154,9 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
         tracker.update(detections)
 
         # Update visualization.
-        if display:
-            vis.set_image(image.copy())
-            vis.draw_detections(detections)
-            vis.draw_trackers(tracker.tracks)
+        vis.set_image(image.copy())
+        vis.draw_detections(detections)
+        vis.draw_trackers(tracker.tracks)
 
         # Store results.
         for track in tracker.tracks:
@@ -168,10 +167,7 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
                 frame_idx, track.track_id, bbox[0], bbox[1], bbox[2], bbox[3]])
 
     # Run tracker.
-    if display:
-        visualizer = visualization.Visualization(seq_info, update_ms=5)
-    else:
-        visualizer = visualization.NoVisualization(seq_info)
+    visualizer = visualization.Visualization(seq_info, update_ms=5)
     visualizer.run(frame_callback)
 
     # Store results.
@@ -219,9 +215,6 @@ def _parse_args():
     parser.add_argument(
         "--nn_budget", help="Maximum size of the appearance descriptors "
                             "gallery. If None, no budget is enforced.", type=int, default=None)
-    parser.add_argument(
-        "--display", help="Show intermediate tracking results",
-        default=True, type=_bool_string)
     return parser.parse_args()
 
 
@@ -230,4 +223,4 @@ if __name__ == "__main__":
     run(
         args.sequence_dir, args.detection_file, args.output_file,
         args.min_confidence, args.nms_max_overlap, args.min_detection_height,
-        args.max_cosine_distance, args.nn_budget, args.display)
+        args.max_cosine_distance, args.nn_budget)

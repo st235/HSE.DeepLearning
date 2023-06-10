@@ -32,8 +32,7 @@ python deep_sort_app.py \
     --sequence_dir=./MOT16/test/MOT16-06 \
     --detection_file=./resources/detections/MOT16_POI_test/MOT16-06.npy \
     --min_confidence=0.3 \
-    --nn_budget=100 \
-    --display=True
+    --nn_budget=100
 ```
 Check `python deep_sort_app.py -h` for an overview of available options.
 There are also scripts in the repository to visualize results, generate videos,

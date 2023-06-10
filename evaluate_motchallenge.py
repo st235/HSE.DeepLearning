@@ -49,4 +49,4 @@ if __name__ == "__main__":
         deep_sort_app.run(
             sequence_dir, detection_file, output_file, args.min_confidence,
             args.nms_max_overlap, args.min_detection_height,
-            args.max_cosine_distance, args.nn_budget, display=False)
+            args.max_cosine_distance, args.nn_budget)
