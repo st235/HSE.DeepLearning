@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 class Rect(object):
 
     def __init__(self,

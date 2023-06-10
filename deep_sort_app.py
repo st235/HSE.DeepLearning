@@ -9,7 +9,9 @@ import numpy as np
 from app import preprocessing
 from app import visualization
 from deep_sort import nn_matching
+from deep_sort.detector.detections_provider import DetectionsProvider
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
+from deep_sort.detector.nanodet_detections_provider import NanodetDetectionsProvider
 from deep_sort.tracker import Tracker
 
 
@@ -122,7 +124,8 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
         If True, show visualization of intermediate tracking results.
 
     """
-    detections_provider = FileDetectionsProvider(detections_file_path=detection_file)
+    # detections_provider = FileDetectionsProvider(detections_file_path=detection_file)
+    detections_provider: DetectionsProvider = NanodetDetectionsProvider()
 
     seq_info = gather_sequence_info(sequence_dir, detection_file)
     metric = nn_matching.NearestNeighborDistanceMetric(

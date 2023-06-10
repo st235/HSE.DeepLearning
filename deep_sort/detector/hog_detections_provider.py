@@ -2,10 +2,11 @@ import cv2
 import numpy as np
 
 from deep_sort.detector.detection import Detection
+from deep_sort.detector.detections_provider import DetectionsProvider
 from utils.geometry.rect import Rect
 
 
-class HogDetectionsProvider(object):
+class HogDetectionsProvider(DetectionsProvider):
     """
     Detects people using Histogram of Oriented Gradients (HOG) approach.
     For classification is using SVM. Detections are happening in real time.
