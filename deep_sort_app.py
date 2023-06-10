@@ -157,6 +157,7 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
         vis.set_image(image.copy())
         vis.draw_detections(detections)
         vis.draw_trackers(tracker.tracks)
+        vis.show_fps()
 
         # Store results.
         for track in tracker.tracks:

@@ -1,5 +1,6 @@
-import numpy as np
+import time
 import colorsys
+import numpy as np
 from .image_viewer import ImageViewer
 
 
@@ -74,6 +75,9 @@ class NoVisualization(object):
     def draw_trackers(self, trackers):
         pass
 
+    def show_fps(self):
+        pass
+
     def run(self, frame_callback):
         while self.frame_idx <= self.last_idx:
             frame_callback(self, self.frame_idx)
@@ -89,20 +93,23 @@ class Visualization(object):
         image_shape = seq_info["image_size"][::-1]
         aspect_ratio = float(image_shape[1]) / image_shape[0]
         image_shape = 1024, int(aspect_ratio * 1024)
+
         self.viewer = ImageViewer(
             update_ms, image_shape, "Figure %s" % seq_info["sequence_name"])
         self.viewer.thickness = 2
-        self.frame_idx = seq_info["min_frame_idx"]
-        self.last_idx = seq_info["max_frame_idx"]
+        self.__frame_idx = seq_info["min_frame_idx"]
+        self.__last_idx = seq_info["max_frame_idx"]
+
+        self.__last_update_time = None
 
     def run(self, frame_callback):
         self.viewer.run(lambda: self._update_fun(frame_callback))
 
     def _update_fun(self, frame_callback):
-        if self.frame_idx > self.last_idx:
+        if self.__frame_idx > self.__last_idx:
             return False  # Terminate
-        frame_callback(self, self.frame_idx)
-        self.frame_idx += 1
+        frame_callback(self, self.__frame_idx)
+        self.__frame_idx += 1
         return True
 
     def set_image(self, image):
@@ -132,4 +139,17 @@ class Visualization(object):
                 *track.to_tlwh().astype(np.int32), label=str(track.track_id))
             # self.viewer.gaussian(track.mean[:2], track.covariance[:2, :2],
             #                      label="%d" % track.track_id)
-#
+
+    def show_fps(self):
+        current_time = time.time()
+
+        if self.__last_update_time is not None:
+            elapsed_time = current_time - self.__last_update_time
+
+            self.viewer.color = (0, 0, 0)
+            self.viewer.thickness = -1
+            self.viewer.rectangle(0, 25, 150, 25)
+            self.viewer.text_color = (255, 255, 255)
+            self.viewer.text(0, 50, f"FPS: {round(1.0 / elapsed_time)}")
+
+        self.__last_update_time = current_time

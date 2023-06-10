@@ -209,7 +209,7 @@ class ImageViewer(object):
             cv2.putText(self.image, label, center, cv2.FONT_HERSHEY_PLAIN,
                         2, self.text_color, 2)
 
-    def annotate(self, x, y, text):
+    def text(self, x, y, text):
         """Draws a text string at a given location.
 
         Parameters
