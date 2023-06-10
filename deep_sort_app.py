@@ -9,9 +9,7 @@ import numpy as np
 from app import preprocessing
 from app import visualization
 from deep_sort import nn_matching
-from deep_sort.detector.detection import Detection
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
-from utils.geometry.rect import Rect
 from deep_sort.tracker import Tracker
 
 
@@ -133,10 +131,12 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
     results = []
 
     def frame_callback(vis, frame_idx):
+        image = cv2.imread(seq_info["image_filenames"][frame_idx], cv2.IMREAD_COLOR)
+
         print("Processing frame %05d" % frame_idx)
 
         # Load image and generate detections.
-        detections = detections_provider.load_detections(frame_idx, min_detection_height)
+        detections = detections_provider.load_detections(image, frame_idx, min_detection_height)
         detections = [d for d in detections if d.confidence >= min_confidence]
 
         # Run non-maxima suppression.
@@ -152,8 +152,6 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
 
         # Update visualization.
         if display:
-            image = cv2.imread(
-                seq_info["image_filenames"][frame_idx], cv2.IMREAD_COLOR)
             vis.set_image(image.copy())
             vis.draw_detections(detections)
             vis.draw_trackers(tracker.tracks)
