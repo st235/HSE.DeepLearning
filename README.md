@@ -1,11 +1,11 @@
 # Deep SORT
 
 ## Introduction
-
 This repository contains code for *Simple Online and Realtime Tracking with a Deep Association Metric* (Deep SORT).
 We extend the original [SORT](https://github.com/abewley/sort) algorithm to
 integrate appearance information based on a deep appearance descriptor.
 See the [arXiv preprint](https://arxiv.org/abs/1703.07402) for more information.
+
 
 ## Dependencies
 
@@ -18,26 +18,9 @@ needed to run the tracker:
 
 Additionally, feature generation requires TensorFlow (>= 1.0).
 
-## Installation
+## Running
 
-First, clone the repository:
-```
-git clone https://github.com/nwojke/deep_sort.git
-```
-Then, download pre-generated detections and the CNN checkpoint file from
-[here](https://drive.google.com/open?id=18fKzfqnqhqW3s9zwsCbnVJ5XF2JFeqMp).
-
-*NOTE:* The candidate object locations of our pre-generated detections are
-taken from the following paper:
-```
-F. Yu, W. Li, Q. Li, Y. Liu, X. Shi, J. Yan. POI: Multiple Object Tracking with
-High Performance Detection and Appearance Feature. In BMTT, SenseTime Group
-Limited, 2016.
-```
-We have replaced the appearance descriptor with a custom deep convolutional
-neural network (see below).
-
-## Running the tracker
+### 
 
 The following example starts the tracker on one of the
 [MOT16 benchmark](https://motchallenge.net/data/MOT16/)
@@ -92,7 +75,7 @@ some cases.
 
 To train the deep association metric model we used a novel [cosine metric learning](https://github.com/nwojke/cosine_metric_learning) approach which is provided as a separate repository.
 
-## Highlevel overview of source files
+## Overview of source files
 
 In the top-level directory are executable scripts to execute, evaluate, and
 visualize the tracker. The main entry point is in `deep_sort_app.py`.
@@ -116,26 +99,49 @@ files. These can be computed from MOTChallenge detections using
 `generate_detections.py`. We also provide
 [pre-generated detections](https://drive.google.com/open?id=1VVqtL0klSUvLnmBKS89il1EKC3IxUBVK).
 
-## Citing DeepSORT
+### Detection logic
 
-If you find this repo useful in your research, please consider citing the following papers:
+Detect
 
-    @inproceedings{Wojke2017simple,
-      title={Simple Online and Realtime Tracking with a Deep Association Metric},
-      author={Wojke, Nicolai and Bewley, Alex and Paulus, Dietrich},
-      booktitle={2017 IEEE International Conference on Image Processing (ICIP)},
-      year={2017},
-      pages={3645--3649},
-      organization={IEEE},
-      doi={10.1109/ICIP.2017.8296962}
-    }
+#### Nanodet
 
-    @inproceedings{Wojke2018deep,
-      title={Deep Cosine Metric Learning for Person Re-identification},
-      author={Wojke, Nicolai and Bewley, Alex},
-      booktitle={2018 IEEE Winter Conference on Applications of Computer Vision (WACV)},
-      year={2018},
-      pages={748--756},
-      organization={IEEE},
-      doi={10.1109/WACV.2018.00087}
-    }
+[NanodetDetectionsProvider](./deep_sort/detector/nanodet_detections_provider.py) is using [Nanodet](https://github.com/RangiLyu/nanodet) model.
+
+The library should be installed and available in order to run this code. To do so you need
+
+1. Clone the repository
+2. Setup the library calling `python setup.py develop` in the root of the project
+
+The library does not work on MacOS. In order to make it work you need to patch some files in the original code.
+Here is the patch that you can apply on your code
+
+```
+diff --git a/nanodet/model/arch/one_stage_detector.py b/nanodet/model/arch/one_stage_detector.py
+index 6b0a098..e791d9f 100644
+--- a/nanodet/model/arch/one_stage_detector.py
++++ b/nanodet/model/arch/one_stage_detector.py
+@@ -47,14 +47,14 @@ class OneStageDetector(nn.Module):
+ 
+     def inference(self, meta):
+         with torch.no_grad():
+-            torch.cuda.synchronize()
++            # torch.cuda.synchronize()
+             time1 = time.time()
+             preds = self(meta["img"])
+-            torch.cuda.synchronize()
++            # torch.cuda.synchronize()
+             time2 = time.time()
+             print("forward time: {:.3f}s".format((time2 - time1)), end=" | ")
+             results = self.head.post_process(preds, meta)
+-            torch.cuda.synchronize()
++            # torch.cuda.synchronize()
+             print("decode time: {:.3f}s".format((time.time() - time2)), end=" | ")
+         return results
+```
+
+
+
+## Acknowledgement
+
+Project is based on a [DeepSort algorithm implementation](https://github.com/nwojke/deep_sort) originally proposed in ["Simple Online and Realtime Tracking with a Deep Association Metric"](https://arxiv.org/abs/1703.07402).
+The original project is licensed under Gnu General Public License.
