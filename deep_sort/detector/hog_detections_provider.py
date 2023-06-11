@@ -3,7 +3,7 @@ import numpy as np
 
 from deep_sort.detector.detection import Detection
 from deep_sort.detector.detections_provider import DetectionsProvider
-from utils.geometry.rect import Rect
+from deep_sort.utils.geometry.rect import Rect
 
 
 class HogDetectionsProvider(DetectionsProvider):

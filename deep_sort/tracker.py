@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import numpy as np
 from . import kalman_filter
 from . import linear_assignment
-from utils.geometry import iou_utils
+from .utils.geometry import iou_utils
 from .track import Track
 
 

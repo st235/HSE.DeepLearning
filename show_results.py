@@ -5,8 +5,8 @@ import numpy as np
 
 import deep_sort_app
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
-from utils.geometry.iou_utils import iou
-from utils.geometry.rect import Rect
+from deep_sort.utils.geometry.iou_utils import iou
+from deep_sort.utils.geometry.rect import Rect
 from app import visualization
 
 
