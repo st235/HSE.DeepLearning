@@ -1,0 +1,3 @@
+[submodule "depdendencies/yolov5"]
+	path = depdendencies/yolov5
+	url = https://github.com/ultralytics/yolov5
