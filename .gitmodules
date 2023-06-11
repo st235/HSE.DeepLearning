@@ -1,6 +1,6 @@
-[submodule "depdendencies/yolov5"]
-	path = depdendencies/yolov5
+[submodule "dependencies/yolov5"]
+	path = dependencies/yolov5
 	url = https://github.com/ultralytics/yolov5
-[submodule "depdendencies/nanodet"]
-	path = depdendencies/nanodet
+[submodule "dependencies/nanodet"]
+	path = dependencies/nanodet
 	url = git@github.com:st235/nanodet.git

@@ -1,6 +1,6 @@
 import numpy as np
 
-from depdendencies.definitions import fetch_model
+from dependencies.definitions import fetch_model
 
 from deep_sort.detector.detection import Detection
 from deep_sort.detector.detections_provider import DetectionsProvider
