@@ -10,7 +10,7 @@ from nanodet.util import Logger, cfg, load_config, load_model_weight
 
 from deep_sort.detector.detection import Detection
 from deep_sort.detector.detections_provider import DetectionsProvider
-from deep_sort.detector.nanodet.nanodet_model import NanoDetPaths
+from depdendencies.nanodet_binaries.nanodet_model import NanoDetPaths
 from deep_sort.utils.torch_utils import get_available_device
 from deep_sort.utils.geometry.rect import Rect
 

@@ -126,7 +126,7 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
 
     """
     # detections_provider = FileDetectionsProvider(detections_file_path=detection_file)
-    detections_provider: DetectionsProvider = YoloV5DetectionsProvider()
+    detections_provider: DetectionsProvider = NanodetDetectionsProvider()
 
     seq_info = gather_sequence_info(sequence_dir, detection_file)
     metric = nn_matching.NearestNeighborDistanceMetric(

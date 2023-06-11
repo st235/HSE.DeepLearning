@@ -1,6 +1,6 @@
 import numpy as np
 
-from depdendencies.definitions import load_model
+from depdendencies.definitions import fetch_model
 
 from deep_sort.detector.detection import Detection
 from deep_sort.detector.detections_provider import DetectionsProvider
@@ -19,8 +19,8 @@ class YoloV5DetectionsProvider(DetectionsProvider):
     """
 
     def __init__(self):
-        self.__model = load_model('yolov5',
-                                  model_path='yolov5_binaries/yolov5n.pt')
+        self.__model = fetch_model('yolov5',
+                                   model_path='yolov5_binaries/yolov5n.pt')
 
     def load_detections(self,
                         frame_image: np.ndarray,
