@@ -13,6 +13,7 @@ from deep_sort.detector.detections_provider import DetectionsProvider
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from deep_sort.detector.nanodet_detections_provider import NanodetDetectionsProvider
 from deep_sort.detector.yolov5_detections_provider import YoloV5DetectionsProvider
+from deep_sort.detector.mmdetection_detections_provider import MmdetectionDetectionsProvider
 from deep_sort.tracker import Tracker
 
 
@@ -126,7 +127,7 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
 
     """
     # detections_provider = FileDetectionsProvider(detections_file_path=detection_file)
-    detections_provider: DetectionsProvider = NanodetDetectionsProvider()
+    detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detection_file)
 
     seq_info = gather_sequence_info(sequence_dir, detection_file)
     metric = nn_matching.NearestNeighborDistanceMetric(

@@ -13,6 +13,10 @@ def load_module(module: str):
     sys.path.append(__get_dependency_folder(module))
 
 
+def get_file_path(*paths) -> str:
+    return os.path.join(_DIRECTORY_CURRENT, *paths)
+
+
 def fetch_model(dependency_name: str, model_path: str):
     return torch.hub.load(__get_dependency_folder(dependency_name), 'custom',
                           source='local',

@@ -4,3 +4,6 @@
 [submodule "dependencies/nanodet"]
 	path = dependencies/nanodet
 	url = git@github.com:st235/nanodet.git
+[submodule "dependencies/mmdetection"]
+	path = dependencies/mmdetection
+	url = https://github.com/open-mmlab/mmdetection.git
