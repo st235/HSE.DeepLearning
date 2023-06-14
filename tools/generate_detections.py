@@ -3,7 +3,8 @@ import errno
 import argparse
 import numpy as np
 import cv2
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 
 def _run_in_batches(f, data_dict, out, batch_size):
@@ -147,6 +148,10 @@ def _generate_detections(encoder, mot_dir, output_dir, detection_dir=None):
     for sequence in os.listdir(mot_dir):
         print("Processing %s" % sequence)
         sequence_dir = os.path.join(mot_dir, sequence)
+
+        if not os.path.isdir(sequence_dir):
+            # Filter out hidden files, like, system ones.
+            continue
 
         image_dir = os.path.join(sequence_dir, "img1")
         image_filenames = {
