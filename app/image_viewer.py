@@ -82,7 +82,7 @@ class ImageViewer(object):
         drawing routines of this class. Internally, the image is treated as
         beeing in BGR color space.
 
-        Note that the image is resized to the the image viewers window_shape
+        Note that the image is resized to the image viewers window_shape
         just prior to visualization. Therefore, you may pass differently sized
         images and call drawing routines with the appropriate, original point
         coordinates.

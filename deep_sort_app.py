@@ -6,14 +6,10 @@ import os
 import cv2
 import numpy as np
 
-from app import preprocessing
 from app import visualization
-from deep_sort import nn_matching
+from deep_sort import nn_matching, preprocessing
 from deep_sort.detector.detections_provider import DetectionsProvider
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
-from deep_sort.detector.nanodet_detections_provider import NanodetDetectionsProvider
-from deep_sort.detector.yolov5_detections_provider import YoloV5DetectionsProvider
-from deep_sort.detector.mmdetection_detections_provider import MmdetectionDetectionsProvider
 from deep_sort.tracker import Tracker
 
 
