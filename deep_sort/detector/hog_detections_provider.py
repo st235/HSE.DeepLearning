@@ -17,14 +17,14 @@ class HogDetectionsProvider(DetectionsProvider):
         self.__hog.setSVMDetector(svm_people_detector)
 
     def load_detections(self,
-                        frame_image: np.ndarray,
-                        frame_index: int,
+                        image: np.ndarray,
+                        frame_id: str,
                         min_height: int = 0) -> list[Detection]:
         """Creates detections for given image.
         """
         detection_list = []
 
-        (humans, _) = self.__hog.detectMultiScale(frame_image, winStride=(15, 15), padding=(32, 32), scale=1.1)
+        (humans, _) = self.__hog.detectMultiScale(image, winStride=(15, 15), padding=(32, 32), scale=1.1)
 
         # loop over all detected humans
         for (x, y, w, h) in humans:

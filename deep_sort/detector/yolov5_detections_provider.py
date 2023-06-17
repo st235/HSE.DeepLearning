@@ -23,10 +23,10 @@ class YoloV5DetectionsProvider(DetectionsProvider):
                                    model_path='yolov5_binaries/yolov5n.pt')
 
     def load_detections(self,
-                        frame_image: np.ndarray,
-                        frame_index: int,
+                        image: np.ndarray,
+                        frame_id: str,
                         min_height: int = 0) -> list[Detection]:
-        results = self.__model(frame_image)
+        results = self.__model(image)
         detection_list = []
 
         for obj in results.pred[0]:

@@ -38,10 +38,10 @@ class NanodetDetectionsProvider(DetectionsProvider):
         self.__pipeline = Pipeline(cfg.data.val.pipeline, cfg.data.val.keep_ratio)
 
     def load_detections(self,
-                        frame_image: np.ndarray,
-                        frame_index: int,
+                        image: np.ndarray,
+                        frame_id: str,
                         min_height: int = 0) -> list[Detection]:
-        meta, results = self.__inference(frame_image)
+        meta, results = self.__inference(image)
 
         person_index = cfg.class_names.index('person')
 

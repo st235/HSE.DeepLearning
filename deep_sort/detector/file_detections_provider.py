@@ -19,14 +19,14 @@ class FileDetectionsProvider(DetectionsProvider):
         self.__detections = np.load(self.__detections_file_path)
 
     def load_detections(self,
-                        frame_image: np.ndarray,
-                        frame_index: int,
+                        image: np.ndarray,
+                        frame_id: str,
                         min_height: int = 0) -> list[Detection]:
         """Creates detections for given frame index from the file on disk.
 
         Parameters
         ----------
-        frame_index : int
+        frame_id : int
             The frame index.
         min_height : Optional[int]
             A minimum detection bounding box height. Detections that are smaller
@@ -39,7 +39,7 @@ class FileDetectionsProvider(DetectionsProvider):
 
         """
         frame_indices = self.__detections[:, 0].astype(np.int32)
-        mask = frame_indices == frame_index
+        mask = frame_indices == int(frame_id)
 
         detection_list = []
         for row in self.__detections[mask]:

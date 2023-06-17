@@ -82,9 +82,20 @@ class Rect(object):
 
     @property
     def area(self) -> float:
-        return self.width * self.height
+        return self.__width * self.__height
 
-    def check_if_intersects(self, that: Rect):
+    def inset(self,
+              left: float, top: float,
+              right: float, bottom: float) -> Rect:
+        assert left >= 0
+        assert top >= 0
+        assert right >= 0
+        assert bottom >= 0
+
+        return Rect(left=self.__left - left, top=self.__top - top,
+                    width=self.__width + left + right, height=self.__height + top + bottom)
+
+    def check_if_intersects(self, that: Rect) -> bool:
         return self.__check_if_lines_intersect(self.left, self.right, that.left, that.right) and \
             self.__check_if_lines_intersect(self.top, self.bottom, that.top, that.bottom)
 

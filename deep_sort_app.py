@@ -1,10 +1,10 @@
 from __future__ import division, print_function, absolute_import
 
 import argparse
-import cv2
 import numpy as np
 
-from app import visualization
+from app.app import App
+from app.visualization import Visualization
 from challenge.mot_challenge_descriptor import MotChallengeDescriptor
 from deep_sort import nn_matching, preprocessing
 from deep_sort.detector.detections_provider import DetectionsProvider
@@ -48,19 +48,15 @@ def run(sequence_directory: str,
     challenge_descriptor = MotChallengeDescriptor.load(sequence_directory)
     detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detections_file)
 
+    app = App(challenge_descriptor)
+
     metric = nn_matching.NearestNeighborDistanceMetric(
         "cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
     results = []
 
-    def frame_callback(vis, frame_idx):
-        image_files = challenge_descriptor.images_files
-        image = cv2.imread(image_files[frame_idx], cv2.IMREAD_COLOR)
-
-        print("Processing frame %05d" % frame_idx)
-
-        # Load image and generate detections.
-        detections = detections_provider.load_detections(image, frame_idx, min_detection_height)
+    def frame_callback(image: np.ndarray, visualisation: Visualization):
+        detections = detections_provider.load_detections(image, visualisation.frame_id, min_detection_height)
         detections = [d for d in detections if d.confidence >= min_confidence]
 
         # Run non-maxima suppression.
@@ -75,10 +71,8 @@ def run(sequence_directory: str,
         tracker.update(detections)
 
         # Update visualization.
-        vis.set_image(image.copy())
-        vis.draw_detections(detections)
-        vis.draw_trackers(tracker.tracks)
-        vis.show_fps()
+        visualisation.draw_detections(detections)
+        visualisation.draw_trackers(tracker.tracks)
 
         # Store results.
         for track in tracker.tracks:
@@ -86,16 +80,16 @@ def run(sequence_directory: str,
                 continue
             bbox = track.to_tlwh()
             results.append([
-                frame_idx, track.track_id, bbox[0], bbox[1], bbox[2], bbox[3]])
+                visualisation.frame_id, track.track_id, bbox[0], bbox[1], bbox[2], bbox[3]])
 
-    # Run tracker.
-    visualizer = visualization.Visualization(challenge_descriptor=challenge_descriptor, update_ms=5)
-    visualizer.run(frame_callback)
+    # Run the app.
+    app.display_fps()
+    app.start(frame_callback)
 
     # Store results.
     f = open(output_file, 'w')
     for row in results:
-        print('%d,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1' % (
+        print('%s,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1' % (
             row[0], row[1], row[2], row[3], row[4], row[5]), file=f)
 
 
@@ -142,7 +136,6 @@ def _parse_args():
 
 if __name__ == "__main__":
     args = _parse_args()
-    run(
-        args.sequence_dir, args.detection_file, args.output_file,
+    run(args.sequence_dir, args.detection_file, args.output_file,
         args.min_confidence, args.nms_max_overlap, args.min_detection_height,
         args.max_cosine_distance, args.nn_budget)

@@ -1,159 +1,106 @@
-import time
-import colorsys
 import numpy as np
 
-from app.image_viewer import ImageViewer
-from challenge.mot_challenge_descriptor import MotChallengeDescriptor
-
-
-def _create_unique_color_float(tag, hue_step=0.41):
-    """Create a unique RGB color code for a given track id (tag).
-
-    The color code is generated in HSV color space by moving along the
-    hue angle and gradually changing the saturation.
-
-    Parameters
-    ----------
-    tag : int
-        The unique target identifying tag.
-    hue_step : float
-        Difference between two neighboring color codes in HSV space (more
-        specifically, the distance in hue channel).
-
-    Returns
-    -------
-    (float, float, float)
-        RGB color code in range [0, 1]
-
-    """
-    h, v = (tag * hue_step) % 1, 1. - (int(tag * hue_step) % 4) / 5.
-    r, g, b = colorsys.hsv_to_rgb(h, 1., v)
-    return r, g, b
-
-
-def _create_unique_color_uchar(tag, hue_step=0.41):
-    """Create a unique RGB color code for a given track id (tag).
-
-    The color code is generated in HSV color space by moving along the
-    hue angle and gradually changing the saturation.
-
-    Parameters
-    ----------
-    tag : int
-        The unique target identifying tag.
-    hue_step : float
-        Difference between two neighboring color codes in HSV space (more
-        specifically, the distance in hue channel).
-
-    Returns
-    -------
-    (int, int, int)
-        RGB color code in range [0, 255]
-
-    """
-    r, g, b = _create_unique_color_float(tag, hue_step)
-    return int(255 * r), int(255 * g), int(255 * b)
-
-
-class NoVisualization(object):
-    """
-    A dummy visualization object that loops through all frames in a given
-    sequence to update the tracker without performing any visualization.
-    """
-
-    def __init__(self, challenge_descriptor: MotChallengeDescriptor):
-        self.frame_idx = 1
-        self.last_idx = challenge_descriptor.sequence_size
-
-    def set_image(self, image):
-        pass
-
-    def draw_groundtruth(self, track_ids, boxes):
-        pass
-
-    def draw_detections(self, detections):
-        pass
-
-    def draw_trackers(self, trackers):
-        pass
-
-    def show_fps(self):
-        pass
-
-    def run(self, frame_callback):
-        while self.frame_idx <= self.last_idx:
-            frame_callback(self, self.frame_idx)
-            self.frame_idx += 1
+from app.drawing.color import Color
+from app.drawing.drawing_context import DrawingContext
+from app.drawing.paint import Paint
 
 
 class Visualization(object):
-    """
-    This class shows tracking output in an OpenCV image viewer.
+    """Draws tacking output on the given image.
     """
 
     def __init__(self,
-                 challenge_descriptor: MotChallengeDescriptor,
-                 update_ms: float):
-        image_shape = challenge_descriptor.image_size[::-1]
-        aspect_ratio = float(image_shape[1]) / image_shape[0]
-        image_shape = 1024, int(aspect_ratio * 1024)
+                 frame_id: str,
+                 image: np.ndarray):
+        self.__paint = Paint()
+        self.__frame_id = frame_id
+        self.__drawing_context = DrawingContext(image=image)
 
-        self.viewer = ImageViewer(
-            update_ms, image_shape, "Figure %s" % challenge_descriptor.name)
-        self.viewer.thickness = 2
-        self.__frame_idx = 1
-        self.__last_idx = challenge_descriptor.sequence_size
+    @property
+    def frame_id(self) -> str:
+        return self.__frame_id
 
-        self.__last_update_time = None
+    @property
+    def image(self) -> np.ndarray:
+        return self.__drawing_context.image
 
-    def run(self, frame_callback):
-        self.viewer.run(lambda: self._update_fun(frame_callback))
+    def __draw_label_with_bounding_box(self,
+                                       label: str,
+                                       x: int, y: int,
+                                       padding: int,
+                                       text_thickness: int,
+                                       text_size: float,
+                                       color: Color):
+        self.__paint.color = color
 
-    def _update_fun(self, frame_callback):
-        if self.__frame_idx > self.__last_idx:
-            return False  # Terminate
-        frame_callback(self, self.__frame_idx)
-        self.__frame_idx += 1
-        return True
+        self.__paint.style = Paint.Style.STROKE
+        self.__paint.thickness = text_thickness
+        self.__paint.text_size = text_size
+        label_width, label_height = self.__paint.measure_text(label)
+        label_x, label_y = x + padding, y + padding + label_height
 
-    def set_image(self, image):
-        self.viewer.image = image
+        width = label_width + 2 * padding
+        height = label_height + 2 * padding
 
-    def draw_groundtruth(self, track_ids, boxes):
-        self.viewer.thickness = 2
+        # Draws bounding box.
+        self.__paint.style = Paint.Style.FILL
+        self.__paint.thickness = 3
+        self.__drawing_context.rectangle(x, y, width, height, self.__paint)
+
+        self.__paint.style = Paint.Style.STROKE
+        self.__paint.color = Color(red=255, green=255, blue=255)
+        self.__paint.thickness = text_thickness
+        self.__paint.text_size = text_size
+        self.__drawing_context.text(label_x, label_y, label, self.__paint)
+
+    def __draw_track(self,
+                     track_id: int,
+                     box: np.ndarray):
+        track_color: Color = Color.create_unique(track_id)
+
+        # Draws detection rectangle.
+        detection_x, detection_y, detection_width, detection_height = box.astype(np.int32)
+
+        self.__paint.style = Paint.Style.STROKE
+        self.__paint.color = track_color
+        self.__paint.thickness = 3
+        self.__drawing_context.rectangle(detection_x, detection_y, detection_width, detection_height, self.__paint)
+
+        # Draws label rectangle.
+        self.__draw_label_with_bounding_box(label=str(track_id),
+                                            x=detection_x, y=detection_y,
+                                            padding=5,
+                                            text_thickness=2,
+                                            text_size=1.1,
+                                            color=track_color)
+
+    def draw_ground_truth(self, track_ids, boxes):
         for track_id, box in zip(track_ids, boxes):
-            self.viewer.color = _create_unique_color_uchar(track_id)
-            self.viewer.rectangle(*box.astype(np.int32), label=str(track_id))
+            self.__draw_track(track_id, box)
 
     def draw_detections(self, detections):
-        self.viewer.thickness = 2
-        self.viewer.color = 0, 0, 255
+        self.__paint.style = Paint.Style.STROKE
+        self.__paint.thickness = 3
+        self.__paint.color = Color(red=0, green=0, blue=255)
         for i, detection in enumerate(detections):
             detection_origin = detection.origin
-            self.viewer.rectangle(detection_origin.left, detection_origin.top,
-                                  detection_origin.width, detection_origin.height)
+            self.__drawing_context.rectangle(int(detection_origin.left), int(detection_origin.top),
+                                             int(detection_origin.width), int(detection_origin.height),
+                                             self.__paint)
 
     def draw_trackers(self, tracks):
-        self.viewer.thickness = 2
         for track in tracks:
             if not track.is_confirmed() or track.time_since_update > 0:
                 continue
-            self.viewer.color = _create_unique_color_uchar(track.track_id)
-            self.viewer.rectangle(
-                *track.to_tlwh().astype(np.int32), label=str(track.track_id))
-            # self.viewer.gaussian(track.mean[:2], track.covariance[:2, :2],
-            #                      label="%d" % track.track_id)
 
-    def show_fps(self):
-        current_time = time.time()
+            self.__draw_track(track.track_id, track.to_tlwh())
 
-        if self.__last_update_time is not None:
-            elapsed_time = current_time - self.__last_update_time
-
-            self.viewer.color = (0, 0, 0)
-            self.viewer.thickness = -1
-            self.viewer.rectangle(0, 25, 150, 25)
-            self.viewer.text_color = (255, 255, 255)
-            self.viewer.text(0, 50, f"FPS: {round(1.0 / elapsed_time)}")
-
-        self.__last_update_time = current_time
+    def draw_info(self, info: str):
+        background_color = Color(red=0, green=0, blue=0)
+        # Draws label rectangle.
+        self.__draw_label_with_bounding_box(label=info,
+                                            x=25, y=25,
+                                            padding=5,
+                                            text_thickness=2,
+                                            text_size=2,
+                                            color=background_color)

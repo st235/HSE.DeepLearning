@@ -27,10 +27,10 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
             get_file_path('mmdetection_binaries', 'dynamic_rcnn_r50_fpn_1x.pth'), device='cpu')
 
     def load_detections(self,
-                        frame_image: np.ndarray,
-                        frame_index: int,
+                        image: np.ndarray,
+                        frame_id: str,
                         min_height: int = 0) -> list[Detection]:
-        results = inference_detector(self.__model, frame_image)
+        results = inference_detector(self.__model, image)
         detection_list = []
 
         predictions = results.pred_instances

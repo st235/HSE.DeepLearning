@@ -3,7 +3,9 @@ import argparse
 import cv2
 import numpy as np
 
-from app import visualization
+from app.app import App
+from app.visualization import Visualization
+from app.window.virtual_window import VirtualWindow
 from challenge.mot_challenge_descriptor import MotChallengeDescriptor
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from deep_sort.utils.geometry.iou_utils import iou
@@ -43,27 +45,24 @@ def run(sequence_directory: str,
     detections_provider = FileDetectionsProvider(detections_file)
     results = np.loadtxt(result_file, delimiter=',')
 
+    app = App(challenge_descriptor, window=VirtualWindow())
+
     if show_false_alarms and challenge_descriptor.ground_truth is None:
-        raise ValueError("No groundtruth available. Cannot show false alarms.")
+        raise ValueError("No ground truth available. Cannot show false alarms.")
 
-    def frame_callback(vis, frame_idx):
-        image_files = challenge_descriptor.images_files
-        image = cv2.imread(image_files[frame_idx], cv2.IMREAD_COLOR)
-
-        vis.set_image(image.copy())
-
+    def frame_callback(image: np.ndarray, visualisation: Visualization):
         if detections_file is not None:
-            detections = detections_provider.load_detections(image, frame_idx)
-            vis.draw_detections(detections)
+            detections = detections_provider.load_detections(image, visualisation.frame_id)
+            visualisation.draw_detections(detections)
 
-        mask = results[:, 0].astype(np.int32) == frame_idx
+        mask = results[:, 0].astype(np.int32) == int(visualisation.frame_id)
         track_ids = results[mask, 1].astype(np.int32)
         boxes = results[mask, 2:6]
-        vis.draw_groundtruth(track_ids, boxes)
+        visualisation.draw_ground_truth(track_ids, boxes)
 
         if show_false_alarms:
             ground_truth = challenge_descriptor.ground_truth
-            mask = ground_truth[:, 0].astype(np.int32) == frame_idx
+            mask = ground_truth[:, 0].astype(np.int32) == int(visualisation.frame_id)
             gt_boxes = [Rect.from_tlwh(candidate) for candidate in ground_truth[mask, 2:6]]
             for box in boxes:
                 # NOTE(nwojke): This is not strictly correct, because we don't

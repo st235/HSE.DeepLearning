@@ -13,17 +13,17 @@ class DetectionsProvider(object):
     """
 
     def load_detections(self,
-                        frame_image: np.ndarray,
-                        frame_index: int,
+                        image: np.ndarray,
+                        frame_id: str,
                         min_height: int = 0) -> list[Detection]:
         """Creates detections for given frame index from the file on disk.
 
         Parameters
         ----------
-        frame_image: np.ndarray
+        image: np.ndarray
             Current frame with detections
-        frame_index : int
-            The frame index.
+        frame_id : str
+            The frame id, should be unique.
         min_height : Optional[int]
             A minimum detection bounding box height. Detections that are smaller
             than this value are disregarded.
