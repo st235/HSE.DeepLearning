@@ -1,7 +1,9 @@
 import time
 import colorsys
 import numpy as np
-from .image_viewer import ImageViewer
+
+from app.image_viewer import ImageViewer
+from challenge.mot_challenge_descriptor import MotChallengeDescriptor
 
 
 def _create_unique_color_float(tag, hue_step=0.41):
@@ -50,7 +52,7 @@ def _create_unique_color_uchar(tag, hue_step=0.41):
 
     """
     r, g, b = _create_unique_color_float(tag, hue_step)
-    return int(255*r), int(255*g), int(255*b)
+    return int(255 * r), int(255 * g), int(255 * b)
 
 
 class NoVisualization(object):
@@ -59,9 +61,9 @@ class NoVisualization(object):
     sequence to update the tracker without performing any visualization.
     """
 
-    def __init__(self, seq_info):
-        self.frame_idx = seq_info["min_frame_idx"]
-        self.last_idx = seq_info["max_frame_idx"]
+    def __init__(self, challenge_descriptor: MotChallengeDescriptor):
+        self.frame_idx = 1
+        self.last_idx = challenge_descriptor.sequence_size
 
     def set_image(self, image):
         pass
@@ -89,16 +91,18 @@ class Visualization(object):
     This class shows tracking output in an OpenCV image viewer.
     """
 
-    def __init__(self, seq_info, update_ms):
-        image_shape = seq_info["image_size"][::-1]
+    def __init__(self,
+                 challenge_descriptor: MotChallengeDescriptor,
+                 update_ms: float):
+        image_shape = challenge_descriptor.image_size[::-1]
         aspect_ratio = float(image_shape[1]) / image_shape[0]
         image_shape = 1024, int(aspect_ratio * 1024)
 
         self.viewer = ImageViewer(
-            update_ms, image_shape, "Figure %s" % seq_info["sequence_name"])
+            update_ms, image_shape, "Figure %s" % challenge_descriptor.name)
         self.viewer.thickness = 2
-        self.__frame_idx = seq_info["min_frame_idx"]
-        self.__last_idx = seq_info["max_frame_idx"]
+        self.__frame_idx = 1
+        self.__last_idx = challenge_descriptor.sequence_size
 
         self.__last_update_time = None
 

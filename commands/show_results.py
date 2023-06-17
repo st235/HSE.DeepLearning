@@ -3,29 +3,33 @@ import argparse
 import cv2
 import numpy as np
 
-import deep_sort_app
+from app import visualization
+from challenge.mot_challenge_descriptor import MotChallengeDescriptor
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from deep_sort.utils.geometry.iou_utils import iou
 from deep_sort.utils.geometry.rect import Rect
-from app import visualization
-
+from typing import Optional
 
 DEFAULT_UPDATE_MS = 20
 
 
-def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
-        update_ms=None, video_filename=None):
+def run(sequence_directory: str,
+        result_file: str,
+        show_false_alarms: bool = False,
+        detections_file: Optional[str] = None,
+        update_ms: Optional[int] = None,
+        video_filename: Optional[str] = None):
     """Run tracking result visualization.
 
     Parameters
     ----------
-    sequence_dir : str
+    sequence_directory : str
         Path to the MOTChallenge sequence directory.
     result_file : str
         Path to the tracking output file in MOTChallenge ground truth format.
     show_false_alarms : Optional[bool]
         If True, false alarms are highlighted as red boxes.
-    detection_file : Optional[str]
+    detections_file : Optional[str]
         Path to the detection file.
     update_ms : Optional[int]
         Number of milliseconds between cosecutive frames. Defaults to (a) the
@@ -35,22 +39,21 @@ def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
         If not None, a video of the tracking results is written to this file.
 
     """
-    detections_provider = FileDetectionsProvider(detection_file)
-    seq_info = deep_sort_app.gather_sequence_info(sequence_dir, detection_file)
+    challenge_descriptor = MotChallengeDescriptor.load(sequence_directory)
+    detections_provider = FileDetectionsProvider(detections_file)
     results = np.loadtxt(result_file, delimiter=',')
 
-    if show_false_alarms and seq_info["groundtruth"] is None:
+    if show_false_alarms and challenge_descriptor.ground_truth is None:
         raise ValueError("No groundtruth available. Cannot show false alarms.")
 
     def frame_callback(vis, frame_idx):
-        print("Frame idx", frame_idx)
-        image = cv2.imread(
-            seq_info["image_filenames"][frame_idx], cv2.IMREAD_COLOR)
+        image_files = challenge_descriptor.images_files
+        image = cv2.imread(image_files[frame_idx], cv2.IMREAD_COLOR)
 
         vis.set_image(image.copy())
 
-        if seq_info["detections"] is not None:
-            detections = detections_provider.load_detections(frame_idx)
+        if detections_file is not None:
+            detections = detections_provider.load_detections(image, frame_idx)
             vis.draw_detections(detections)
 
         mask = results[:, 0].astype(np.int32) == frame_idx
@@ -59,9 +62,9 @@ def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
         vis.draw_groundtruth(track_ids, boxes)
 
         if show_false_alarms:
-            groundtruth = seq_info["groundtruth"]
-            mask = groundtruth[:, 0].astype(np.int32) == frame_idx
-            gt_boxes = [Rect.from_tlwh(candidate) for candidate in groundtruth[mask, 2:6]]
+            ground_truth = challenge_descriptor.ground_truth
+            mask = ground_truth[:, 0].astype(np.int32) == frame_idx
+            gt_boxes = [Rect.from_tlwh(candidate) for candidate in ground_truth[mask, 2:6]]
             for box in boxes:
                 # NOTE(nwojke): This is not strictly correct, because we don't
                 # solve the assignment problem here.
@@ -72,10 +75,10 @@ def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
                     vis.viewer.rectangle(*box.astype(np.int32))
 
     if update_ms is None:
-        update_ms = seq_info["update_ms"]
+        update_ms = challenge_descriptor.update_rate
     if update_ms is None:
         update_ms = DEFAULT_UPDATE_MS
-    visualizer = visualization.Visualization(seq_info, update_ms)
+    visualizer = visualization.Visualization(challenge_descriptor, update_ms)
     if video_filename is not None:
         visualizer.viewer.enable_videowriter(video_filename)
     visualizer.run(frame_callback)
@@ -96,7 +99,7 @@ def _parse_args():
         default=None)
     parser.add_argument(
         "--update_ms", help="Time between consecutive frames in milliseconds. "
-        "Defaults to the frame_rate specified in seqinfo.ini, if available.",
+                            "Defaults to the frame_rate specified in seqinfo.ini, if available.",
         default=None)
     parser.add_argument(
         "--output_file", help="Filename of the (optional) output video.",

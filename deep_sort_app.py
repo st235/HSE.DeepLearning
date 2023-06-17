@@ -1,106 +1,29 @@
 from __future__ import division, print_function, absolute_import
 
 import argparse
-import os
-
 import cv2
 import numpy as np
 
 from app import visualization
+from challenge.mot_challenge_descriptor import MotChallengeDescriptor
 from deep_sort import nn_matching, preprocessing
 from deep_sort.detector.detections_provider import DetectionsProvider
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from deep_sort.tracker import Tracker
+from typing import Optional
 
 
-def gather_sequence_info(sequence_dir, detection_file):
-    """Gather sequence information, such as image filenames, detections,
-    groundtruth (if available).
-
-    Parameters
-    ----------
-    sequence_dir : str
-        Path to the MOTChallenge sequence directory.
-    detection_file : str
-        Path to the detection file.
-
-    Returns
-    -------
-    Dict
-        A dictionary of the following sequence information:
-
-        * sequence_name: Name of the sequence
-        * image_filenames: A dictionary that maps frame indices to image
-          filenames.
-        * detections: A numpy array of detections in MOTChallenge format.
-        * groundtruth: A numpy array of ground truth in MOTChallenge format.
-        * image_size: Image size (height, width).
-        * min_frame_idx: Index of the first frame.
-        * max_frame_idx: Index of the last frame.
-
-    """
-    image_dir = os.path.join(sequence_dir, "img1")
-    image_filenames = {
-        int(os.path.splitext(f)[0]): os.path.join(image_dir, f)
-        for f in os.listdir(image_dir)}
-    groundtruth_file = os.path.join(sequence_dir, "gt/gt.txt")
-
-    detections = None
-    if detection_file is not None:
-        detections = np.load(detection_file)
-    groundtruth = None
-    if os.path.exists(groundtruth_file):
-        groundtruth = np.loadtxt(groundtruth_file, delimiter=',')
-
-    if len(image_filenames) > 0:
-        image = cv2.imread(next(iter(image_filenames.values())),
-                           cv2.IMREAD_GRAYSCALE)
-        image_size = image.shape
-    else:
-        image_size = None
-
-    if len(image_filenames) > 0:
-        min_frame_idx = min(image_filenames.keys())
-        max_frame_idx = max(image_filenames.keys())
-    else:
-        min_frame_idx = int(detections[:, 0].min())
-        max_frame_idx = int(detections[:, 0].max())
-
-    info_filename = os.path.join(sequence_dir, "seqinfo.ini")
-    if os.path.exists(info_filename):
-        with open(info_filename, "r") as f:
-            line_splits = [l.split('=') for l in f.read().splitlines()[1:]]
-            info_dict = dict(
-                s for s in line_splits if isinstance(s, list) and len(s) == 2)
-
-        update_ms = 1000 / int(info_dict["frameRate"])
-    else:
-        update_ms = None
-
-    feature_dim = detections.shape[1] - 10 if detections is not None else 0
-    seq_info = {
-        "sequence_name": os.path.basename(sequence_dir),
-        "image_filenames": image_filenames,
-        "groundtruth": groundtruth,
-        "image_size": image_size,
-        "min_frame_idx": min_frame_idx,
-        "max_frame_idx": max_frame_idx,
-        "feature_dim": feature_dim,
-        "update_ms": update_ms
-    }
-    return seq_info
-
-
-def run(sequence_dir, detection_file, output_file, min_confidence,
+def run(sequence_directory: str,
+        detections_file: str, output_file, min_confidence,
         nms_max_overlap, min_detection_height, max_cosine_distance,
         nn_budget):
     """Run multi-target tracker on a particular sequence.
 
     Parameters
     ----------
-    sequence_dir : str
+    sequence_directory : str
         Path to the MOTChallenge sequence directory.
-    detection_file : str
+    detections_file : str
         Path to the detections file.
     output_file : str
         Path to the tracking output file. This file will contain the tracking
@@ -122,17 +45,17 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
         If True, show visualization of intermediate tracking results.
 
     """
-    # detections_provider = FileDetectionsProvider(detections_file_path=detection_file)
-    detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detection_file)
+    challenge_descriptor = MotChallengeDescriptor.load(sequence_directory)
+    detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detections_file)
 
-    seq_info = gather_sequence_info(sequence_dir, detection_file)
     metric = nn_matching.NearestNeighborDistanceMetric(
         "cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
     results = []
 
     def frame_callback(vis, frame_idx):
-        image = cv2.imread(seq_info["image_filenames"][frame_idx], cv2.IMREAD_COLOR)
+        image_files = challenge_descriptor.images_files
+        image = cv2.imread(image_files[frame_idx], cv2.IMREAD_COLOR)
 
         print("Processing frame %05d" % frame_idx)
 
@@ -166,7 +89,7 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
                 frame_idx, track.track_id, bbox[0], bbox[1], bbox[2], bbox[3]])
 
     # Run tracker.
-    visualizer = visualization.Visualization(seq_info, update_ms=5)
+    visualizer = visualization.Visualization(challenge_descriptor=challenge_descriptor, update_ms=5)
     visualizer.run(frame_callback)
 
     # Store results.
