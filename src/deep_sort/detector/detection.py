@@ -1,6 +1,6 @@
 import numpy as np
 
-from deep_sort.utils.geometry.rect import Rect
+from src.deep_sort.utils.geometry.rect import Rect
 
 
 class Detection(object):

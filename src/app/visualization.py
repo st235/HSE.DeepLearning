@@ -1,9 +1,9 @@
 import numpy as np
 
-from app.drawing.color import Color
-from app.drawing.drawing_context import DrawingContext
-from app.drawing.paint import Paint
-from deep_sort.utils.geometry.rect import Rect
+from src.app.drawing.color import Color
+from src.app.drawing.drawing_context import DrawingContext
+from src.app.drawing.paint import Paint
+from src.deep_sort.utils.geometry.rect import Rect
 
 
 class Visualization(object):

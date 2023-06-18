@@ -104,7 +104,7 @@ Detect
 
 #### Nanodet
 
-[NanodetDetectionsProvider](./deep_sort/detector/nanodet_detections_provider.py) is using [Nanodet](https://github.com/RangiLyu/nanodet) model.
+[NanodetDetectionsProvider](src/deep_sort/detector/nanodet_detections_provider.py) is using [Nanodet](https://github.com/RangiLyu/nanodet) model.
 
 The library should be installed and available in order to run this code. To do so you need
 

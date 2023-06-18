@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import cv2
 
-from app.drawing.color import Color
+from src.app.drawing.color import Color
 from enum import Enum
 
 

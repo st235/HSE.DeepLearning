@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from app.drawing.paint import Paint
+from src.app.drawing.paint import Paint
 
 
 class DrawingContext(object):

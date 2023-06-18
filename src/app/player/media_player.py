@@ -2,7 +2,7 @@ import cv2
 import time
 import numpy as np
 
-from app.player.media_sequence import MediaSequence
+from src.app.player.media_sequence import MediaSequence
 from enum import Enum
 from typing import Callable, Optional
 

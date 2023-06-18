@@ -2,13 +2,13 @@ import argparse
 
 import numpy as np
 
-from app.app import App
-from app.visualization import Visualization
-from app.window.virtual_window import VirtualWindow
-from dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
-from deep_sort.detector.file_detections_provider import FileDetectionsProvider
-from deep_sort.utils.geometry.iou_utils import iou
-from deep_sort.utils.geometry.rect import Rect
+from src.app import App
+from src.app import Visualization
+from src.app.window.virtual_window import VirtualWindow
+from src.dataset.mot import MotDatasetDescriptor
+from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
+from src.deep_sort.utils.geometry.iou_utils import iou
+from src.deep_sort.utils.geometry.rect import Rect
 from typing import Optional
 
 DEFAULT_UPDATE_MS = 20

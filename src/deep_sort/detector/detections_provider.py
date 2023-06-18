@@ -1,6 +1,6 @@
 import numpy as np
 
-from deep_sort.detector.detection import Detection
+from src.deep_sort.detector.detection import Detection
 
 
 class DetectionsProvider(object):

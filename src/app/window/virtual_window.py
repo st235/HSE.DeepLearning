@@ -1,6 +1,6 @@
 import numpy as np
 
-from app.window.window import Window
+from src.app.window.window import Window
 
 
 class VirtualWindow(Window):

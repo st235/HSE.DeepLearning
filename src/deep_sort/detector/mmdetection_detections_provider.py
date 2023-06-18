@@ -4,9 +4,9 @@ from mmdet.apis import init_detector, inference_detector
 from mmdet.utils import register_all_modules
 
 from dependencies.definitions import get_file_path
-from deep_sort.detector.detection import Detection
-from deep_sort.detector.detections_provider import DetectionsProvider
-from deep_sort.utils.geometry.rect import Rect
+from src.deep_sort.detector.detection import Detection
+from src.deep_sort.detector.detections_provider import DetectionsProvider
+from src.deep_sort.utils.geometry.rect import Rect
 
 _LABEL_PERSON = 0
 

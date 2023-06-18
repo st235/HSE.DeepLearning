@@ -4,7 +4,7 @@ import os
 import cv2
 import numpy as np
 
-from dataset.mot.mot_ground_truth import MotGroundTruth
+from src.dataset.mot.mot_ground_truth import MotGroundTruth
 from typing import List, Optional
 
 

@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 
-from app.player.media_sequence import MediaSequence
+from src.app.player.media_sequence import MediaSequence
 from typing import List
 
 

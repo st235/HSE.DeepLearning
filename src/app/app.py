@@ -1,11 +1,11 @@
 import time
 import numpy as np
 
-from app.visualization import Visualization
-from app.player.media_player import MediaPlayer
-from app.player.images_media_sequence import ImagesMediaSequence
-from app.window.window import Window
-from dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
+from src.app.visualization import Visualization
+from src.app.player.media_player import MediaPlayer
+from src.app.player.images_media_sequence import ImagesMediaSequence
+from src.app.window.window import Window
+from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from typing import Callable, Optional
 
 

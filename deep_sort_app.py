@@ -3,13 +3,13 @@ from __future__ import division, print_function, absolute_import
 import argparse
 import numpy as np
 
-from app.app import App
-from app.visualization import Visualization
-from dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
-from deep_sort import nn_matching, preprocessing
-from deep_sort.detector.detections_provider import DetectionsProvider
-from deep_sort.detector.file_detections_provider import FileDetectionsProvider
-from deep_sort.tracker import Tracker
+from src.app.app import App
+from src.app.visualization import Visualization
+from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
+from src.deep_sort import nn_matching, preprocessing
+from src.deep_sort.detector.detections_provider import DetectionsProvider
+from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
+from src.deep_sort.tracker import Tracker
 from typing import Optional
 
 

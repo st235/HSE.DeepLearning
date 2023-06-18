@@ -1,6 +1,6 @@
 import pytest
 
-from deep_sort.utils.geometry.rect import Rect
+from src.deep_sort.utils.geometry.rect import Rect
 
 
 @pytest.mark.parametrize("ltwh,expected_lrtbwh", [
