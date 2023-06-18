@@ -6,13 +6,13 @@ from app.visualization import Visualization
 from app.player.media_player import MediaPlayer
 from app.player.images_media_sequence import ImagesMediaSequence
 from app.window.window import Window
-from challenge.mot_challenge_descriptor import MotChallengeDescriptor
+from dataset.mot_dataset_descriptor import MotDatasetDescriptor
 from typing import Callable, Optional
 
 
 class App(object):
     def __init__(self,
-                 challenge_descriptor: MotChallengeDescriptor,
+                 challenge_descriptor: MotDatasetDescriptor,
                  window: Optional[Window] = None):
         window_shape = challenge_descriptor.image_size[::-1]
         aspect_ratio = float(window_shape[1]) / window_shape[0]

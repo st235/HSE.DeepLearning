@@ -6,7 +6,7 @@ import numpy as np
 from app.app import App
 from app.visualization import Visualization
 from app.window.virtual_window import VirtualWindow
-from challenge.mot_challenge_descriptor import MotChallengeDescriptor
+from dataset.mot_dataset_descriptor import MotDatasetDescriptor
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from deep_sort.utils.geometry.iou_utils import iou
 from deep_sort.utils.geometry.rect import Rect
@@ -41,7 +41,7 @@ def run(sequence_directory: str,
         If not None, a video of the tracking results is written to this file.
 
     """
-    challenge_descriptor = MotChallengeDescriptor.load(sequence_directory)
+    challenge_descriptor = MotDatasetDescriptor.load(sequence_directory)
     detections_provider = FileDetectionsProvider(detections_file)
     results = np.loadtxt(result_file, delimiter=',')
 

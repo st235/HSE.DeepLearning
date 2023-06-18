@@ -7,13 +7,13 @@ import numpy as np
 from typing import List, Optional
 
 
-class MotChallengeDescriptor(object):
+class MotDatasetDescriptor(object):
 
     @classmethod
     def load(cls,
-             sequence_directory: str) -> MotChallengeDescriptor:
+             sequence_directory: str) -> MotDatasetDescriptor:
         """Loads sequence information, such as image filenames, detections,
-        ground truth and creates MotChallengeDescriptor.
+        ground truth and creates MotDatasetDescriptor.
 
         Parameters
         ----------
@@ -22,7 +22,7 @@ class MotChallengeDescriptor(object):
 
         Returns
         -------
-            MotChallengeDescriptor instance.
+            MotDatasetDescriptor instance.
         """
         assert os.path.exists(sequence_directory)
 
@@ -48,11 +48,11 @@ class MotChallengeDescriptor(object):
         else:
             update_ms = None
 
-        return MotChallengeDescriptor(name=os.path.basename(sequence_directory),
-                                      images_files=images_files,
-                                      ground_truth=ground_truth,
-                                      image_size=image_size,
-                                      update_rate=update_ms)
+        return MotDatasetDescriptor(name=os.path.basename(sequence_directory),
+                                    images_files=images_files,
+                                    ground_truth=ground_truth,
+                                    image_size=image_size,
+                                    update_rate=update_ms)
 
     def __init__(self,
                  name: str,

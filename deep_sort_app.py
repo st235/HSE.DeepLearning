@@ -5,7 +5,7 @@ import numpy as np
 
 from app.app import App
 from app.visualization import Visualization
-from challenge.mot_challenge_descriptor import MotChallengeDescriptor
+from dataset.mot_dataset_descriptor import MotDatasetDescriptor
 from deep_sort import nn_matching, preprocessing
 from deep_sort.detector.detections_provider import DetectionsProvider
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
@@ -41,11 +41,8 @@ def run(sequence_directory: str,
     nn_budget : Optional[int]
         Maximum size of the appearance descriptor gallery. If None, no budget
         is enforced.
-    display : bool
-        If True, show visualization of intermediate tracking results.
-
     """
-    challenge_descriptor = MotChallengeDescriptor.load(sequence_directory)
+    challenge_descriptor = MotDatasetDescriptor.load(sequence_directory)
     detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detections_file)
 
     app = App(challenge_descriptor)
