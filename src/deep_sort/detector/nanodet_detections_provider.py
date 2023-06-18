@@ -11,8 +11,8 @@ from nanodet.util import Logger, cfg, load_config, load_model_weight
 from src.deep_sort.detector.detection import Detection
 from src.deep_sort.detector.detections_provider import DetectionsProvider
 from dependencies.nanodet_binaries.nanodet_model import NanoDetPaths
-from src.deep_sort.utils.torch_utils import get_available_device
-from src.deep_sort.utils.geometry.rect import Rect
+from src.utils.torch_utils import get_available_device
+from src.utils.geometry.rect import Rect
 
 _NANODET_DEVICE_DEFAULT = get_available_device()
 

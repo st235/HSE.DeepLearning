@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import numpy as np
 from src.deep_sort import linear_assignment
 
-from src.deep_sort.utils.geometry.rect import Rect
+from src.utils.geometry.rect import Rect
 
 
 def iou(bbox: Rect, candidates: list[Rect]) -> np.ndarray[float]:

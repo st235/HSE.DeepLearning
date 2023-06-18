@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import numpy as np
 
-from src.deep_sort.utils.geometry.rect import Rect
+from src.utils.geometry.rect import Rect
 from typing import Optional
 
 

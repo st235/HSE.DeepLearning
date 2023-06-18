@@ -3,7 +3,7 @@ import numpy as np
 from src.app.drawing.color import Color
 from src.app.drawing.drawing_context import DrawingContext
 from src.app.drawing.paint import Paint
-from src.deep_sort.utils.geometry.rect import Rect
+from src.utils.geometry.rect import Rect
 
 
 class Visualization(object):

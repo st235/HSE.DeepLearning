@@ -4,7 +4,7 @@ from dependencies.definitions import fetch_model
 
 from src.deep_sort.detector.detection import Detection
 from src.deep_sort.detector.detections_provider import DetectionsProvider
-from src.deep_sort.utils.geometry.rect import Rect
+from src.utils.geometry.rect import Rect
 
 _LABEL_PERSON = 0
 

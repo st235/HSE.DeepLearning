@@ -7,8 +7,8 @@ from src.app import Visualization
 from src.app.window.virtual_window import VirtualWindow
 from src.dataset.mot import MotDatasetDescriptor
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
-from src.deep_sort.utils.geometry.iou_utils import iou
-from src.deep_sort.utils.geometry.rect import Rect
+from src.utils.geometry.iou_utils import iou
+from src.utils.geometry.rect import Rect
 from typing import Optional
 
 DEFAULT_UPDATE_MS = 20
