@@ -14,9 +14,9 @@ class App(object):
     def __init__(self,
                  challenge_descriptor: MotChallengeDescriptor,
                  window: Optional[Window] = None):
-        image_shape = challenge_descriptor.image_size[::-1]
-        aspect_ratio = float(image_shape[1]) / image_shape[0]
-        image_shape = 1024, int(aspect_ratio * 1024)
+        window_shape = challenge_descriptor.image_size[::-1]
+        aspect_ratio = float(window_shape[1]) / window_shape[0]
+        window_shape = 1024, int(aspect_ratio * 1024)
 
         images_files = challenge_descriptor.images_files
         assert (images_files is not None) and len(images_files) > 0
@@ -31,8 +31,7 @@ class App(object):
                                           update_rate_ms=update_rate_ms)
 
         self.__display_fps = False
-        self.__window_shape = image_shape
-        self.__window = window if window is not None else Window(title=challenge_descriptor.name, size=image_shape)
+        self.__window = window if window is not None else Window(title=challenge_descriptor.name, size=window_shape)
 
         self.__last_update_time = None
 
@@ -60,7 +59,7 @@ class App(object):
         if self.__display_fps:
             visualisation.draw_info(f"FPS: {frames_per_second}\nFrame: {int(frame_id)}")
 
-        self.__window.update(cv2.resize(visualisation.image, self.__window_shape[:2]))
+        self.__window.update(visualisation.image)
 
         self.__last_update_time = current_time
 
