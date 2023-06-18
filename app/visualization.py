@@ -3,6 +3,7 @@ import numpy as np
 from app.drawing.color import Color
 from app.drawing.drawing_context import DrawingContext
 from app.drawing.paint import Paint
+from deep_sort.utils.geometry.rect import Rect
 
 
 class Visualization(object):
@@ -55,11 +56,11 @@ class Visualization(object):
 
     def __draw_track(self,
                      track_id: int,
-                     box: np.ndarray):
+                     box: Rect):
         track_color: Color = Color.create_unique(track_id)
 
         # Draws detection rectangle.
-        detection_x, detection_y, detection_width, detection_height = box.astype(np.int32)
+        detection_x, detection_y, detection_width, detection_height = [int(v) for v in list(box)]
 
         self.__paint.style = Paint.Style.STROKE
         self.__paint.color = track_color
@@ -74,8 +75,8 @@ class Visualization(object):
                                             text_size=1.1,
                                             color=track_color)
 
-    def draw_ground_truth(self, track_ids, boxes):
-        for track_id, box in zip(track_ids, boxes):
+    def draw_ground_truth(self, tracks: dict[int, Rect]):
+        for track_id, box in tracks.items():
             self.__draw_track(track_id, box)
 
     def draw_detections(self, detections):
@@ -93,7 +94,7 @@ class Visualization(object):
             if not track.is_confirmed() or track.time_since_update > 0:
                 continue
 
-            self.__draw_track(track.track_id, track.to_tlwh())
+            self.__draw_track(track.track_id, Rect.from_tlwh(track.to_tlwh()))
 
     def draw_info(self, info: str):
         background_color = Color(red=0, green=0, blue=0)

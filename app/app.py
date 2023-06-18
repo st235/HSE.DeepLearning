@@ -1,4 +1,3 @@
-import cv2
 import time
 import numpy as np
 
@@ -6,7 +5,7 @@ from app.visualization import Visualization
 from app.player.media_player import MediaPlayer
 from app.player.images_media_sequence import ImagesMediaSequence
 from app.window.window import Window
-from dataset.mot_dataset_descriptor import MotDatasetDescriptor
+from dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from typing import Callable, Optional
 
 

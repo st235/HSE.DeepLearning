@@ -1,12 +1,11 @@
 import argparse
 
-import cv2
 import numpy as np
 
 from app.app import App
 from app.visualization import Visualization
 from app.window.virtual_window import VirtualWindow
-from dataset.mot_dataset_descriptor import MotDatasetDescriptor
+from dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from deep_sort.utils.geometry.iou_utils import iou
 from deep_sort.utils.geometry.rect import Rect

@@ -5,7 +5,7 @@ import numpy as np
 
 from app.app import App
 from app.visualization import Visualization
-from dataset.mot_dataset_descriptor import MotDatasetDescriptor
+from dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from deep_sort import nn_matching, preprocessing
 from deep_sort.detector.detections_provider import DetectionsProvider
 from deep_sort.detector.file_detections_provider import FileDetectionsProvider

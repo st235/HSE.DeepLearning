@@ -4,6 +4,7 @@ import os
 import cv2
 import numpy as np
 
+from dataset.mot.mot_ground_truth import MotGroundTruth
 from typing import List, Optional
 
 
@@ -30,7 +31,7 @@ class MotDatasetDescriptor(object):
         images_files = sorted([os.path.join(images_directory, file) for file in os.listdir(images_directory)])
         ground_truth_file = os.path.join(sequence_directory, "gt", "gt.txt")
 
-        ground_truth = np.loadtxt(ground_truth_file, delimiter=',') if os.path.exists(ground_truth_file) else None
+        ground_truth = MotGroundTruth.load(ground_truth_file)
 
         if len(images_files) > 0:
             image = cv2.imread(next(iter(images_files)), cv2.IMREAD_GRAYSCALE)
@@ -57,7 +58,7 @@ class MotDatasetDescriptor(object):
     def __init__(self,
                  name: str,
                  images_files: List[str],
-                 ground_truth: Optional[np.ndarray],
+                 ground_truth: Optional[MotGroundTruth],
                  image_size: np.ndarray,
                  update_rate: Optional[float]):
         self.__name = name
@@ -75,7 +76,14 @@ class MotDatasetDescriptor(object):
         return self.__images_files
 
     @property
-    def ground_truth(self) -> np.ndarray:
+    def ground_truth(self) -> Optional[MotGroundTruth]:
+        """Returns ground truth.
+
+        Returns
+        -------
+            Optional[MotGroundTruth]
+            Returns MotGroundTruth if was able to locate the corresponding file and None otherwise.
+        """
         return self.__ground_truth
 
     @property
