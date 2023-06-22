@@ -10,6 +10,8 @@ from src.deep_sort import nn_matching, preprocessing
 from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from src.deep_sort.tracker import Tracker
+from src.utils.geometry.rect import Rect
+from src.metrics.hota_metric import HotaMetric
 from typing import Optional
 
 
@@ -42,13 +44,16 @@ def run(sequence_directory: str,
         Maximum size of the appearance descriptor gallery. If None, no budget
         is enforced.
     """
-    challenge_descriptor = MotDatasetDescriptor.load(sequence_directory)
+    dataset_descriptor = MotDatasetDescriptor.load(sequence_directory)
     detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detections_file)
 
-    app = App(challenge_descriptor)
+    app = App(dataset_descriptor)
 
     metric = nn_matching.NearestNeighborDistanceMetric(
         "cosine", max_cosine_distance, nn_budget)
+
+    hota = HotaMetric(ground_truth=dataset_descriptor.ground_truth)
+
     tracker = Tracker(metric)
     results = []
 
@@ -67,9 +72,11 @@ def run(sequence_directory: str,
         tracker.predict()
         tracker.update(detections)
 
-        # Update visualization.
-        visualisation.draw_detections(detections)
         visualisation.draw_trackers(tracker.tracks)
+
+        hota.update_frame(int(visualisation.frame_id),
+                          {track.track_id: Rect.from_tlwh(track.to_tlwh()) for track in tracker.tracks if
+                           track.is_confirmed() and track.time_since_update <= 0})
 
         # Store results.
         for track in tracker.tracks:
@@ -82,6 +89,9 @@ def run(sequence_directory: str,
     # Run the app.
     app.display_fps()
     app.start(frame_callback)
+
+    print('Started')
+    print(hota.evaluate())
 
     # Store results.
     f = open(output_file, 'w')

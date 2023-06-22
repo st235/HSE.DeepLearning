@@ -1,3 +1,4 @@
+import math
 import numpy as np
 
 from scipy.optimize import linear_sum_assignment
@@ -8,6 +9,8 @@ from src.utils.geometry.rect import Rect
 class HotaMetric(object):
     def __init__(self,
                  ground_truth: MotGroundTruth):
+        assert ground_truth is not None
+
         self.__ground_truth = ground_truth
 
         self.__detections: dict[int, dict[int, Rect]] = dict()
@@ -28,9 +31,11 @@ class HotaMetric(object):
 
     def evaluate(self):
         hota_a = 0
-        for alpha in range(start=0.05, stop=1.0, step=0.05):
-            hota_a += self.__evaluate_sequence_with_alpha(alpha=alpha)
-        return 1/19 * hota_a
+        for alpha in range(5, 100, 5):
+            detection, association = self.__evaluate_sequence_with_alpha(alpha=alpha / 100)
+            hota_a += math.sqrt(detection * association)
+
+        return 1 / 19 * hota_a
 
     def __evaluate_sequence_with_alpha(self,
                                        alpha: float) -> [float, float]:
@@ -48,7 +53,7 @@ class HotaMetric(object):
             accumulated_ass += frame_ass
 
         detection = tp / (tp + fn + fp)
-        association = accumulated_ass / tp
+        association = accumulated_ass / tp if tp > 0 else 0
 
         return detection, association
 
@@ -66,13 +71,20 @@ class HotaMetric(object):
         raw_detections = self.__detections[frame_id]
         raw_ground_truth = self.__ground_truth[frame_id]
 
+        if len(raw_detections) == 0 and len(raw_ground_truth) == 0:
+            return 1, 0, 0, 1
+        elif len(raw_detections) == 0:
+            return 0, 0, len(raw_ground_truth), 0
+        elif len(raw_ground_truth) == 0:
+            return 0, len(raw_detections), 0, 0
+
         detection_ids, detection_boxes = zip(*raw_detections.items())
         ground_truth_ids, ground_truth_boxes = zip(*raw_ground_truth.items())
 
         assert len(detection_ids) == len(detection_boxes)
         assert len(ground_truth_ids) == len(ground_truth_boxes)
 
-        scores = np.array((len(detection_boxes), len(ground_truth_boxes)), type=np.float)
+        scores = np.zeros((len(detection_boxes), len(ground_truth_boxes)), dtype=np.float32)
 
         for i in range(len(detection_ids)):
             detection_box = detection_boxes[i]
@@ -80,7 +92,8 @@ class HotaMetric(object):
                 ground_truth_box = ground_truth_boxes[j]
 
                 iou_score = detection_box.iou(ground_truth_box)
-                scores[i, j] = iou_score if iou_score >= alpha else 0
+                if iou_score >= alpha:
+                    scores[i, j] = iou_score
 
         row_indexes, col_indexes = linear_sum_assignment(scores, maximize=True)
 
@@ -89,7 +102,7 @@ class HotaMetric(object):
                 # TP association found.
                 detection_tp += 1
                 accumulated_ass += self.__evaluate_track(alpha=alpha, detection_track_id=detection_ids[row],
-                                                        ground_truth_track_id=ground_truth_ids[column])
+                                                         ground_truth_track_id=ground_truth_ids[column])
 
         detection_fp += len(detection_ids) - detection_tp
         detection_fn += len(ground_truth_ids) - detection_tp
