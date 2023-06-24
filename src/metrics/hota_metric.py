@@ -72,7 +72,7 @@ class HotaMetric(object):
         raw_ground_truth = self.__ground_truth[frame_id]
 
         if len(raw_detections) == 0 and len(raw_ground_truth) == 0:
-            return 1, 0, 0, 1
+            return 0, 0, 0, 1
         elif len(raw_detections) == 0:
             return 0, 0, len(raw_ground_truth), 0
         elif len(raw_ground_truth) == 0:
@@ -91,9 +91,7 @@ class HotaMetric(object):
             for j in range(len(ground_truth_ids)):
                 ground_truth_box = ground_truth_boxes[j]
 
-                iou_score = detection_box.iou(ground_truth_box)
-                if iou_score >= alpha:
-                    scores[i, j] = iou_score
+                scores[i, j] = detection_box.iou(ground_truth_box)
 
         row_indexes, col_indexes = linear_sum_assignment(scores, maximize=True)
 

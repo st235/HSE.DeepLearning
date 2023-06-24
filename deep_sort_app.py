@@ -76,7 +76,7 @@ def run(sequence_directory: str,
 
         hota.update_frame(int(visualisation.frame_id),
                           {track.track_id: Rect.from_tlwh(track.to_tlwh()) for track in tracker.tracks if
-                           track.is_confirmed() and track.time_since_update <= 0})
+                           track.is_confirmed() and track.time_since_update <= 1})
 
         # Store results.
         for track in tracker.tracks:
