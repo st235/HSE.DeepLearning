@@ -16,7 +16,7 @@ def benchmark(function: Callable) -> Callable:
         return_value = function(*args, **kwargs)
         finish_sec = time.time()
         elapsed_time_sec = finish_sec - start_sec
-        print(f"Elapsed time: {elapsed_time_sec} sec.")
+        print(f"** Finished {function.__name__} in {elapsed_time_sec} sec. **")
         return return_value
 
     return wrapper

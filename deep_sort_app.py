@@ -10,7 +10,6 @@ from src.deep_sort import nn_matching, preprocessing
 from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from src.deep_sort.tracker import Tracker
-from src.utils.geometry.rect import Rect
 from typing import Optional
 
 
@@ -70,10 +69,6 @@ def run(sequence_directory: str,
         tracker.update(detections)
 
         visualisation.draw_trackers(tracker.tracks)
-
-        hota.update_frame(frame_id,
-                          {track.track_id: Rect.from_tlwh(track.to_tlwh()) for track in tracker.tracks if
-                           track.is_confirmed() and track.time_since_update <= 1})
 
         # Store results.
         for track in tracker.tracks:
