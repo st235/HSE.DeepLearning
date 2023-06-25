@@ -5,6 +5,7 @@ from src.app.visualization import Visualization
 from src.app.player.media_player import MediaPlayer
 from src.app.player.images_media_sequence import ImagesMediaSequence
 from src.app.window.window import Window
+from src.app.window.opencv_window import OpenCVWindow
 from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from typing import Callable, Optional
 
@@ -30,7 +31,9 @@ class App(object):
                                           update_rate_ms=update_rate_ms)
 
         self.__display_fps = False
-        self.__window = window if window is not None else Window(title=challenge_descriptor.name, size=window_shape)
+
+        self.__window = window if window is not None else OpenCVWindow(title=challenge_descriptor.name,
+                                                                       size=window_shape)
 
         self.__last_update_time = None
 
