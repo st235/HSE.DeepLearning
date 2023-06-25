@@ -10,6 +10,7 @@ from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from src.deep_sort.tracker import Tracker
 from src.metrics.hota_metric import HotaMetric
+from src.metrics.metrics_printer import MetricsPrinter
 from src.utils.geometry.rect import Rect
 
 
@@ -27,8 +28,7 @@ def run(sequences_directory: str,
         Path to the detections directory.
     """
 
-    tracked_metrics = [HotaMetric.KEY_METRIC_HOTA, HotaMetric.KEY_METRIC_DETA, HotaMetric.KEY_METRIC_ASSA]
-    sequences_metrics: dict[str, dict] = dict()
+    metrics_printer = MetricsPrinter(metrics_to_track=[HotaMetric.KEY_METRIC_HOTA, HotaMetric.KEY_METRIC_DETA, HotaMetric.KEY_METRIC_ASSA])
 
     for sequence in os.listdir(sequences_directory):
         sequence_directory = os.path.join(sequences_directory, sequence)
@@ -37,24 +37,11 @@ def run(sequences_directory: str,
         print(f"Evaluating sequence {sequence}")
 
         metrics = __evaluate_single_sequence(sequence_directory, detection_directory)
-        assert sequence not in sequences_metrics
-
-        sequences_metrics[sequence] = metrics
+        metrics_printer.add_sequence(sequence, metrics)
 
     print()
 
-    # Print table header.
-    print(f"{'':20}|", end='')
-    for metric in tracked_metrics:
-        print(f"{metric:10}|", end='')
-    print()
-
-    for sequence in sorted(sequences_metrics.keys()):
-        metrics = sequences_metrics[sequence]
-        print(f"{sequence:20}|", end='')
-        for metric_name in tracked_metrics:
-            print(f"{metrics[metric_name]:10.5}|", end='')
-        print()
+    metrics_printer.print()
 
 
 def __evaluate_single_sequence(sequence_directory: str,
