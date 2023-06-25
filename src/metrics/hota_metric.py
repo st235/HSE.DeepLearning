@@ -31,6 +31,10 @@ class HotaMetric(object):
             Lookup table to find all detections per track.
     """
 
+    KEY_METRIC_HOTA = "HOTA"
+    KEY_METRIC_DETA = "DetA"
+    KEY_METRIC_ASSA = "AssA"
+
     def __init__(self,
                  ground_truth: MotGroundTruth):
         assert ground_truth is not None
@@ -55,10 +59,38 @@ class HotaMetric(object):
 
     @benchmark
     def evaluate(self) -> float:
-        hota_a = self.__evaluate_sequence()
-        return 1 / 19 * np.sum(hota_a)
+        detection, association = self.__evaluate_sequence()
+        return self.__get_hota(detection, association)
 
-    def __evaluate_sequence(self) -> np.ndarray:
+    @benchmark
+    def evaluate_with_sub_metrics(self) -> dict:
+        metrics_dict = dict()
+
+        detection, association = self.__evaluate_sequence()
+
+        metrics_dict[HotaMetric.KEY_METRIC_HOTA] = self.__get_hota(detection, association)
+        metrics_dict[HotaMetric.KEY_METRIC_DETA] = np.mean(detection)
+        metrics_dict[HotaMetric.KEY_METRIC_ASSA] = np.mean(association)
+
+        return metrics_dict
+
+    @staticmethod
+    def __get_hota(detection: np.ndarray[float],
+                   association: np.ndarray[float]) -> float:
+        return 1 / 19 * np.sum(np.sqrt(detection * association))
+
+    def __evaluate_sequence(self) -> tuple[np.ndarray[float], np.ndarray[float]]:
+        """Evaluates a sequence collected through #update_frame method.
+
+        Computes detection and association scores for alphas from 0.05 up to 0.95.
+
+        Returns
+        -------
+            A tuple of np.ndarray[float] containing detection and association scores for every alpha.
+            In tuple the detection score always comes before the association.
+            Index of a corresponding score to some alpha 'a' can be obtained as ('a'/0.05 - 1).
+        """
+
         # Accumulator of metrics per all frames.
         result_metrics = np.zeros(shape=(19, 4))
 
@@ -70,7 +102,7 @@ class HotaMetric(object):
 
         assert detection.shape == association.shape
 
-        return np.sqrt(detection * association)
+        return detection, association
 
     def __evaluate_frame(self,
                          frame_id: int) -> np.ndarray:

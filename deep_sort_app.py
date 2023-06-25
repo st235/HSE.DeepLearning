@@ -11,7 +11,6 @@ from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from src.deep_sort.tracker import Tracker
 from src.utils.geometry.rect import Rect
-from src.metrics.hota_metric import HotaMetric
 from typing import Optional
 
 
@@ -52,8 +51,6 @@ def run(sequence_directory: str,
     metric = nn_matching.NearestNeighborDistanceMetric(
         "cosine", max_cosine_distance, nn_budget)
 
-    hota = HotaMetric(ground_truth=dataset_descriptor.ground_truth)
-
     tracker = Tracker(metric)
     results = []
 
@@ -88,8 +85,6 @@ def run(sequence_directory: str,
     # Run the app.
     app.display_fps()
     app.start(frame_callback)
-
-    print(hota.evaluate())
 
     # Store results.
     f = open(output_file, 'w')
