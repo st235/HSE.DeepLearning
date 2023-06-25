@@ -16,7 +16,7 @@ class ImagesMediaSequence(MediaSequence):
         self.__index = 0
         return self
 
-    def __next__(self) -> (np.ndarray, str):
+    def __next__(self) -> (np.ndarray, int):
         if self.__index >= len(self.__image_files):
             raise StopIteration()
 
@@ -30,4 +30,4 @@ class ImagesMediaSequence(MediaSequence):
         assert image_shape[0] > 0 and image_shape[1] > 0
 
         image_file_name = os.path.basename(image_file)
-        return image, os.path.splitext(image_file_name)[0]
+        return image, int(os.path.splitext(image_file_name)[0])

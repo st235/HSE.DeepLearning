@@ -34,12 +34,12 @@ class App(object):
 
         self.__last_update_time = None
 
-    def start(self, frame_callback: Callable[[np.ndarray, Visualization], None]):
+    def start(self, frame_callback: Callable[[int, np.ndarray, Visualization], None]):
         self.__media_player.play(lambda image, frame_id: self.__on_frame_changed(image, frame_id, frame_callback))
 
     def __on_frame_changed(self,
-                           image: np.ndarray, frame_id: str,
-                           frame_callback: Callable[[np.ndarray, Visualization], None]):
+                           image: Optional[np.ndarray], frame_id: int,
+                           frame_callback: Callable[[int, np.ndarray, Visualization], None]):
         if image is None:
             self.__window.destroy()
             return
@@ -51,12 +51,12 @@ class App(object):
             elapsed_time = current_time - self.__last_update_time
             frames_per_second = int(round(1.0 / elapsed_time))
 
-        visualisation = Visualization(frame_id, image)
+        visualisation = Visualization(image=image)
 
-        frame_callback(image, visualisation)
+        frame_callback(frame_id, image, visualisation)
 
         if self.__display_fps:
-            visualisation.draw_info(f"FPS: {frames_per_second}\nFrame: {int(frame_id)}")
+            visualisation.draw_info(f"FPS: {frames_per_second}\nFrame: {frame_id}")
 
         self.__window.update(visualisation.image)
 

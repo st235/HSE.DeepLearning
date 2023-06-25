@@ -28,7 +28,7 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
 
     def load_detections(self,
                         image: np.ndarray,
-                        frame_id: str,
+                        frame_id: int,
                         min_height: int = 0) -> list[Detection]:
         results = inference_detector(self.__model, image)
         detection_list = []
