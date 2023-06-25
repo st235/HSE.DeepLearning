@@ -23,9 +23,7 @@ def run(sequence_directory: str):
 
     app = App(dataset_descriptor)
 
-    def frame_callback(_: np.ndarray, visualisation: Visualization):
-        frame_id = int(visualisation.frame_id)
-
+    def frame_callback(frame_id: int, _: np.ndarray, visualisation: Visualization):
         ground_truth = dataset_descriptor.ground_truth
         ground_truth_tracks = ground_truth[frame_id]
 
