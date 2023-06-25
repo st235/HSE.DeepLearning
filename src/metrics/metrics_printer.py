@@ -25,7 +25,7 @@ class MetricsPrinter(object):
         print()
 
     def __print_sequences(self):
-        for sequence_name in self.__sequences_metrics.keys():
+        for sequence_name in sorted(self.__sequences_metrics.keys()):
             self.__print_sequence(sequence_name)
 
     def __print_sequence(self,
