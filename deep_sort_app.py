@@ -89,7 +89,6 @@ def run(sequence_directory: str,
     app.display_fps()
     app.start(frame_callback)
 
-    print('Started')
     print(hota.evaluate())
 
     # Store results.
