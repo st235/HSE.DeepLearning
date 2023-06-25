@@ -11,7 +11,6 @@ from src.deep_sort.detector.file_detections_provider import FileDetectionsProvid
 from src.deep_sort.tracker import Tracker
 from src.metrics.hota_metric import HotaMetric
 from src.utils.geometry.rect import Rect
-from typing import Optional
 
 
 def run(sequences_directory: str,
@@ -50,11 +49,11 @@ def run(sequences_directory: str,
         print(f"{metric:10}|", end='')
     print()
 
-    for sequence in sequences_metrics.keys():
+    for sequence in sorted(sequences_metrics.keys()):
         metrics = sequences_metrics[sequence]
         print(f"{sequence:20}|", end='')
         for metric_name in tracked_metrics:
-            print(f"{metrics[metric_name]:10}|", end='')
+            print(f"{metrics[metric_name]:10.5}|", end='')
         print()
 
 

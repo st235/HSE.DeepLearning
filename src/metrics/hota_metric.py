@@ -98,7 +98,10 @@ class HotaMetric(object):
             result_metrics += self.__evaluate_frame(frame_id=frame_id)
 
         detection = result_metrics[:, 0] / np.maximum(1, np.sum(result_metrics[:, 0:3], axis=1))
-        association = np.where(result_metrics[:, 0] > 0, result_metrics[:, 3] / result_metrics[:, 0], 0)
+        # Out parameter is required to utilise where otherwise where is ignored.
+        association = np.divide(result_metrics[:, 3], result_metrics[:, 0],
+                                out=np.zeros_like(result_metrics[:, 0]),
+                                where=result_metrics[:, 0] > 0)
 
         assert detection.shape == association.shape
 
