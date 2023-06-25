@@ -39,7 +39,7 @@ class NanodetDetectionsProvider(DetectionsProvider):
 
     def load_detections(self,
                         image: np.ndarray,
-                        frame_id: str,
+                        frame_id: int,
                         min_height: int = 0) -> list[Detection]:
         meta, results = self.__inference(image)
 

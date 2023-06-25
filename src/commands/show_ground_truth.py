@@ -9,12 +9,14 @@ from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 
 
 def run(sequence_directory: str):
-    """Run ground truth visualisation of MOT Challenge.
+    """Run ground truth visualisation of the given dataset.
+
+    Default dataset implementation is MotDatasetDescriptor (MOT Challenge).
 
     Parameters
     ----------
     sequence_directory : str
-        Path to the MOTChallenge sequence directory.
+        Path to the sequence directory.
     """
     dataset_descriptor = MotDatasetDescriptor.load(sequence_directory)
 
@@ -23,9 +25,7 @@ def run(sequence_directory: str):
 
     app = App(dataset_descriptor)
 
-    def frame_callback(_: np.ndarray, visualisation: Visualization):
-        frame_id = int(visualisation.frame_id)
-
+    def frame_callback(frame_id: int, _: np.ndarray, visualisation: Visualization):
         ground_truth = dataset_descriptor.ground_truth
         ground_truth_tracks = ground_truth[frame_id]
 
@@ -39,9 +39,9 @@ def run(sequence_directory: str):
 def __parse_args():
     """ Parse command line arguments.
     """
-    parser = argparse.ArgumentParser(description="Deep SORT")
+    parser = argparse.ArgumentParser(description="Ground truth visualisation")
     parser.add_argument(
-        "--sequence_dir", help="Path to MOTChallenge sequence directory",
+        "--sequence_dir", help="Path to the sequence directory",
         default=None, required=True)
     return parser.parse_args()
 

@@ -11,15 +11,9 @@ class Visualization(object):
     """
 
     def __init__(self,
-                 frame_id: str,
                  image: np.ndarray):
         self.__paint = Paint()
-        self.__frame_id = frame_id
         self.__drawing_context = DrawingContext(image=image)
-
-    @property
-    def frame_id(self) -> str:
-        return self.__frame_id
 
     @property
     def image(self) -> np.ndarray:

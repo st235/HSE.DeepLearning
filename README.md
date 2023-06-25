@@ -138,7 +138,95 @@ index 6b0a098..e791d9f 100644
          return results
 ```
 
+## Metric
 
+### HOTA
+
+Metric used in this project is called _Higher Order Tracking Accuracy_ (aka HOTA).
+
+The metric consists of a few sub metrics:
+
+#### 1. Localization
+
+Finds the spatial alignment between predicted detections and ground truth detections.
+[_IOU_](https://en.wikipedia.org/wiki/Jaccard_index) is used to find localisation between **one** detection and **one**
+ground truth object.
+
+![Intersection Over Union picture](./resources/iou.png)
+
+Overall Localization Accuracy (LocA) is calculated over all pairs across the **entire dataset**.
+
+```math
+LocA = \frac{1}{|TP|} \sum_{c \in TP} Loc-IOU(c)
+```
+
+In the codebase iou implemented in [iou utils](./src/utils/geometry/iou_utils.py) and [Rect](./src/utils/geometry/rect.py)
+
+#### 2. Detection
+
+Detection measures the alignment between all predicted detections and ground truth detections.
+We rely on _localisation_ results to find the overlap between predictions and ground truth. To break the tie
+when there are more than one prediction intersect with a ground truth _Hungarian algorithm_ (aka assignment problem algorithm) is used.
+
+Implementation of the assignment algorithm is used from [scipy.linear_sum_assignment](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html#scipy-optimize-linear-sum-assignment),
+in the latest release of the library _Hungarian algorithm_ has been replaced with _Jonker-Volgenant algorithm_.
+
+After running the algorithm we end up with matched and unmatched elements. We can divide them into 3 groups:
+True Positives (intersection between the two sets of detections), False Positives (predicted detections that don’t match),
+and False Negatives (ground-truth detections that don’t match).
+
+Overall Detection Accuracy (aka DetA) is calcuated by using the count of TPs, FNs and FPs over the whole dataset.
+
+```math
+DetA=\frac{|TP|}{|TP|+|FP|+|FN|}
+```
+
+#### 3. Association
+
+Show how well the tracking links detections **over time** into the **same identities**.
+
+The intersection between two tracks can be found in a similar way as during the detection step, but with
+a little difference: True Positive Associations (number of True Positive matches between the two tracks), 
+False Positive Associations (any remaining detections in the predicted track which are either matched to other ground-truth tracks or none at all),
+and False Negative Associations (any remaining detections in the ground-truth track).
+
+See visual example of the definitions TPA, FNA and FPA:
+
+![Example of Association Metrics](./resources/assa.png)
+
+Overall Association Accuracy (aka AssA) is calculated for **every** True Positive pair **across the entire dataset**.
+
+```math
+AssA=\frac{1}{|TP|} \sum_{c \in TP} \frac{|TPA(c)|}{|TPA(c)|+|FPA(c)|+|FNA(c)|}
+```
+
+#### Gathering sub-metrics together
+
+Detection and association were defined using a _Hungarian matching_ based on a certain _Loc-IoU threshold_ (_α_). 
+Since they both depend on the quality of localisation we calculate them over a range of different _α_ thresholds.
+
+_HOTA_ for specific alpha a can be calculated as:
+
+```math
+HOTA_{\alpha}=\sqrt{DetA_{\alpha}*AssA_{\alpha}}
+```
+
+Overall _HOTA_ is a **discrete integral** over different alphas:
+
+```math
+HOTA=\int_{0 < \alpha \le 1} HOTA_{\alpha} \thickapprox \sum_{\alpha=0.05,\space \alpha += 0.05}^{0.95} HOTA_{\alpha}
+```
+
+#### Implementation
+
+- [HotaMetric](./src/metrics/hota_metric.py)
+
+
+#### References
+
+- [How to evaluate tracking with the HOTA metricsPermalink](https://autonomousvision.github.io/hota-metrics/)
+- [HOTA: A Higher Order Metric for Evaluating Multi-object Tracking](https://link.springer.com/article/10.1007/s11263-020-01375-2)
+- [TrackEval](https://github.com/JonathonLuiten/TrackEval/blob/master/trackeval/metrics/hota.py)
 
 ## Acknowledgement
 

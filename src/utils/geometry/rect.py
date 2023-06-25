@@ -100,6 +100,8 @@ class Rect(object):
             self.__check_if_lines_intersect(self.top, self.bottom, that.top, that.bottom)
 
     def iou(self, that: Rect) -> float:
+        assert isinstance(that, Rect), f"Expected Rect but found {type(that)}: {that}"
+
         if not self.check_if_intersects(that):
             return 0
 

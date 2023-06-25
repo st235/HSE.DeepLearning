@@ -8,7 +8,7 @@ from typing import Callable, Optional
 
 
 def _forward_one_frame(media_sequence_iterator,
-                       frame_callback: Callable[[np.ndarray, str], None]) -> (bool, int):
+                       frame_callback: Callable[[np.ndarray, int], None]) -> (bool, int):
     start_time_s = time.time()
 
     termination_token = object()
@@ -43,7 +43,7 @@ class MediaPlayer(object):
         self.__media_sequence = media_sequence
         self.__update_rate_ms = int(update_rate_ms)
 
-    def play(self, frame_callback: Callable[[Optional[np.ndarray], str], None]):
+    def play(self, frame_callback: Callable[[Optional[np.ndarray], int], None]):
 
         media_sequence_iterator = iter(self.__media_sequence)
         is_terminated = False
@@ -69,4 +69,4 @@ class MediaPlayer(object):
                 is_terminated, _ = _forward_one_frame(media_sequence_iterator, frame_callback)
 
         # Signalising the end of the sequence.
-        frame_callback(None, '')
+        frame_callback(None, MediaSequence.FRAME_ID_UNKNOWN)

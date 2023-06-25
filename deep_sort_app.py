@@ -42,18 +42,19 @@ def run(sequence_directory: str,
         Maximum size of the appearance descriptor gallery. If None, no budget
         is enforced.
     """
-    challenge_descriptor = MotDatasetDescriptor.load(sequence_directory)
+    dataset_descriptor = MotDatasetDescriptor.load(sequence_directory)
     detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detections_file)
 
-    app = App(challenge_descriptor)
+    app = App(dataset_descriptor)
 
     metric = nn_matching.NearestNeighborDistanceMetric(
         "cosine", max_cosine_distance, nn_budget)
+
     tracker = Tracker(metric)
     results = []
 
-    def frame_callback(image: np.ndarray, visualisation: Visualization):
-        detections = detections_provider.load_detections(image, visualisation.frame_id, min_detection_height)
+    def frame_callback(frame_id: int, image: np.ndarray, visualisation: Visualization):
+        detections = detections_provider.load_detections(image, frame_id, min_detection_height)
         detections = [d for d in detections if d.confidence >= min_confidence]
 
         # Run non-maxima suppression.
@@ -67,8 +68,6 @@ def run(sequence_directory: str,
         tracker.predict()
         tracker.update(detections)
 
-        # Update visualization.
-        visualisation.draw_detections(detections)
         visualisation.draw_trackers(tracker.tracks)
 
         # Store results.
@@ -76,8 +75,7 @@ def run(sequence_directory: str,
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue
             bbox = track.to_tlwh()
-            results.append([
-                visualisation.frame_id, track.track_id, bbox[0], bbox[1], bbox[2], bbox[3]])
+            results.append([frame_id, track.track_id, bbox[0], bbox[1], bbox[2], bbox[3]])
 
     # Run the app.
     app.display_fps()
@@ -86,7 +84,7 @@ def run(sequence_directory: str,
     # Store results.
     f = open(output_file, 'w')
     for row in results:
-        print('%s,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1' % (
+        print('%d,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1' % (
             row[0], row[1], row[2], row[3], row[4], row[5]), file=f)
 
 

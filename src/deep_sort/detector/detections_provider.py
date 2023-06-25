@@ -1,9 +1,10 @@
 import numpy as np
 
+from abc import ABC, abstractmethod
 from src.deep_sort.detector.detection import Detection
 
 
-class DetectionsProvider(object):
+class DetectionsProvider(ABC):
     """
     Finds humans on the given image.
 
@@ -12,9 +13,10 @@ class DetectionsProvider(object):
     feature vector associated with each detection.
     """
 
+    @abstractmethod
     def load_detections(self,
                         image: np.ndarray,
-                        frame_id: str,
+                        frame_id: int,
                         min_height: int = 0) -> list[Detection]:
         """Creates detections for given frame index from the file on disk.
 
@@ -34,4 +36,4 @@ class DetectionsProvider(object):
             Returns detection responses at given frame index.
 
         """
-        return []
+        ...

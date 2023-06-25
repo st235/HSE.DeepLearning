@@ -20,7 +20,7 @@ class FileDetectionsProvider(DetectionsProvider):
 
     def load_detections(self,
                         image: np.ndarray,
-                        frame_id: str,
+                        frame_id: int,
                         min_height: int = 0) -> list[Detection]:
         """Creates detections for given frame index from the file on disk.
 
@@ -39,7 +39,7 @@ class FileDetectionsProvider(DetectionsProvider):
 
         """
         frame_indices = self.__detections[:, 0].astype(np.int32)
-        mask = frame_indices == int(frame_id)
+        mask = frame_indices == frame_id
 
         detection_list = []
         for row in self.__detections[mask]:
