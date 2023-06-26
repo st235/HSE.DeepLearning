@@ -1,6 +1,7 @@
 class MetricsPrinter(object):
     def __init__(self,
                  metrics_to_track: list[str]):
+        assert len(metrics_to_track) > 0
         self.__metrics_to_track = metrics_to_track
         self.__sequences_metrics: dict[str, dict] = dict()
 
