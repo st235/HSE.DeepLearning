@@ -228,6 +228,53 @@ HOTA=\int_{0 < \alpha \le 1} HOTA_{\alpha} \thickapprox \sum_{\alpha=0.05,\space
 - [HOTA: A Higher Order Metric for Evaluating Multi-object Tracking](https://link.springer.com/article/10.1007/s11263-020-01375-2)
 - [TrackEval](https://github.com/JonathonLuiten/TrackEval/blob/master/trackeval/metrics/hota.py)
 
+### Confusion Matrix Metrics
+
+This is implementation of metrics used primarily for detection assessments
+
+#### Precision
+
+```math
+Precision=\frac{|TP|}{|TP|+|FP|}
+```
+
+#### Recall
+
+```math
+Recall=\frac{|TP|}{|TP|+|FN|}
+```
+
+#### F1
+
+```math
+F1=2 * \frac{Precision*Recall}{Precision+Recall}
+```
+
+#### Implementation
+
+- [ConfusionMatrixMetric](./src/metrics/confusion_matrix_metric.py)
+
+### Usage
+
+You can call [evaluation script](./src/commands/evaluate_sequences.py) using the command below:
+
+```bash
+ ds-evaluate --sequences_dir=./data/sequences --detections_dir=./data/detections --metrics=hota,deta,assa,precision,recall,f1
+```
+
+You will see a table similar to the table below:
+
+```text
+                    |hota      |deta      |assa      |precision |recall    |f1        |
+KITTI-17            |   0.43184|   0.43436|   0.43184|   0.91009|   0.37796|   0.53411|
+MOT16-09            |   0.29949|   0.27881|   0.32212|    0.9461|   0.26864|   0.41846|
+MOT16-11            |   0.40918|   0.34313|   0.48818|   0.98828|   0.30167|   0.46224|
+PETS09-S2L1         |   0.47994|   0.52909|   0.43645|   0.76622|   0.47649|   0.58758|
+TUD-Campus          |   0.41153|   0.43778|   0.38995|   0.87008|   0.38103|   0.52998|
+TUD-Stadtmitte      |   0.37549|   0.45751|    0.3105|   0.79887|   0.42258|   0.55276|
+COMBINED            |   0.40125|   0.41345|   0.39651|   0.87994|    0.3714|   0.51419|
+```
+
 ## Acknowledgement
 
 Project is based on a [DeepSort algorithm implementation](https://github.com/nwojke/deep_sort) originally proposed in ["Simple Online and Realtime Tracking with a Deep Association Metric"](https://arxiv.org/abs/1703.07402).
