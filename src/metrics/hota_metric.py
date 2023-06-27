@@ -3,11 +3,12 @@ import numpy as np
 from functools import cache
 from scipy.optimize import linear_sum_assignment
 from src.dataset.mot.mot_ground_truth import MotGroundTruth
+from src.metrics.metric import Metric
 from src.utils.geometry.rect import Rect
 from src.utils.benchmarking import benchmark
 
 
-class HotaMetric(object):
+class HotaMetric(Metric):
     """Implementation of HOTA metric.
 
     The metric relies on a research paper (https://arxiv.org/pdf/2009.07736.pdf)
@@ -21,13 +22,13 @@ class HotaMetric(object):
 
     Attributes
     ----------
-        __ground_truth: MotGroundTruth
+        _ground_truth: MotGroundTruth
             Ground truth object.
         __association_lookup: dict[int, np.ndarray]
             Lookup table for similarity scores between rects.
-        __detections: dict[int, dict[int, Rect]]
+        _detections: dict[int, dict[int, Rect]]
             Lookup table to find detections per frame per track.
-        __tracks: dict[int, list[(int, Rect)]]
+        _tracks: dict[int, list[(int, Rect)]]
             Lookup table to find all detections per track.
     """
 
@@ -37,33 +38,12 @@ class HotaMetric(object):
 
     def __init__(self,
                  ground_truth: MotGroundTruth):
-        assert ground_truth is not None
-
-        self.__ground_truth = ground_truth
-
-        self.__detections: dict[int, dict[int, Rect]] = dict()
-        self.__tracks: dict[int, list[(int, Rect)]] = dict()
-
-    def update_frame(self,
-                     frame_id: int,
-                     detections: dict[int, Rect]):
-        assert frame_id not in self.__detections
-
-        self.__detections[frame_id] = detections
-
-        for track_id, box in detections.items():
-            if track_id not in self.__tracks:
-                self.__tracks[track_id] = list()
-
-            self.__tracks[track_id].append((frame_id, box))
+        super().__init__(ground_truth=ground_truth,
+                         supported_metrics={HotaMetric.KEY_METRIC_HOTA, HotaMetric.KEY_METRIC_DETA,
+                                            HotaMetric.KEY_METRIC_ASSA})
 
     @benchmark
-    def evaluate(self) -> float:
-        detection, association = self.__evaluate_sequence()
-        return self.__get_hota(detection, association)
-
-    @benchmark
-    def evaluate_with_sub_metrics(self) -> dict:
+    def evaluate(self) -> dict:
         metrics_dict = dict()
 
         detection, association = self.__evaluate_sequence()
@@ -94,7 +74,7 @@ class HotaMetric(object):
         # Accumulator of metrics per all frames.
         result_metrics = np.zeros(shape=(19, 4))
 
-        for frame_id in self.__detections.keys():
+        for frame_id in self._detections.keys():
             result_metrics += self.__evaluate_frame(frame_id=frame_id)
 
         detection = result_metrics[:, 0] / np.maximum(1, np.sum(result_metrics[:, 0:3], axis=1))
@@ -109,8 +89,8 @@ class HotaMetric(object):
 
     def __evaluate_frame(self,
                          frame_id: int) -> np.ndarray:
-        raw_detections = self.__detections[frame_id]
-        raw_ground_truth = self.__ground_truth[frame_id]
+        raw_detections = self._detections[frame_id]
+        raw_ground_truth = self._ground_truth[frame_id]
 
         if len(raw_detections) == 0 and len(raw_ground_truth) == 0:
             return np.repeat([[0, 0, 0, 1]], repeats=19, axis=0)
@@ -166,8 +146,8 @@ class HotaMetric(object):
         fpa = 0
         fna = 0
 
-        detection_track = self.__tracks[detection_track_id]
-        ground_truth_track = self.__ground_truth.get_track(ground_truth_track_id)
+        detection_track = self._tracks[detection_track_id]
+        ground_truth_track = self._ground_truth.get_track(ground_truth_track_id)
 
         if len(detection_track) == 0 and len(ground_truth_track) == 0:
             # No detections and no ground truth: perhaps this could happen.
