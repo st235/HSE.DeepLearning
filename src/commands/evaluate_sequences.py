@@ -30,7 +30,9 @@ def run(sequences_directory: str,
     sequences_directory: str
         Path to the sequence directory.
     detections_directory: str
-        Path to the detections directory.
+        Path to the directory with detection in npy format.
+    metrics_to_track: list[str]
+        List of metrics to evaluate.
     """
 
     metrics_printer = MetricsPrinter(metrics_to_track)
