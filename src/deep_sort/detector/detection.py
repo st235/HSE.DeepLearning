@@ -1,5 +1,6 @@
 import numpy as np
 
+from src.utils.deprecations import deprecated
 from src.utils.geometry.rect import Rect
 
 
@@ -31,5 +32,6 @@ class Detection(object):
         return self.__confidence
 
     @property
+    @deprecated
     def feature(self):
         return self.__feature
