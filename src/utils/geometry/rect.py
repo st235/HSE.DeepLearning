@@ -27,7 +27,7 @@ class Rect(object):
         `(top left, bottom right)` array.
         """
         return Rect(tlbr[0], tlbr[1],
-                    tlbr[2] - tlbr[0], tlbr[3] - tlbr[1])
+                    tlbr[2] - tlbr[0] + 1, tlbr[3] - tlbr[1] + 1)
 
     @classmethod
     def from_xyah(cls, xyah) -> Rect:
@@ -62,11 +62,11 @@ class Rect(object):
 
     @property
     def right(self) -> float:
-        return self.__left + self.__width
+        return self.__left + self.__width - 1
 
     @property
     def bottom(self) -> float:
-        return self.__top + self.__height
+        return self.__top + self.__height - 1
 
     @property
     def center_x(self) -> float:
@@ -143,17 +143,15 @@ class Rect(object):
              that: Rect) -> Rect:
         """Clipping the given rect by current viewport.
         """
-        l, r, t, b = that.left, that.right, that.top, that.bottom
+        left = max(that.left, self.left)
+        right = min(that.right, self.right)
+        top = max(that.top, self.top)
+        bottom = min(that.bottom, self.bottom)
 
-        l = max(l, self.left)
-        r = min(r, self.right)
-        t = max(t, self.top)
-        b = min(b, self.bottom)
+        new_width = right - left + 1
+        new_height = bottom - top + 1
 
-        new_w = r - l
-        new_h = b - t
-
-        return Rect(left=l, top=t, width=new_w, height=new_h)
+        return Rect(left=left, top=top, width=new_width, height=new_height)
 
     @classmethod
     def __check_if_lines_intersect(cls, a_start: float, a_end: float,
