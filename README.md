@@ -93,10 +93,11 @@ This is the patch that was sent to the authors of `Nanodet`:
 
 Features extractor is the main abstraction for converting a detection area into a feature vector.
 
-It provides the only method:
-- **extract(image: np.ndarray, boxes: list[Rect]) -> np.ndarray**: it accepts original image and found detections,
-and returns a list of features vectors. Feature vectors go in the same order as detections.
+The API of the class looks like:
 
+| Method                                                          | Description                                                                                                                                 |
+|-----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| **extract(image: np.ndarray, boxes: list[Rect]) -> np.ndarray** | it accepts original image and found detections, and returns a list of features vectors. Feature vectors go in the same order as detections. |
 
 #### Tensorflow V1
 
@@ -112,28 +113,27 @@ a tensorflow model to extract feature vectors from detections.
 ![Rect](./resources/rect.png)
 
 Rect represents a rectangular area and helps to deal with their geometry. It provides a few helpful methods:
-- **width: float**: returns width of the rect
-- **height: float**: returns height of the rect
-- **top: float**: returns first horizontal pixels position (aka top edge) in the original image
-- **left: float**: returns first vertical pixels position (aka left edge) in the original image
-- **right: float**: returns last vertical pixels position (aka right edge) in the original image
-- **bottom: float**: returns last horizontal pixels position (aka bottom edge) in the original image
-- **center_x: float**: returns horizontal central position
-- **center_y: float**: returns vertical central position
-- **aspect_ratio: float**: returns ratio of width to height, i.e. `width / height`
-- **area: float**: returns rectangle area, i.e. `width * height`
 
-- **inset(left: float, top: float, right: float, bottom: float) -> Rect**: adds paddings to the current rect and returns
-a new rect with new paddings
-- **check_if_intersects(that: Rect) -> bool**: checks if 2 rectangles are intersecting
-- **iou(hat: Rect) -> float**: calculates intersection over union, the return value is always within **[0, 1]**
-- **resize(target_width: float, target_height: float) -> Rect**: scales current rect and returns a new one with
-the same aspect ratio as target_width over target_height
-- **clip(that: Rect) -> Rect**: clips the other rect by the bounding boxes of the current rect, returns a new rect with
-new bounding boxes or raises exception if the other box is completely outside the bounding box of the current rect
+| Method                                                                  | Description                                                                                                                                                    |
+|-------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **width: float**                                                        | returns width of the rect                                                                                                                                      |
+| **height: float**                                                       | returns height of the rect                                                                                                                                     |
+| **top: float**                                                          | returns first horizontal pixels position (aka top edge) in the original image                                                                                  |
+| **left: float**                                                         | returns first vertical pixels position (aka left edge) in the original image                                                                                   |
+| **right: float**                                                        | returns last vertical pixels position (aka right edge) in the original image                                                                                   |
+| **bottom: float**                                                       | returns last horizontal pixels position (aka bottom edge) in the original image                                                                                |
+| **center_x: float**                                                     | returns horizontal central position                                                                                                                            |
+| **center_y: float**                                                     | returns vertical central position                                                                                                                              |
+| **aspect_ratio: float**                                                 | returns ratio of width to height, i.e. `width / height`                                                                                                        |
+| **area: float**                                                         | returns rectangle area, i.e. `width * height`                                                                                                                  |
+| **inset(left: float, top: float, right: float, bottom: float) -> Rect** | adds paddings to the current rect and returns a new rect with new paddings                                                                                     |
+| **check_if_intersects(that: Rect) -> bool**                             | checks if 2 rectangles are intersecting                                                                                                                        | 
+| **iou(hat: Rect) -> float**                                             | calculates intersection over union, the return value is always within **[0, 1]**                                                                               |
+| **resize(target_width: float, target_height: float) -> Rect**           | scales current rect and returns a new one with the same aspect ratio as target_width over target_height                                                        |
+| **clip(that: Rect) -> Rect**                                            | clips the other rect by the bounding boxes of the current rect or raises exception if the other box is completely outside the bounding box of the current rect |
 
-Rect fixes ab issue in original [`deep sort`](https://github.com/nwojke/deep_sort) with incorrect
-bottom-right corner calculation.
+Rect fixes an issue within the original [`deep sort`](https://github.com/nwojke/deep_sort). Bottom right corners of
+the bounding boxes are calculated incorrectly which _may affect detection and metrics calculation quality_.
 
 This is the Pull Request that fixes the issue:
 - [#314 Fix bbox bottom right corner calculation](https://github.com/nwojke/deep_sort/pull/314)
