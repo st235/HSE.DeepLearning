@@ -2,6 +2,7 @@ import argparse
 import os
 import numpy as np
 
+import dependencies.definitions
 from src.app.app import App
 from src.app.visualization import Visualization
 from src.commands.utils.cl_arguments_utils import parse_array
@@ -10,6 +11,7 @@ from src.dataset.mot.mot_ground_truth import MotGroundTruth
 from src.deep_sort import nn_matching, preprocessing
 from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
+from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
 from src.deep_sort.tracker import Tracker
 from src.metrics.metric import Metric
 from src.metrics.hota_metric import HotaMetric
@@ -56,6 +58,7 @@ def __evaluate_single_sequence(sequence_directory: str,
                                metrics_to_track: list[str]) -> dict[str, float]:
     dataset_descriptor = MotDatasetDescriptor.load(sequence_directory)
     detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detection_file)
+    features_extractor = TensorflowV1FeaturesExtractor(checkpoint_file=dependencies.definitions.get_file_path('features_model', 'mars-small128.pb'))
 
     assert dataset_descriptor.ground_truth is not None, \
         f"Ground truth should not be empty for {dataset_descriptor.name}"
@@ -84,9 +87,11 @@ def __evaluate_single_sequence(sequence_directory: str,
         indices = preprocessing.non_max_suppression(boxes, 1.0, scores)
         detections = [detections[i] for i in indices]
 
+        extracted_features = features_extractor.extract(image, [d.origin for d in detections])
+
         # Update tracker.
         tracker.predict()
-        tracker.update(detections)
+        tracker.update(detections, extracted_features)
 
         visualisation.draw_trackers(tracker.tracks)
 
