@@ -32,6 +32,6 @@ class HogDetectionsProvider(DetectionsProvider):
                 continue
 
             bbox_origin = Rect(left=x, top=y, width=w, height=h)
-            detection_list.append(Detection(bbox_origin, 1.0, []))
+            detection_list.append(Detection(bbox_origin, 1.0))
 
         return detection_list

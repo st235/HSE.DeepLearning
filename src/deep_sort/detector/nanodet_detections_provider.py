@@ -61,7 +61,7 @@ class NanodetDetectionsProvider(DetectionsProvider):
                     continue
 
                 rect = Rect(left=x0, top=y0, width=w, height=h)
-                all_box.append(Detection(rect, score, []))
+                all_box.append(Detection(rect, score))
 
         return all_box
 

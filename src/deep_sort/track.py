@@ -1,6 +1,7 @@
 import numpy as np
 
 from enum import Enum
+from src.deep_sort.detector.detection import Detection
 
 
 class TrackState(Enum):
@@ -64,16 +65,22 @@ class Track:
 
     """
 
-    def __init__(self, mean, covariance, track_id, n_init, max_age,
-                 feature=None):
+    def __init__(self,
+                 mean,
+                 covariance,
+                 track_id,
+                 n_init,
+                 max_age,
+                 feature: np.ndarray):
+        assert feature is not None
+
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id
         self.time_since_update = 0
 
         self.features = []
-        if feature is not None:
-            self.features.append(feature)
+        self.features.append(feature)
 
         self.__state = TrackState.Tentative
         self.__hits = 1
@@ -96,20 +103,6 @@ class Track:
         ret[:2] -= ret[2:] / 2
         return ret
 
-    def to_tlbr(self):
-        """Get current position in bounding box format `(min x, miny, max x,
-        max y)`.
-
-        Returns
-        -------
-        ndarray
-            The bounding box.
-
-        """
-        ret = self.to_tlwh()
-        ret[2:] = ret[:2] + ret[2:]
-        return ret
-
     def predict(self, kf):
         """Propagate the state distribution to the current time step using a
         Kalman filter prediction step.
@@ -124,24 +117,27 @@ class Track:
         self.__age += 1
         self.time_since_update += 1
 
-    def update(self, kf, detection):
+    def update(self,
+               kf,
+               detection: Detection,
+               feature: np.ndarray):
         """Perform Kalman filter measurement update step and update the feature
         cache.
 
         Parameters
         ----------
-        kf : kalman_filter.KalmanFilter
+        kf: kalman_filter.KalmanFilter
             The Kalman filter.
-        detection : Detection
+        detection: Detection
             The associated detection.
-
+        feature: np.ndarray
+            1 Dimensional array with a feature vector for the given detection.
         """
         xyah = np.array([detection.origin.center_x, detection.origin.center_y,
                          detection.origin.aspect_ratio, detection.origin.height])
 
-        self.mean, self.covariance = kf.update(
-            self.mean, self.covariance, xyah)
-        self.features.append(detection.feature)
+        self.mean, self.covariance = kf.update(self.mean, self.covariance, xyah)
+        self.features.append(feature)
 
         self.__hits += 1
         self.time_since_update = 0

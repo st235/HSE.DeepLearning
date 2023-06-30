@@ -5,10 +5,11 @@ from typing import Callable
 
 
 def benchmark(function: Callable) -> Callable:
-    """Measures a method performance.
-    """
+    """This is a decorator function to measure performance of the given function.
 
-    instances_lookup = dict()
+    Adding this decorator will result in printing time taken by the function in seconds
+    to the standard output stream.
+    """
 
     @wraps(function)
     def wrapper(*args, **kwargs):

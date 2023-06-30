@@ -57,6 +57,6 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
                 continue
 
             rect = Rect(left=x0, top=y0, width=width, height=height)
-            detection_list.append(Detection(rect, confidence, []))
+            detection_list.append(Detection(rect, confidence))
 
         return detection_list

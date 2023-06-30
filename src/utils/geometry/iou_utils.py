@@ -1,8 +1,10 @@
 from __future__ import absolute_import
 
 import numpy as np
-from src.deep_sort import linear_assignment
 
+from src.deep_sort import linear_assignment
+from src.deep_sort.detector.detection import Detection
+from src.deep_sort.track import Track
 from src.utils.geometry.rect import Rect
 
 
@@ -27,35 +29,38 @@ def iou(bbox: Rect, candidates: list[Rect]) -> np.ndarray[float]:
     return np.array([bbox.iou(candidate) for candidate in candidates])
 
 
-def iou_cost(tracks, detections, track_indices=None,
-             detection_indices=None):
+def iou_cost(tracks: list[Track],
+             detections: list[Detection],
+             features: np.ndarray,
+             track_indices: list[int],
+             detection_indices: list[int]):
     """An intersection over union distance metric.
 
     Parameters
     ----------
-    tracks : List[deep_sort.track.Track]
+    tracks: list[Track]
         A list of tracks.
-    detections : List[deep_sort.detection.Detection]
+    detections: list[Detection]
         A list of detections.
-    track_indices : Optional[List[int]]
+    features: np.ndarray
+        2 Dimensional array of detections features.
+    track_indices: list[int]
         A list of indices to tracks that should be matched. Defaults to
         all `tracks`.
-    detection_indices : Optional[List[int]]
+    detection_indices: list[int]
         A list of indices to detections that should be matched. Defaults
         to all `detections`.
 
     Returns
     -------
-    ndarray
+    np.ndarray
         Returns a cost matrix of shape
         len(track_indices), len(detection_indices) where entry (i, j) is
         `1 - iou(tracks[track_indices[i]], detections[detection_indices[j]])`.
 
     """
-    if track_indices is None:
-        track_indices = np.arange(len(tracks))
-    if detection_indices is None:
-        detection_indices = np.arange(len(detections))
+    assert track_indices is not None
+    assert detection_indices is not None
 
     cost_matrix = np.zeros((len(track_indices), len(detection_indices)))
     for row, track_idx in enumerate(track_indices):

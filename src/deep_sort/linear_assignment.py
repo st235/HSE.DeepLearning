@@ -8,8 +8,9 @@ INFTY_COST = 1e+5
 
 
 def min_cost_matching(
-        distance_metric, max_distance, tracks, detections, track_indices=None,
-        detection_indices=None):
+        distance_metric, max_distance,
+        tracks, detections, features,
+        track_indices=None, detection_indices=None):
     """Solve linear assignment problem.
 
     Parameters
@@ -52,7 +53,7 @@ def min_cost_matching(
         return [], track_indices, detection_indices  # Nothing to match.
 
     cost_matrix = distance_metric(
-        tracks, detections, track_indices, detection_indices)
+        tracks, detections, features, track_indices, detection_indices)
     cost_matrix[cost_matrix > max_distance] = max_distance + 1e-5
     indices = linear_assignment(cost_matrix)
     indices = np.hstack([indices[0].reshape(((indices[0].shape[0]), 1)),indices[1].reshape(((indices[0].shape[0]), 1))])
@@ -76,13 +77,14 @@ def min_cost_matching(
 
 
 def matching_cascade(
-        distance_metric, max_distance, cascade_depth, tracks, detections,
+        distance_metric, max_distance, cascade_depth,
+        tracks, detections, features,
         track_indices=None, detection_indices=None):
     """Run matching cascade.
 
     Parameters
     ----------
-    distance_metric : Callable[List[Track], List[Detection], List[int], List[int]) -> ndarray
+    distance_metric : Callable[list[Track], list[Detection], np.ndarray, list[int], list[int]) -> ndarray
         The distance metric is given a list of tracks and detections as well as
         a list of N track indices and M detection indices. The metric should
         return the NxM dimensional cost matrix, where element (i, j) is the
@@ -134,7 +136,7 @@ def matching_cascade(
 
         matches_l, _, unmatched_detections = \
             min_cost_matching(
-                distance_metric, max_distance, tracks, detections,
+                distance_metric, max_distance, tracks, detections, features,
                 track_indices_l, unmatched_detections)
         matches += matches_l
     unmatched_tracks = list(set(track_indices) - set(k for k, _ in matches))
