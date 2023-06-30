@@ -78,6 +78,9 @@ def _run_in_batches(f, data_dict, out, batch_size):
 
 
 class TensorflowV1FeaturesExtractor(FeaturesExtractor):
+    """Feature extractor based on Tensorflow V1 model.
+    """
+
     def __init__(self,
                  checkpoint_file: str,
                  input_name: str = "images",

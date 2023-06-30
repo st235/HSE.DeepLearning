@@ -127,8 +127,8 @@ Rect represents a rectangular area and helps to deal with their geometry. It pro
 a new rect with new paddings
 - **check_if_intersects(that: Rect) -> bool**: checks if 2 rectangles are intersecting
 - **iou(hat: Rect) -> float**: calculates intersection over union, the return value is always within **[0, 1]**
-- **resize(target_width: float, target_height: float) -> Rect**: resizes current rect and returns a new one with
-target_width and target_height sizes
+- **resize(target_width: float, target_height: float) -> Rect**: scales current rect and returns a new one with
+the same aspect ratio as target_width over target_height
 - **clip(that: Rect) -> Rect**: clips the other rect by the bounding boxes of the current rect, returns a new rect with
 new bounding boxes or raises exception if the other box is completely outside the bounding box of the current rect
 

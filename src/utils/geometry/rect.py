@@ -2,6 +2,19 @@ from __future__ import annotations
 
 
 class Rect(object):
+    """Represents a rectangular area and helps to deal with their geometry.
+
+    Parameters:
+    ----------
+        __left: float
+            Left edge of the rectangle.
+        __top: float
+            Top edge of the rectangle.
+        __width: float
+            Width of the rectangle.
+        __height: float
+            Height of the rectangle.
+    """
 
     def __init__(self,
                  left: float, top: float,
@@ -46,47 +59,88 @@ class Rect(object):
 
     @property
     def width(self) -> float:
+        """Returns width of the rect.
+        """
         return self.__width
 
     @property
     def height(self) -> float:
+        """Returns height of the rect.
+        """
         return self.__height
 
     @property
     def top(self) -> float:
+        """Returns first horizontal pixels position (aka top edge) in the original image.
+        """
         return self.__top
 
     @property
     def left(self) -> float:
+        """Returns first vertical pixels position (aka left edge) in the original image.
+        """
         return self.__left
 
     @property
     def right(self) -> float:
+        """Returns last vertical pixels position (aka right edge) in the original image.
+        """
         return self.__left + self.__width - 1
 
     @property
     def bottom(self) -> float:
+        """Returns last horizontal pixels position (aka bottom edge) in the original image.
+        """
         return self.__top + self.__height - 1
 
     @property
     def center_x(self) -> float:
+        """Returns horizontal central position.
+        """
         return self.__left + self.__width / 2
 
     @property
     def center_y(self) -> float:
+        """Returns vertical central position.
+        """
         return self.__top + self.__height / 2
 
     @property
     def aspect_ratio(self) -> float:
+        """Returns ratio of width to height.
+
+         Ration is calculated using the next equation: width / height.
+        """
         return self.__width / self.__height
 
     @property
     def area(self) -> float:
+        """Returns area of the rectangle.
+
+         Area is calculated using the next equation: width * height.
+        """
         return self.__width * self.__height
 
     def inset(self,
               left: float, top: float,
               right: float, bottom: float) -> Rect:
+        """Adds paddings to the current rect.
+
+        Parameters
+        ----------
+        left: float
+            Left padding.
+        top: float
+            Top padding.
+        right: float
+            Right padding.
+        bottom: float
+            Bottom padding.
+
+        Returns
+        -------
+            Returns a new rectangle with new coordinates and sizes, reflecting the padding.
+        """
         assert left >= 0
         assert top >= 0
         assert right >= 0
@@ -96,10 +150,31 @@ class Rect(object):
                     width=self.__width + left + right, height=self.__height + top + bottom)
 
     def check_if_intersects(self, that: Rect) -> bool:
+        """Checks if the rectangle intersects with the given rect.
+
+        Parameters
+        ----------
+        that: Rect
+            Another Rect we are testing against.
+
+        Returns
+        -------
+            True if rectangles intersect and False otherwise. If rectangles share a common edge they are not
+            considered as intersecting.
+        """
         return self.__check_if_lines_intersect(self.left, self.right, that.left, that.right) and \
             self.__check_if_lines_intersect(self.top, self.bottom, that.top, that.bottom)
 
     def iou(self, that: Rect) -> float:
+        """Calculates intersection over union.
+
+        IoU is a ratio of the area of intersection of two rectangles over their combined area (aka union area).
+
+        Returns
+        -------
+            A ratio. The value is always within [0, 1].
+        """
+
         assert isinstance(that, Rect), f"Expected Rect but found {type(that)}: {that}"
 
         if not self.check_if_intersects(that):
@@ -127,6 +202,20 @@ class Rect(object):
     def resize(self,
                target_width: float,
                target_height: float) -> Rect:
+        """Scales the rectangle to the same aspect ratio as target_width over target_height.
+
+        Parameters
+        ----------
+        target_width: float
+            New width of the rectangle.
+        target_height: float
+            New height of the rectangle.
+
+        Returns
+        -------
+            A new rectangle with aspect_ratio equal to target_width / target_height.
+        """
+
         assert isinstance(target_width, float), \
             f"Target width is not float {type(target_width)}"
         assert isinstance(target_height, float), \
@@ -141,7 +230,12 @@ class Rect(object):
 
     def clip(self,
              that: Rect) -> Rect:
-        """Clipping the given rect by current viewport.
+        """Clips the other rect by the bounding boxes of this rect.
+
+        Returns
+        -------
+            Returns a new rect with new bounding boxes or raises exception if the other box is completely
+             outside the bounding box of the current rect.
         """
         left = max(that.left, self.left)
         right = min(that.right, self.right)
