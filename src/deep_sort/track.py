@@ -103,20 +103,6 @@ class Track:
         ret[:2] -= ret[2:] / 2
         return ret
 
-    def to_tlbr(self):
-        """Get current position in bounding box format `(min x, miny, max x,
-        max y)`.
-
-        Returns
-        -------
-        ndarray
-            The bounding box.
-
-        """
-        ret = self.to_tlwh()
-        ret[2:] = ret[:2] + ret[2:]
-        return ret
-
     def predict(self, kf):
         """Propagate the state distribution to the current time step using a
         Kalman filter prediction step.
