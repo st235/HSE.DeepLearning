@@ -1,21 +1,19 @@
 import argparse
 import os
+
 import numpy as np
 
-import dependencies.definitions
 from src.app.app import App
 from src.app.visualization import Visualization
 from src.commands.utils.cl_arguments_utils import parse_array
 from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from src.dataset.mot.mot_ground_truth import MotGroundTruth
-from src.deep_sort import nn_matching, preprocessing
-from src.deep_sort.detector.detections_provider import DetectionsProvider
+from src.deep_sort.deep_sort import DeepSort
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
-from src.deep_sort.tracker import Tracker
-from src.metrics.metric import Metric
-from src.metrics.hota_metric import HotaMetric
 from src.metrics.confusion_matrix_metric import ConfusionMatrixMetric
+from src.metrics.hota_metric import HotaMetric
+from src.metrics.metric import Metric
 from src.metrics.metrics_printer import MetricsPrinter
 from src.utils.geometry.rect import Rect
 
@@ -57,8 +55,10 @@ def __evaluate_single_sequence(sequence_directory: str,
                                detection_file: str,
                                metrics_to_track: list[str]) -> dict[str, float]:
     dataset_descriptor = MotDatasetDescriptor.load(sequence_directory)
-    detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detection_file)
-    features_extractor = TensorflowV1FeaturesExtractor(checkpoint_file=dependencies.definitions.get_file_path('features_model', 'mars-small128.pb'))
+
+    deep_sort_builder = DeepSort.Builder(dataset_descriptor=dataset_descriptor)
+    deep_sort_builder.detections_provider = FileDetectionsProvider(detections_file_path=detection_file)
+    deep_sort_builder.features_extractor = TensorflowV1FeaturesExtractor.create_default()
 
     assert dataset_descriptor.ground_truth is not None, \
         f"Ground truth should not be empty for {dataset_descriptor.name}"
@@ -75,29 +75,16 @@ def __evaluate_single_sequence(sequence_directory: str,
         metrics.append(metric)
 
     app = App(dataset_descriptor)
-    tracker = Tracker(metric=nn_matching.NearestNeighborDistanceMetric("cosine", 0.2))
+    deep_sort = deep_sort_builder.build()
 
     def frame_callback(frame_id: int, image: np.ndarray, visualisation: Visualization):
-        detections = detections_provider.load_detections(image, frame_id)
-        detections = [d for d in detections if d.confidence >= 0.8]
+        tracks = deep_sort.update(frame_id, image)
 
-        # Run non-maxima suppression.
-        boxes = np.array([list(detection.origin) for detection in detections])
-        scores = np.array([d.confidence for d in detections])
-        indices = preprocessing.non_max_suppression(boxes, 1.0, scores)
-        detections = [detections[i] for i in indices]
-
-        extracted_features = features_extractor.extract(image, [d.origin for d in detections])
-
-        # Update tracker.
-        tracker.predict()
-        tracker.update(detections, extracted_features)
-
-        visualisation.draw_trackers(tracker.tracks)
+        visualisation.draw_trackers(tracks)
 
         for metric in metrics:
             metric.update_frame(frame_id,
-                                {track.track_id: Rect.from_tlwh(track.to_tlwh()) for track in tracker.tracks if
+                                {track.track_id: Rect.from_tlwh(track.to_tlwh()) for track in tracks if
                                  track.is_confirmed() and track.time_since_update <= 1})
 
     # Run the app.

@@ -1,16 +1,16 @@
 from __future__ import division, print_function, absolute_import
 
 import argparse
+from typing import Optional
+
 import numpy as np
 
 from src.app.app import App
 from src.app.visualization import Visualization
 from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
-from src.deep_sort import nn_matching, preprocessing
-from src.deep_sort.detector.detections_provider import DetectionsProvider
+from src.deep_sort.deep_sort import DeepSort
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
-from src.deep_sort.tracker import Tracker
-from typing import Optional
+from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
 
 
 def run(sequence_directory: str,
@@ -43,35 +43,28 @@ def run(sequence_directory: str,
         is enforced.
     """
     dataset_descriptor = MotDatasetDescriptor.load(sequence_directory)
-    detections_provider: DetectionsProvider = FileDetectionsProvider(detections_file_path=detections_file)
 
     app = App(dataset_descriptor)
 
-    metric = nn_matching.NearestNeighborDistanceMetric(
-        "cosine", max_cosine_distance, nn_budget)
+    deep_sort_builder = DeepSort.Builder(dataset_descriptor=dataset_descriptor)
+    deep_sort_builder.detections_provider = FileDetectionsProvider(detections_file_path=detections_file)
+    deep_sort_builder.features_extractor = TensorflowV1FeaturesExtractor.create_default()
 
-    tracker = Tracker(metric)
+    deep_sort_builder.detection_min_confidence = min_confidence
+    deep_sort_builder.detection_nms_max_overlap = nms_max_overlap
+    deep_sort_builder.detection_min_height = min_detection_height
+
+    deep_sort = deep_sort_builder.build()
+
     results = []
 
     def frame_callback(frame_id: int, image: np.ndarray, visualisation: Visualization):
-        detections = detections_provider.load_detections(image, frame_id, min_detection_height)
-        detections = [d for d in detections if d.confidence >= min_confidence]
+        tracks = deep_sort.update(frame_id, image)
 
-        # Run non-maxima suppression.
-        boxes = np.array([list(detection.origin) for detection in detections])
-        scores = np.array([d.confidence for d in detections])
-        indices = preprocessing.non_max_suppression(
-            boxes, nms_max_overlap, scores)
-        detections = [detections[i] for i in indices]
-
-        # Update tracker.
-        tracker.predict()
-        tracker.update(detections)
-
-        visualisation.draw_trackers(tracker.tracks)
+        visualisation.draw_trackers(tracks)
 
         # Store results.
-        for track in tracker.tracks:
+        for track in tracks:
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue
             bbox = track.to_tlwh()

@@ -1,10 +1,10 @@
-import os
-import errno
-import argparse
-import numpy as np
+from __future__ import annotations
+
 import cv2
+import numpy as np
 import tensorflow.compat.v1 as tf
 
+from dependencies.definitions import get_file_path
 from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
 from src.utils.geometry.rect import Rect
 
@@ -105,6 +105,10 @@ class TensorflowV1FeaturesExtractor(FeaturesExtractor):
         self.__image_shape = (float(raw_image_shape[1]), float(raw_image_shape[0]))
 
         self.__batch_size = batch_size
+
+    @classmethod
+    def create_default(cls) -> TensorflowV1FeaturesExtractor:
+        return TensorflowV1FeaturesExtractor(checkpoint_file=get_file_path('features_model', 'mars-small128.pb'))
 
     def extract(self,
                 image: np.ndarray,
