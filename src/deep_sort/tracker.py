@@ -34,7 +34,7 @@ class Tracker:
         Number of frames that a track remains in initialization phase.
     __kalman_filter : KalmanFilter
         A Kalman filter to filter target trajectories in image space.
-    tracks : List[Track]
+    __tracks : List[Track]
         The list of active tracks at the current time step.
 
     """
@@ -51,7 +51,7 @@ class Tracker:
         assert isinstance(n_init, int) \
             and n_init >= 0
 
-        self.tracks = []
+        self.__tracks = []
 
         self.__metric = metric
         self.__max_iou_distance = max_iou_distance
@@ -61,12 +61,16 @@ class Tracker:
         self.__kalman_filter = KalmanFilter()
         self.__next_id = 1
 
+    @property
+    def tracks(self) -> list[Track]:
+        return self.__tracks
+
     def predict(self):
         """Propagate track state distributions one time step forward.
 
         This function should be called once every time step, before `update`.
         """
-        for track in self.tracks:
+        for track in self.__tracks:
             track.predict(self.__kalman_filter)
 
     def update(self,
@@ -89,18 +93,18 @@ class Tracker:
 
         # Update track set.
         for track_idx, detection_idx in matches:
-            self.tracks[track_idx].update(
+            self.__tracks[track_idx].update(
                 self.__kalman_filter, detections[detection_idx], features[detection_idx, :])
         for track_idx in unmatched_tracks:
-            self.tracks[track_idx].mark_missed()
+            self.__tracks[track_idx].mark_missed()
         for detection_idx in unmatched_detections:
             self.__initiate_track(detections[detection_idx], features[detection_idx, :])
-        self.tracks = [t for t in self.tracks if not t.is_deleted()]
+        self.__tracks = [t for t in self.__tracks if not t.is_deleted()]
 
         # Update distance metric.
-        active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
+        active_targets = [t.track_id for t in self.__tracks if t.is_confirmed()]
         features, targets = [], []
-        for track in self.tracks:
+        for track in self.__tracks:
             if not track.is_confirmed():
                 continue
             features += track.features
@@ -123,26 +127,26 @@ class Tracker:
 
         # Split track set into confirmed and unconfirmed tracks.
         confirmed_tracks = [
-            i for i, t in enumerate(self.tracks) if t.is_confirmed()]
+            i for i, t in enumerate(self.__tracks) if t.is_confirmed()]
         unconfirmed_tracks = [
-            i for i, t in enumerate(self.tracks) if not t.is_confirmed()]
+            i for i, t in enumerate(self.__tracks) if not t.is_confirmed()]
 
         # Associate confirmed tracks using appearance features.
         matches_a, unmatched_tracks_a, unmatched_detections = \
             linear_assignment.matching_cascade(
                 gated_metric, self.__metric.matching_threshold, self.__max_age,
-                self.tracks, detections, features, confirmed_tracks)
+                self.__tracks, detections, features, confirmed_tracks)
 
         # Associate remaining tracks together with unconfirmed tracks using IOU.
         iou_track_candidates = unconfirmed_tracks + [
             k for k in unmatched_tracks_a if
-            self.tracks[k].time_since_update == 1]
+            self.__tracks[k].time_since_update == 1]
         unmatched_tracks_a = [
             k for k in unmatched_tracks_a if
-            self.tracks[k].time_since_update != 1]
+            self.__tracks[k].time_since_update != 1]
         matches_b, unmatched_tracks_b, unmatched_detections = \
             linear_assignment.min_cost_matching(
-                iou_utils.iou_cost, self.__max_iou_distance, self.tracks,
+                iou_utils.iou_cost, self.__max_iou_distance, self.__tracks,
                 detections, features, iou_track_candidates, unmatched_detections)
 
         matches = matches_a + matches_b
@@ -155,5 +159,5 @@ class Tracker:
         xyah = np.array([detection.origin.center_x, detection.origin.center_y,
                          detection.origin.aspect_ratio, detection.origin.height])
         mean, covariance = self.__kalman_filter.initiate(xyah)
-        self.tracks.append(Track(mean, covariance, self.__next_id, self.__n_init, self.__max_age, feature))
+        self.__tracks.append(Track(mean, covariance, self.__next_id, self.__n_init, self.__max_age, feature))
         self.__next_id += 1
