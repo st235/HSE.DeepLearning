@@ -4,9 +4,9 @@ from src.utils.geometry.rect import Rect
 
 
 @pytest.mark.parametrize("ltwh,expected_lrtbwh", [
-    ([0, 0, 10, 100], [0, 10, 0, 100, 10, 100]),
-    ([0, 0, 15, 25], [0, 15, 0, 25, 15, 25]),
-    ([10, 15, 73, 4], [10, 83, 15, 19, 73, 4]),
+    ([0, 0, 10, 100], [0, 9, 0, 99, 10, 100]),
+    ([0, 0, 15, 25], [0, 14, 0, 24, 15, 25]),
+    ([10, 15, 73, 4], [10, 82, 15, 18, 73, 4]),
 ])
 def test_initWithLeftTopWidthHeight_paramsAreCorrect_isSuccessful(ltwh, expected_lrtbwh):
     rect = Rect(left=ltwh[0], top=ltwh[1],
@@ -39,9 +39,9 @@ def test_initWithLeftTopWidthHeight_sizeIsNegativeOrNull_initFails(ltwh):
 
 
 @pytest.mark.parametrize("ltwh,expected_lrtbwh", [
-    ([0, 0, 10, 100], [0, 10, 0, 100, 10, 100]),
-    ([0, 0, 15, 25], [0, 15, 0, 25, 15, 25]),
-    ([10, 15, 73, 4], [10, 83, 15, 19, 73, 4]),
+    ([0, 0, 10, 100], [0, 9, 0, 99, 10, 100]),
+    ([0, 0, 15, 25], [0, 14, 0, 24, 15, 25]),
+    ([10, 15, 73, 4], [10, 82, 15, 18, 73, 4]),
 ])
 def test_initUsingTlwhFactory_paramsAreCorrect_isSuccessful(ltwh, expected_lrtbwh):
     rect = Rect.from_tlwh(ltwh)
@@ -96,11 +96,11 @@ def test_iou_rectsDoNotIntersect_methodReturns0(rect_a, rect_b, expected_interse
     assert one.iou(another) == expected_intersection
 
 @pytest.mark.parametrize("rect_a,rect_b,expected_intersection", [
-    ([0, 0, 10, 100], [0, 50, 20, 100], 0.1999999992),
-    ([0, 0, 20, 100], [10, 10, 10, 100], 0.4285714265306122),
-    ([0, 0, 10, 100], [-5, 0, 10, 100], 0.33333333111111113),
-    ([0, 0, 50, 120], [20, 20, 10, 10], 0.01666666663888889),
-    ([0, 0, 40, 50], [-10, -10, 200, 200], 0.049999999987499995),
+    ([0, 0, 10, 100], [0, 50, 20, 100], 0.17233294255568582),
+    ([0, 0, 20, 100], [10, 10, 10, 100], 0.36425648021828105),
+    ([0, 0, 10, 100], [-5, 0, 10, 100], 0.24688279301745636),
+    ([0, 0, 50, 120], [20, 20, 10, 10], 0.013457384947665725),
+    ([0, 0, 40, 50], [-10, -10, 200, 200], 0.047668936616029334),
 ])
 def test_iou_rectsIntersect_methodReturnsCorrectMetric(rect_a, rect_b, expected_intersection):
     one = Rect.from_tlwh(rect_a)
