@@ -64,16 +64,22 @@ class Track:
 
     """
 
-    def __init__(self, mean, covariance, track_id, n_init, max_age,
-                 feature=None):
+    def __init__(self,
+                 mean,
+                 covariance,
+                 track_id,
+                 n_init,
+                 max_age,
+                 feature: np.ndarray):
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id
         self.time_since_update = 0
 
+        assert feature is not None
+
         self.features = []
-        if feature is not None:
-            self.features.append(feature)
+        self.features.append(feature)
 
         self.__state = TrackState.Tentative
         self.__hits = 1
