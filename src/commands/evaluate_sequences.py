@@ -84,7 +84,7 @@ def __evaluate_single_sequence(sequence_directory: str,
 
         for metric in metrics:
             metric.update_frame(frame_id,
-                                {track.track_id: Rect.from_tlwh(track.to_tlwh()) for track in tracks if
+                                {track.track_id: track.bounding_box for track in tracks if
                                  track.is_confirmed() and track.time_since_update <= 1})
 
     # Run the app.

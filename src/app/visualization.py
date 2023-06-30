@@ -88,7 +88,7 @@ class Visualization(object):
             if not track.is_confirmed() or track.time_since_update > 0:
                 continue
 
-            self.__draw_track(track.track_id, Rect.from_tlwh(track.to_tlwh()))
+            self.__draw_track(track.track_id, track.bounding_box)
 
     def draw_info(self, info: str):
         background_color = Color(red=0, green=0, blue=0)

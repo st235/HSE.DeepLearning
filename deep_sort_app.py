@@ -67,7 +67,7 @@ def run(sequence_directory: str,
         for track in tracks:
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue
-            bbox = track.to_tlwh()
+            bbox = list(track.bounding_box)
             results.append([frame_id, track.track_id, bbox[0], bbox[1], bbox[2], bbox[3]])
 
     # Run the app.

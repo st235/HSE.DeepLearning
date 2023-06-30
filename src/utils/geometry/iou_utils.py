@@ -68,7 +68,7 @@ def iou_cost(tracks: list[Track],
             cost_matrix[row, :] = linear_assignment.INFTY_COST
             continue
 
-        bbox = Rect.from_tlwh(tracks[track_idx].to_tlwh())
+        bbox = tracks[track_idx].bounding_box
         candidates = [detections[i].origin for i in detection_indices]
         cost_matrix[row, :] = 1. - iou(bbox, candidates)
     return cost_matrix
