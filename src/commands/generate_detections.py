@@ -3,151 +3,58 @@ import errno
 import argparse
 import numpy as np
 import cv2
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+
+from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
+from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
+from src.utils.geometry.rect import Rect
 
 
-def _run_in_batches(f, data_dict, out, batch_size):
-    data_len = len(out)
-    num_batches = int(data_len / batch_size)
-
-    s, e = 0, 0
-    for i in range(num_batches):
-        s, e = i * batch_size, (i + 1) * batch_size
-        batch_data_dict = {k: v[s:e] for k, v in data_dict.items()}
-        out[s:e] = f(batch_data_dict)
-    if e < len(out):
-        batch_data_dict = {k: v[e:] for k, v in data_dict.items()}
-        out[e:] = f(batch_data_dict)
+def _create_box_encoder(model_filename: str,
+                        input_name: str = "images",
+                        output_name: str = "features",
+                        batch_size: int = 32) -> FeaturesExtractor:
+    return TensorflowV1FeaturesExtractor(checkpoint_file=model_filename,
+                                         input_name=input_name,
+                                         output_name=output_name,
+                                         batch_size=batch_size)
 
 
-def _extract_image_patch(image, bbox, patch_shape):
-    """Extract image patch from bounding box.
-
-    Parameters
-    ----------
-    image : ndarray
-        The full image.
-    bbox : array_like
-        The bounding box in format (x, y, width, height).
-    patch_shape : Optional[array_like]
-        This parameter can be used to enforce a desired patch shape
-        (height, width). First, the `bbox` is adapted to the aspect ratio
-        of the patch shape, then it is clipped at the image boundaries.
-        If None, the shape is computed from :arg:`bbox`.
-
-    Returns
-    -------
-    ndarray | NoneType
-        An image patch showing the :arg:`bbox`, optionally reshaped to
-        :arg:`patch_shape`.
-        Returns None if the bounding box is empty or fully outside of the image
-        boundaries.
-
-    """
-    bbox = np.array(bbox)
-    if patch_shape is not None:
-        # correct aspect ratio to patch shape
-        target_aspect = float(patch_shape[1]) / patch_shape[0]
-        new_width = target_aspect * bbox[3]
-        bbox[0] -= (new_width - bbox[2]) / 2
-        bbox[2] = new_width
-
-    # convert to top left, bottom right
-    bbox[2:] += bbox[:2]
-    bbox = bbox.astype(np.int32)
-
-    # clip at image boundaries
-    bbox[:2] = np.maximum(0, bbox[:2])
-    bbox[2:] = np.minimum(np.asarray(image.shape[:2][::-1]) - 1, bbox[2:])
-    if np.any(bbox[:2] >= bbox[2:]):
-        return None
-    sx, sy, ex, ey = bbox
-    image = image[sy:ey, sx:ex]
-    image = cv2.resize(image, tuple(patch_shape[::-1]))
-    return image
-
-
-class ImageEncoder(object):
-
-    def __init__(self, checkpoint_filename, input_name="images",
-                 output_name="features"):
-        self.session = tf.Session()
-        with tf.gfile.GFile(checkpoint_filename, "rb") as file_handle:
-            graph_def = tf.GraphDef()
-            graph_def.ParseFromString(file_handle.read())
-        tf.import_graph_def(graph_def, name="net")
-        self.input_var = tf.get_default_graph().get_tensor_by_name(
-            "net/%s:0" % input_name)
-        self.output_var = tf.get_default_graph().get_tensor_by_name(
-            "net/%s:0" % output_name)
-
-        assert len(self.output_var.get_shape()) == 2
-        assert len(self.input_var.get_shape()) == 4
-        self.feature_dim = self.output_var.get_shape().as_list()[-1]
-        self.image_shape = self.input_var.get_shape().as_list()[1:]
-
-    def __call__(self, data_x, batch_size=32):
-        out = np.zeros((len(data_x), self.feature_dim), np.float32)
-        _run_in_batches(
-            lambda x: self.session.run(self.output_var, feed_dict=x),
-            {self.input_var: data_x}, out, batch_size)
-        return out
-
-
-def _create_box_encoder(model_filename, input_name="images",
-                        output_name="features", batch_size=32):
-    image_encoder = ImageEncoder(model_filename, input_name, output_name)
-    image_shape = image_encoder.image_shape
-
-    def encoder(image, boxes):
-        image_patches = []
-        for box in boxes:
-            patch = _extract_image_patch(image, box, image_shape[:2])
-            if patch is None:
-                print("WARNING: Failed to extract image patch: %s." % str(box))
-                patch = np.random.uniform(
-                    0., 255., image_shape).astype(np.uint8)
-            image_patches.append(patch)
-        image_patches = np.asarray(image_patches)
-        return image_encoder(image_patches, batch_size)
-
-    return encoder
-
-
-def _generate_detections(encoder, mot_dir, output_dir, detection_dir=None):
+def _generate_detections(features_extractor: FeaturesExtractor,
+                         mot_directory: str,
+                         output_directory: str,
+                         detection_directory: str = None):
     """Generate detections with features.
 
     Parameters
     ----------
-    encoder : Callable[image, ndarray] -> ndarray
+    features_extractor : Callable[image, ndarray] -> ndarray
         The encoder function takes as input a BGR color image and a matrix of
         bounding boxes in format `(x, y, w, h)` and returns a matrix of
         corresponding feature vectors.
-    mot_dir : str
+    mot_directory : str
         Path to the MOTChallenge directory (can be either train or test).
-    output_dir
+    output_directory
         Path to the output directory. Will be created if it does not exist.
-    detection_dir
+    detection_directory
         Path to custom detections. The directory structure should be the default
         MOTChallenge structure: `[sequence]/det/det.txt`. If None, uses the
         standard MOTChallenge detections.
 
     """
-    if detection_dir is None:
-        detection_dir = mot_dir
+    if detection_directory is None:
+        detection_directory = mot_directory
     try:
-        os.makedirs(output_dir)
+        os.makedirs(output_directory)
     except OSError as exception:
-        if exception.errno == errno.EEXIST and os.path.isdir(output_dir):
+        if exception.errno == errno.EEXIST and os.path.isdir(output_directory):
             pass
         else:
             raise ValueError(
-                "Failed to created output directory '%s'" % output_dir)
+                "Failed to created output directory '%s'" % output_directory)
 
-    for sequence in os.listdir(mot_dir):
+    for sequence in os.listdir(mot_directory):
         print("Processing %s" % sequence)
-        sequence_dir = os.path.join(mot_dir, sequence)
+        sequence_dir = os.path.join(mot_directory, sequence)
 
         if not os.path.isdir(sequence_dir):
             # Filter out hidden files, like, system ones.
@@ -159,7 +66,7 @@ def _generate_detections(encoder, mot_dir, output_dir, detection_dir=None):
             for f in os.listdir(image_dir)}
 
         detection_file = os.path.join(
-            detection_dir, sequence, "det/det.txt")
+            detection_directory, sequence, "det/det.txt")
         detections_in = np.loadtxt(detection_file, delimiter=',')
         detections_out = []
 
@@ -174,13 +81,19 @@ def _generate_detections(encoder, mot_dir, output_dir, detection_dir=None):
             if frame_idx not in image_filenames:
                 print("WARNING could not find image for frame %d" % frame_idx)
                 continue
-            bgr_image = cv2.imread(
-                image_filenames[frame_idx], cv2.IMREAD_COLOR)
-            features = encoder(bgr_image, rows[:, 2:6].copy())
+            bgr_image = cv2.imread(image_filenames[frame_idx], cv2.IMREAD_COLOR)
+
+            bbox_rects = []
+
+            for row_index in range(rows.shape[0]):
+                row = rows[row_index, :]
+                bbox_rects.append(Rect.from_tlwh(row[2:6]))
+
+            features = features_extractor.extract(bgr_image, bbox_rects)
             detections_out += [np.r_[(row, feature)] for row, feature
                                in zip(rows, features)]
 
-        output_filename = os.path.join(output_dir, "%s.npy" % sequence)
+        output_filename = os.path.join(output_directory, "%s.npy" % sequence)
         np.save(
             output_filename, np.asarray(detections_out), allow_pickle=False)
 

@@ -124,6 +124,37 @@ class Rect(object):
 
         return intersection_area / union_area
 
+    def resize(self,
+               target_width: float,
+               target_height: float) -> Rect:
+        assert isinstance(target_width, float), \
+            f"Target width is not float {type(target_width)}"
+        assert isinstance(target_height, float), \
+            f"Target height is not float {type(target_height)}"
+
+        target_aspect_ratio = target_width / target_height
+
+        new_width = target_aspect_ratio * self.height
+        new_left = self.left - (new_width - self.width) / 2
+
+        return Rect(left=new_left, top=self.top, width=new_width, height=self.height)
+
+    def clip(self,
+             that: Rect) -> Rect:
+        """Clipping the given rect by current viewport.
+        """
+        l, r, t, b = that.left, that.right, that.top, that.bottom
+
+        l = max(l, self.left)
+        r = min(r, self.right)
+        t = max(t, self.top)
+        b = min(b, self.bottom)
+
+        new_w = r - l
+        new_h = b - t
+
+        return Rect(left=l, top=t, width=new_w, height=new_h)
+
     @classmethod
     def __check_if_lines_intersect(cls, a_start: float, a_end: float,
                                    b_start: float, b_end: float):
