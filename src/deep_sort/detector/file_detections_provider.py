@@ -43,9 +43,9 @@ class FileDetectionsProvider(DetectionsProvider):
 
         detection_list = []
         for row in self.__detections[mask]:
-            bbox, confidence, feature = row[2:6], row[6], row[10:]
+            bbox, confidence = row[2:6], row[6]
             if bbox[3] < min_height:
                 continue
             bbox_origin = Rect.from_tlwh(bbox)
-            detection_list.append(Detection(bbox_origin, confidence, feature))
+            detection_list.append(Detection(bbox_origin, confidence))
         return detection_list

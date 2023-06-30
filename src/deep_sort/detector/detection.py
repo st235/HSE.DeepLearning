@@ -1,6 +1,5 @@
 import numpy as np
 
-from src.utils.deprecations import deprecated
 from src.utils.geometry.rect import Rect
 
 
@@ -10,18 +9,15 @@ class Detection(object):
 
     Attributes
     ----------
-    origin : Rect
+    __origin : Rect
         Bounding box origin rect.
-    confidence : float
+    __confidence : float
         Detector confidence score.
-    feature : array_like
-        A feature vector that describes the object contained in this image.
     """
 
-    def __init__(self, origin: Rect, confidence, feature):
+    def __init__(self, origin: Rect, confidence):
         self.__origin = origin
         self.__confidence = float(confidence)
-        self.__feature = np.asarray(feature, dtype=np.float32)
 
     @property
     def origin(self) -> Rect:
@@ -30,8 +26,3 @@ class Detection(object):
     @property
     def confidence(self) -> float:
         return self.__confidence
-
-    @property
-    @deprecated
-    def feature(self):
-        return self.__feature
