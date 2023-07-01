@@ -122,8 +122,12 @@ def _parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     args = _parse_args()
     run(args.sequence_dir, args.detection_file, args.output_file,
         args.min_confidence, args.nms_max_overlap, args.min_detection_height,
         args.max_cosine_distance, args.nn_budget)
+
+
+if __name__ == "__main__":
+    main()
