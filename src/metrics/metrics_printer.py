@@ -3,11 +3,11 @@ class MetricsPrinter(object):
                  metrics_to_track: list[str]):
         assert len(metrics_to_track) > 0
         self.__metrics_to_track = metrics_to_track
-        self.__sequences_metrics: dict[str, dict] = dict()
+        self.__sequences_metrics: dict[str, dict[str, float]] = dict()
 
     def add_sequence(self,
                      sequence: str,
-                     metrics: dict):
+                     metrics: dict[str, float]):
         assert self.__validate_metrics(metrics)
         assert sequence not in self.__sequences_metrics
 
