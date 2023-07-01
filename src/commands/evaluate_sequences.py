@@ -5,15 +5,10 @@ import numpy as np
 
 from src.app.app import App
 from src.app.visualization import Visualization
-from src.commands.utils.cl_arguments_utils import parse_array
 from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
-from src.dataset.mot.mot_ground_truth import MotGroundTruth
 from src.deep_sort.deep_sort import DeepSort
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
 from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
-from src.metrics.confusion_matrix_metric import ConfusionMatrixMetric
-from src.metrics.hota_metric import HotaMetric
-from src.metrics.metric import Metric
 from src.metrics.metrics_mixer import MetricsMixer
 from src.metrics.metrics_printer import MetricsPrinter
 
