@@ -14,9 +14,8 @@ class FileDetectionsProvider(DetectionsProvider):
     feature vector associated with each detection.
     """
 
-    def __init__(self, detections_file_path: str):
-        self.__detections_file_path = detections_file_path
-        self.__detections = np.load(self.__detections_file_path)
+    def __init__(self, detections: np.ndarray):
+        self.__detections = detections
 
     def load_detections(self,
                         image: np.ndarray,

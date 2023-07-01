@@ -14,7 +14,7 @@ from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import Te
 
 
 def run(sequence_directory: str,
-        detections_file: str, output_file, min_confidence,
+        output_file, min_confidence,
         nms_max_overlap, min_detection_height, max_cosine_distance,
         nn_budget):
     """Run multi-target tracker on a particular sequence.
@@ -23,8 +23,6 @@ def run(sequence_directory: str,
     ----------
     sequence_directory : str
         Path to the MOTChallenge sequence directory.
-    detections_file : str
-        Path to the detections file.
     output_file : str
         Path to the tracking output file. This file will contain the tracking
         results on completion.
@@ -47,7 +45,7 @@ def run(sequence_directory: str,
     app = App(dataset_descriptor)
 
     deep_sort_builder = DeepSort.Builder(dataset_descriptor=dataset_descriptor)
-    deep_sort_builder.detections_provider = FileDetectionsProvider(detections_file_path=detections_file)
+    deep_sort_builder.detections_provider = FileDetectionsProvider(detections=dataset_descriptor.detections)
     deep_sort_builder.features_extractor = TensorflowV1FeaturesExtractor.create_default()
 
     deep_sort_builder.detection_min_confidence = min_confidence
@@ -96,9 +94,6 @@ def _parse_args():
         "--sequence_dir", help="Path to MOTChallenge sequence directory",
         default=None, required=True)
     parser.add_argument(
-        "--detection_file", help="Path to custom detections.", default=None,
-        required=True)
-    parser.add_argument(
         "--output_file", help="Path to the tracking output file. This file will"
                               " contain the tracking results on completion.",
         default="/tmp/hypotheses.txt")
@@ -124,7 +119,7 @@ def _parse_args():
 
 def main():
     args = _parse_args()
-    run(args.sequence_dir, args.detection_file, args.output_file,
+    run(args.sequence_dir, args.output_file,
         args.min_confidence, args.nms_max_overlap, args.min_detection_height,
         args.max_cosine_distance, args.nn_budget)
 

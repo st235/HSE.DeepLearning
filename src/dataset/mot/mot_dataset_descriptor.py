@@ -33,6 +33,9 @@ class MotDatasetDescriptor(object):
 
         ground_truth = MotGroundTruth.load(ground_truth_file)
 
+        detection_file = os.path.join(sequence_directory, "det", "det.txt")
+        detections = np.loadtxt(detection_file, delimiter=',')
+
         if len(images_files) > 0:
             image = cv2.imread(next(iter(images_files)), cv2.IMREAD_GRAYSCALE)
             image_size = image.shape
@@ -52,6 +55,7 @@ class MotDatasetDescriptor(object):
         return MotDatasetDescriptor(name=os.path.basename(sequence_directory),
                                     images_files=images_files,
                                     ground_truth=ground_truth,
+                                    detections=detections,
                                     image_size=image_size,
                                     update_rate=update_ms)
 
@@ -59,11 +63,13 @@ class MotDatasetDescriptor(object):
                  name: str,
                  images_files: List[str],
                  ground_truth: Optional[MotGroundTruth],
+                 detections: np.ndarray,
                  image_size: np.ndarray,
                  update_rate: Optional[float]):
         self.__name = name
         self.__images_files = images_files
         self.__ground_truth = ground_truth
+        self.__detections = detections
         self.__image_size = image_size
         self.__update_rate = update_rate
 
@@ -85,6 +91,14 @@ class MotDatasetDescriptor(object):
             Returns MotGroundTruth if was able to locate the corresponding file and None otherwise.
         """
         return self.__ground_truth
+
+    @property
+    def detections(self) -> np.ndarray:
+        """Returns raw detections.
+
+        Detections should be located under dt folder in dt.txt file.
+        """
+        return self.__detections
 
     @property
     def image_size(self) -> np.ndarray:

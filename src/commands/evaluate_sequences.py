@@ -15,11 +15,9 @@ from src.metrics.confusion_matrix_metric import ConfusionMatrixMetric
 from src.metrics.hota_metric import HotaMetric
 from src.metrics.metric import Metric
 from src.metrics.metrics_printer import MetricsPrinter
-from src.utils.geometry.rect import Rect
 
 
 def run(sequences_directory: str,
-        detections_directory: str,
         metrics_to_track: list[str]):
     """Runs evaluation of all sequences in the directory.
 
@@ -39,11 +37,10 @@ def run(sequences_directory: str,
 
     for sequence in os.listdir(sequences_directory):
         sequence_directory = os.path.join(sequences_directory, sequence)
-        detection_directory = os.path.join(detections_directory, f"{sequence}.npy")
 
         print(f"Evaluating sequence {sequence}")
 
-        metrics = __evaluate_single_sequence(sequence_directory, detection_directory, metrics_to_track)
+        metrics = __evaluate_single_sequence(sequence_directory, metrics_to_track)
         metrics_printer.add_sequence(sequence, metrics)
 
     print()
@@ -52,12 +49,11 @@ def run(sequences_directory: str,
 
 
 def __evaluate_single_sequence(sequence_directory: str,
-                               detection_file: str,
                                metrics_to_track: list[str]) -> dict[str, float]:
     dataset_descriptor = MotDatasetDescriptor.load(sequence_directory)
 
     deep_sort_builder = DeepSort.Builder(dataset_descriptor=dataset_descriptor)
-    deep_sort_builder.detections_provider = FileDetectionsProvider(detections_file_path=detection_file)
+    deep_sort_builder.detections_provider = FileDetectionsProvider(detections=dataset_descriptor.detections)
     deep_sort_builder.features_extractor = TensorflowV1FeaturesExtractor.create_default()
 
     assert dataset_descriptor.ground_truth is not None, \
@@ -125,9 +121,6 @@ def __parse_args():
         "--sequences_dir", help="Path to the sequences directory",
         default=None, required=True)
     parser.add_argument(
-        "--detections_dir", help="Path to the detections directory",
-        default=None, required=True)
-    parser.add_argument(
         "--metrics", help="List of metrics separated by coma, which will be evaluated on the dataset",
         default="HOTA", required=False)
     return parser.parse_args()
@@ -136,7 +129,6 @@ def __parse_args():
 def main():
     args = __parse_args()
     run(args.sequences_dir,
-        args.detections_dir,
         [metric.lower() for metric in parse_array(args.metrics)])
 
 
