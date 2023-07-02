@@ -257,10 +257,10 @@ F1=2 * \frac{Precision*Recall}{Precision+Recall}
 
 ### Usage
 
-You can call [evaluation script](./src/commands/evaluate_sequences.py) using the command below:
+You can enable evaluation in [the main script](./src/commands/deep_sort.py) using the command below:
 
 ```bash
-ds-evaluate --sequences_dir=./data/sequences -m HOTA DetA AssA F1 Recall Precision
+deep-sort run ./data/sequences --eval HOTA DetA AssA F1 Recall Precision
 ```
 
 You will see a table similar to the table below:
