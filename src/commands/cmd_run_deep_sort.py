@@ -18,6 +18,7 @@ from src.deep_sort.detector.nanodet_detections_provider import NanodetDetections
 from src.deep_sort.detector.yolov5_detections_provider import YoloV5DetectionsProvider
 from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
 from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
+from src.deep_sort.features_extractor.torchreid_features_extractor import TorchReidFeaturesExtractor
 from src.metrics.metrics_mixer import MetricsMixer
 from src.metrics.metrics_printer import MetricsPrinter
 from src.metrics.no_op_metrics_mixer import NoOpMetricsMixer
@@ -178,11 +179,14 @@ def __create_detector_by_name(detector: str,
 def get_supported_features_extractor() -> set[str]:
     """Returns supported features extractor.
     """
-    return {'ftv1'}
+    return {'ftv1', 'torchreid'}
 
 
 def __create_features_extractor_by_name(features_extractor: str) -> FeaturesExtractor:
     if features_extractor == 'tfv1':
         return TensorflowV1FeaturesExtractor.create_default()
+
+    if features_extractor == 'torchreid':
+        return TorchReidFeaturesExtractor()
 
     raise Exception(f"Unknown features extractor {features_extractor}")
