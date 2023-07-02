@@ -50,7 +50,7 @@ def __parse_args():
                                   nargs='*')
     deep_sort_parser.add_argument('-d', '--detector',
                                   help=f"Detector for finding people",
-                                  default='file',
+                                  default='det',
                                   choices=cmd_run_deep_sort.get_supported_detectors(),
                                   required=False)
     deep_sort_parser.add_argument('-fe', '--features_extractor',

@@ -11,6 +11,7 @@ from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from src.deep_sort.deep_sort import DeepSort
 from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
+from src.deep_sort.detector.ground_truth_detections_provider import GroundTruthDetectionsProvider
 from src.deep_sort.detector.hog_detections_provider import HogDetectionsProvider
 from src.deep_sort.detector.mmdetection_detections_provider import MmdetectionDetectionsProvider
 from src.deep_sort.detector.nanodet_detections_provider import NanodetDetectionsProvider
@@ -100,7 +101,7 @@ def __run_sequence(sequence_directory: str,
     app = App(dataset_descriptor)
 
     deep_sort_builder = DeepSort.Builder(dataset_descriptor=dataset_descriptor)
-    deep_sort_builder.detections_provider = __create_detector_by_name(detector, dataset_descriptor.detections)
+    deep_sort_builder.detections_provider = __create_detector_by_name(detector, dataset_descriptor)
     deep_sort_builder.features_extractor = __create_features_extractor_by_name(features_extractor)
 
     deep_sort_builder.detection_min_confidence = min_confidence
@@ -148,13 +149,16 @@ def __run_sequence(sequence_directory: str,
 def get_supported_detectors() -> set[str]:
     """Returns supported detectors.
     """
-    return {'file', 'hog', 'mmdet', 'nanodet', 'yolov5'}
+    return {'det', 'gt', 'hog', 'mmdet', 'nanodet', 'yolov5'}
 
 
 def __create_detector_by_name(detector: str,
-                              detections: np.ndarray) -> DetectionsProvider:
-    if detector == 'file':
-        return FileDetectionsProvider(detections=detections)
+                              dataset_descriptor: MotDatasetDescriptor) -> DetectionsProvider:
+    if detector == 'det':
+        return FileDetectionsProvider(detections=dataset_descriptor.detections)
+
+    if detector == 'gt':
+        return GroundTruthDetectionsProvider(ground_truth=dataset_descriptor.ground_truth)
 
     if detector == 'hog':
         return HogDetectionsProvider()
