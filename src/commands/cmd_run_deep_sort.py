@@ -9,7 +9,13 @@ from src.app.app import App
 from src.app.visualization import Visualization
 from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from src.deep_sort.deep_sort import DeepSort
+from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.deep_sort.detector.file_detections_provider import FileDetectionsProvider
+from src.deep_sort.detector.hog_detections_provider import HogDetectionsProvider
+from src.deep_sort.detector.mmdetection_detections_provider import MmdetectionDetectionsProvider
+from src.deep_sort.detector.nanodet_detections_provider import NanodetDetectionsProvider
+from src.deep_sort.detector.yolov5_detections_provider import YoloV5DetectionsProvider
+from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
 from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
 from src.metrics.metrics_mixer import MetricsMixer
 from src.metrics.metrics_printer import MetricsPrinter
@@ -19,6 +25,8 @@ from src.metrics.std_metrics_printer import StdMetricsPrinter
 
 
 def run(sequence_directories: list[str],
+        detector: str,
+        features_extractor: str,
         output_file: str,
         min_confidence: float,
         nms_max_overlap: int,
@@ -37,6 +45,8 @@ def run(sequence_directories: list[str],
         print(f"Running {sequence_name} sequence")
 
         metrics = __run_sequence(sequence_path,
+                                 detector,
+                                 features_extractor,
                                  output_file,
                                  min_confidence,
                                  nms_max_overlap,
@@ -52,6 +62,8 @@ def run(sequence_directories: list[str],
 
 
 def __run_sequence(sequence_directory: str,
+                   detector: str,
+                   features_extractor: str,
                    output_file: str,
                    min_confidence: float,
                    nms_max_overlap: int,
@@ -88,8 +100,8 @@ def __run_sequence(sequence_directory: str,
     app = App(dataset_descriptor)
 
     deep_sort_builder = DeepSort.Builder(dataset_descriptor=dataset_descriptor)
-    deep_sort_builder.detections_provider = FileDetectionsProvider(detections=dataset_descriptor.detections)
-    deep_sort_builder.features_extractor = TensorflowV1FeaturesExtractor.create_default()
+    deep_sort_builder.detections_provider = __create_detector_by_name(detector, dataset_descriptor.detections)
+    deep_sort_builder.features_extractor = __create_features_extractor_by_name(features_extractor)
 
     deep_sort_builder.detection_min_confidence = min_confidence
     deep_sort_builder.detection_nms_max_overlap = nms_max_overlap
@@ -131,3 +143,42 @@ def __run_sequence(sequence_directory: str,
             row[0], row[1], row[2], row[3], row[4], row[5]), file=f)
 
     return metrics_mixer.evaluate()
+
+
+def get_supported_detectors() -> set[str]:
+    """Returns supported detectors.
+    """
+    return {'file', 'hog', 'mmdet', 'nanodet', 'yolov5'}
+
+
+def __create_detector_by_name(detector: str,
+                              detections: np.ndarray) -> DetectionsProvider:
+    if detector == 'file':
+        return FileDetectionsProvider(detections=detections)
+
+    if detector == 'hog':
+        return HogDetectionsProvider()
+
+    if detector == 'mmdet':
+        return MmdetectionDetectionsProvider()
+
+    if detector == 'nanodet':
+        return NanodetDetectionsProvider()
+
+    if detector == 'yolov5':
+        return YoloV5DetectionsProvider()
+
+    raise Exception(f"Unknown detector type {detector}")
+
+
+def get_supported_features_extractor() -> set[str]:
+    """Returns supported features extractor.
+    """
+    return {'ftv1'}
+
+
+def __create_features_extractor_by_name(features_extractor: str) -> FeaturesExtractor:
+    if features_extractor == 'tfv1':
+        return TensorflowV1FeaturesExtractor.create_default()
+
+    raise Exception(f"Unknown features extractor {features_extractor}")

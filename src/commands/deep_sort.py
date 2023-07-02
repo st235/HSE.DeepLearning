@@ -48,6 +48,16 @@ def __parse_args():
                                   choices=MetricsMixer.supported_metrics(),
                                   required=False,
                                   nargs='*')
+    deep_sort_parser.add_argument('-d', '--detector',
+                                  help=f"Detector for finding people",
+                                  default='file',
+                                  choices=cmd_run_deep_sort.get_supported_detectors(),
+                                  required=False)
+    deep_sort_parser.add_argument('-fe', '--features_extractor',
+                                  help=f"Features extractor for ReID",
+                                  default='tfv1',
+                                  choices=cmd_run_deep_sort.get_supported_features_extractor(),
+                                  required=False)
     deep_sort_parser.add_argument(
         "--output_file", help="Path to the tracking output file. This file will"
                               " contain the tracking results on completion.",
@@ -82,6 +92,8 @@ def main():
         cmd_show_ground_truth.run(sequences)
     elif args.cmd == 'run':
         cmd_run_deep_sort.run(sequences,
+                              args.detector,
+                              args.features_extractor,
                               args.output_file,
                               args.min_confidence,
                               args.nms_max_overlap,

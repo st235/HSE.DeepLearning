@@ -47,8 +47,8 @@ class NanodetDetectionsProvider(DetectionsProvider):
 
         all_box = []
         for label in results[0]:
-            if label != person_index:
-                continue
+            # if label != person_index:
+            #     continue
 
             for bbox in results[0][label]:
                 score = bbox[-1]
