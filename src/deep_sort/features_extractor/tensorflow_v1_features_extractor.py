@@ -6,60 +6,11 @@ import tensorflow.compat.v1 as tf
 
 from dependencies.definitions import get_file_path
 from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
+from src.deep_sort.features_extractor.utils.images import extract_image_patch
 from src.utils.geometry.rect import Rect
 
 # Falling back to v1.
 tf.disable_v2_behavior()
-
-
-def _extract_image_patch(image: np.ndarray,
-                         bbox: Rect,
-                         patch_shape: tuple[float, float]):
-    """Extract image patch from bounding box.
-
-    Parameters
-    ----------
-    image : ndarray
-        The full image.
-    bbox : Rect
-        The bounding box.
-    patch_shape : tuple[float, float]
-        This parameter can be used to enforce a desired patch shape
-        (width, height). First, the `bbox` is adapted to the aspect ratio
-        of the patch shape, then it is clipped at the image boundaries.
-        If None, the shape is computed from :arg:`bbox`.
-
-    Returns
-    -------
-    ndarray | NoneType
-        An image patch showing the :arg:`bbox`, optionally reshaped to
-        :arg:`patch_shape`.
-        Returns None if the bounding box is empty or fully outside of the image
-        boundaries.
-
-    """
-    assert isinstance(bbox, Rect), \
-        f"Bbox was of different type {type(bbox)}"
-
-    if patch_shape is not None:
-        bbox = bbox.resize(target_width=patch_shape[0],
-                           target_height=patch_shape[1])
-
-    # Shape is in (h, w) format.
-    image_shape = image.shape
-    image_width = image_shape[1]
-    image_height = image_shape[0]
-
-    image_box = Rect(left=0, top=0,
-                     width=image_width, height=image_height)
-
-    # Let's clip the box by the image viewport.
-    bbox = image_box.clip(bbox)
-
-    image_patch = image[int(bbox.top):int(bbox.bottom), int(bbox.left):int(bbox.right)]
-
-    image_patch = cv2.resize(image_patch, (int(patch_shape[0]), int(patch_shape[1])))
-    return image_patch
 
 
 def _run_in_batches(f, data_dict, out, batch_size):
@@ -115,7 +66,7 @@ class TensorflowV1FeaturesExtractor(FeaturesExtractor):
                 boxes: list[Rect]) -> np.ndarray:
         image_patches = []
         for box in boxes:
-            patch = _extract_image_patch(image, box, self.__image_shape)
+            patch = extract_image_patch(image, box, self.__image_shape)
             if patch is None:
                 raise Exception(f"Cannot extract detection {box} from the image.")
             image_patches.append(patch)

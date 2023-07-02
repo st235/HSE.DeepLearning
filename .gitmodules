@@ -7,3 +7,6 @@
 [submodule "dependencies/mmdetection"]
 	path = dependencies/mmdetection
 	url = https://github.com/open-mmlab/mmdetection.git
+[submodule "dependencies/deep-person-reid"]
+	path = dependencies/deep-person-reid
+	url = https://github.com/KaiyangZhou/deep-person-reid
