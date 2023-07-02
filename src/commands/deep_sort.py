@@ -44,7 +44,7 @@ def __parse_args():
     deep_sort_parser.add_argument('-e', '--eval',
                                   help=f"List of metrics to evaluate, "
                                        f"supported metrics are {', '.join(MetricsMixer.supported_metrics())}",
-                                  default=['HOTA'],
+                                  default=[],
                                   choices=MetricsMixer.supported_metrics(),
                                   required=False,
                                   nargs='*')
