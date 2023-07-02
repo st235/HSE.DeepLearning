@@ -16,15 +16,12 @@ class ConfusionMatrixMetric(Metric):
                  ground_truth: MotGroundTruth,
                  iou_threshold: float = 0.5):
         assert 0 < iou_threshold <= 1
-        super().__init__(ground_truth=ground_truth,
-                         supported_metrics={ConfusionMatrixMetric.KEY_METRIC_PRECISION,
-                                            ConfusionMatrixMetric.KEY_METRIC_RECALL,
-                                            ConfusionMatrixMetric.KEY_METRIC_F1})
+        super().__init__(ground_truth=ground_truth)
 
         self.__iou_threshold = iou_threshold
 
     @benchmark
-    def evaluate(self) -> dict:
+    def evaluate(self) -> dict[str, float]:
         result_metrics: dict[str, float] = dict()
         overall_tp, overall_fp, overall_fn = 0, 0, 0
 

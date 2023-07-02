@@ -113,24 +113,26 @@ class NearestNeighborDistanceMetric(object):
 
     Attributes
     ----------
-    samples : Dict[int -> List[ndarray]]
+    __samples : Dict[int -> List[ndarray]]
         A dictionary that maps from target identities to the list of samples
         that have been observed so far.
 
     """
 
-    def __init__(self, metric, matching_threshold, budget=None):
+    def __init__(self, metric: str,
+                 matching_threshold,
+                 budget=None):
         if metric == "euclidean":
-            self._metric = _nn_euclidean_distance
+            self.__metric = _nn_euclidean_distance
         elif metric == "cosine":
-            self._metric = _nn_cosine_distance
+            self.__metric = _nn_cosine_distance
         else:
             raise ValueError(
                 "Invalid metric; must be either 'euclidean' or 'cosine'")
 
         self.matching_threshold = matching_threshold
-        self.budget = budget
-        self.samples = {}
+        self.__budget = budget
+        self.__samples = {}
 
     def partial_fit(self, features, targets, active_targets):
         """Update the distance metric with new data.
@@ -146,10 +148,10 @@ class NearestNeighborDistanceMetric(object):
 
         """
         for feature, target in zip(features, targets):
-            self.samples.setdefault(target, []).append(feature)
-            if self.budget is not None:
-                self.samples[target] = self.samples[target][-self.budget:]
-        self.samples = {k: self.samples[k] for k in active_targets}
+            self.__samples.setdefault(target, []).append(feature)
+            if self.__budget is not None:
+                self.__samples[target] = self.__samples[target][-self.__budget:]
+        self.__samples = {k: self.__samples[k] for k in active_targets}
 
     def distance(self, features, targets):
         """Compute distance between features and targets.
@@ -171,5 +173,5 @@ class NearestNeighborDistanceMetric(object):
         """
         cost_matrix = np.zeros((len(targets), len(features)))
         for i, target in enumerate(targets):
-            cost_matrix[i, :] = self._metric(self.samples[target], features)
+            cost_matrix[i, :] = self.__metric(self.__samples[target], features)
         return cost_matrix

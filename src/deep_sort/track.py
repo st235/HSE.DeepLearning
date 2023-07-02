@@ -2,6 +2,7 @@ import numpy as np
 
 from enum import Enum
 from src.deep_sort.detector.detection import Detection
+from src.utils.geometry.rect import Rect
 
 
 class TrackState(Enum):
@@ -88,20 +89,20 @@ class Track:
         self.__n_init = n_init
         self.__max_age = max_age
 
-    def to_tlwh(self):
-        """Get current position in bounding box format `(top left x, top left y,
-        width, height)`.
+    @property
+    def bounding_box(self) -> Rect:
+        """Get bounding box for current track position.
 
         Returns
         -------
-        ndarray
+        Rect
             The bounding box.
 
         """
-        ret = self.mean[:4].copy()
-        ret[2] *= ret[3]
-        ret[:2] -= ret[2:] / 2
-        return ret
+        bbox = self.mean[:4].copy()
+        bbox[2] *= bbox[3]
+        bbox[:2] -= bbox[2:] / 2
+        return Rect.from_tlwh(bbox)
 
     def predict(self, kf):
         """Propagate the state distribution to the current time step using a

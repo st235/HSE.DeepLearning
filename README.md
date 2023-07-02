@@ -257,23 +257,23 @@ F1=2 * \frac{Precision*Recall}{Precision+Recall}
 
 ### Usage
 
-You can call [evaluation script](./src/commands/evaluate_sequences.py) using the command below:
+You can enable evaluation in [the main script](./src/commands/deep_sort.py) using the command below:
 
 ```bash
- ds-evaluate --sequences_dir=./data/sequences --detections_dir=./data/detections --metrics=hota,deta,assa,precision,recall,f1
+deep-sort run ./data/sequences --eval HOTA DetA AssA F1 Recall Precision
 ```
 
 You will see a table similar to the table below:
 
 ```text
-                    |hota      |deta      |assa      |precision |recall    |f1        |
-KITTI-17            |   0.43184|   0.43436|   0.43184|   0.91009|   0.37796|   0.53411|
-MOT16-09            |   0.29949|   0.27881|   0.32212|    0.9461|   0.26864|   0.41846|
-MOT16-11            |   0.40918|   0.34313|   0.48818|   0.98828|   0.30167|   0.46224|
-PETS09-S2L1         |   0.47994|   0.52909|   0.43645|   0.76622|   0.47649|   0.58758|
-TUD-Campus          |   0.41153|   0.43778|   0.38995|   0.87008|   0.38103|   0.52998|
-TUD-Stadtmitte      |   0.37549|   0.45751|    0.3105|   0.79887|   0.42258|   0.55276|
-COMBINED            |   0.40125|   0.41345|   0.39651|   0.87994|    0.3714|   0.51419|
+                    |HOTA      |DetA      |AssA      |F1        |Recall    |Precision |
+KITTI-17            |   0.39411|    0.4061|   0.38431|   0.52665|   0.37511|   0.88362|
+MOT16-09            |   0.30053|   0.27235|   0.33223|   0.41727|   0.26783|   0.94404|
+MOT16-11            |   0.40245|   0.33696|   0.48102|    0.4623|   0.30172|   0.98828|
+PETS09-S2L1         |    0.4469|   0.48727|   0.41129|   0.57651|   0.46904|   0.74787|
+TUD-Campus          |    0.4007|   0.44327|   0.36568|   0.53687|   0.39358|    0.8442|
+TUD-Stadtmitte      |    0.3568|   0.43991|   0.29182|   0.54371|   0.41616|   0.78402|
+COMBINED            |   0.38358|   0.39764|   0.37772|   0.51055|   0.37057|   0.86534|
 ```
 
 ## Acknowledgement

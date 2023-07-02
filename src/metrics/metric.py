@@ -5,22 +5,13 @@ from src.utils.geometry.rect import Rect
 
 class Metric(ABC):
     def __init__(self,
-                 ground_truth: MotGroundTruth,
-                 supported_metrics: set[str]):
+                 ground_truth: MotGroundTruth):
         assert ground_truth is not None
 
         self._ground_truth = ground_truth
-        self.__supported_metrics = [metric.lower() for metric in supported_metrics]
 
         self._detections: dict[int, dict[int, Rect]] = dict()
         self._tracks: dict[int, list[(int, Rect)]] = dict()
-
-    @property
-    def available_metrics(self) -> list[str]:
-        return list(iter(self.__supported_metrics))
-
-    def is_metric_supported(self, metric: str) -> bool:
-        return metric.lower() in self.__supported_metrics
 
     def update_frame(self,
                      frame_id: int,
@@ -36,5 +27,5 @@ class Metric(ABC):
             self._tracks[track_id].append((frame_id, box))
 
     @abstractmethod
-    def evaluate(self) -> dict:
+    def evaluate(self) -> dict[str, float]:
         ...

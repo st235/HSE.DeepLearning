@@ -38,12 +38,10 @@ class HotaMetric(Metric):
 
     def __init__(self,
                  ground_truth: MotGroundTruth):
-        super().__init__(ground_truth=ground_truth,
-                         supported_metrics={HotaMetric.KEY_METRIC_HOTA, HotaMetric.KEY_METRIC_DETA,
-                                            HotaMetric.KEY_METRIC_ASSA})
+        super().__init__(ground_truth=ground_truth)
 
     @benchmark
-    def evaluate(self) -> dict:
+    def evaluate(self) -> dict[str, float]:
         metrics_dict = dict()
 
         detection, association = self.__evaluate_sequence()
