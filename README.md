@@ -101,7 +101,7 @@ i.e. where the particular detection is located in the frame, and a confidence sc
 
 There are a few classes implementing __DetectionsProvider__.
 
-#### Original FileDetectionsProvider
+#### FileDetectionsProvider [from original DeepSORT algorithm]
 
 ![FileDetectionsProvider](./resources/file_detections_provider.png)
 
@@ -131,6 +131,163 @@ TUD-Stadtmitte      |   0.54371|   0.78402|   0.41616|
 COMBINED            |   0.51055|   0.86534|   0.37057|
 ```
 
+#### YoloV5DetectionsProvider
+
+![YoloV5DetectionsProvider](./resources/yolov5_detections_provider.png)
+
+This _DetectionsProvider_ implements [Yolo V5](https://github.com/ultralytics/yolov5) object detection model.
+
+This project implements `YoloV5` as a submodule.
+
+Detector supports models:
+- Nano, aka [YOLOv5n](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5n.pt)
+- Small, aka [YOLOv5s](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5s.pt)
+- Medium, aka [YOLOv5m](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5m.pt)
+- Large, aka [YOLOv5l](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5l.pt)
+- Nano6, aka [YOLOv5n6](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5n6.pt)
+
+All models are available in [`data/yolov5_binaries`](./dependencies/yolov5_binaries). However, if you were not able
+to locate some checkpoints, please, do check the links above or the YoloV5 official repository.
+
+**YoloV5N**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5n
+```
+
+A lot of people were not recognized correctly.
+
+![YoloV5 Nano](./resources/detection_score_yolov5n.png)
+
+FPS score has also dropped dramatically across the whole dataset (almost twice). Though, please, approach this and
+any further notices about FPS drops with a reasonable pragmatism: **the local setup which is used for this project
+is CPU-bounded as does not support CUDA**.
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.24921|   0.80822|   0.14732|
+MOT16-09            |   0.29334|   0.96658|   0.17291|
+MOT16-11            |   0.38864|   0.97384|   0.24276|
+PETS09-S2L1         |   0.46029|   0.94319|   0.30443|
+TUD-Campus          |    0.4127|   0.92199|   0.26585|
+TUD-Stadtmitte      |    0.4919|   0.99118|   0.32712|
+COMBINED            |   0.38268|   0.93417|    0.2434|
+```
+
+**YoloV5N6**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5n6
+```
+
+Seems like this implementation provides more detections.
+
+![YoloV5 Nano 6](./resources/detection_score_yolov5n6.png)
+
+Performs really badly on [`KITTI17`](./data/sequences/KITTI-17)
+
+![YoloV5 Nano 6 KITTI17](./resources/detection_score_yolov5n6_kitti17.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.25214|   0.87407|   0.14732|
+MOT16-09            |   0.28806|   0.97536|   0.16899|
+MOT16-11            |   0.37966|   0.96694|    0.2362|
+PETS09-S2L1         |   0.39286|   0.94852|   0.24773|
+TUD-Campus          |   0.50606|   0.95918|   0.34369|
+TUD-Stadtmitte      |   0.52127|   0.99527|   0.35311|
+COMBINED            |   0.39001|   0.95323|   0.24951|
+```
+
+**YoloV5S**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5s
+```
+
+Much more accurate than `nano` models.
+
+![YoloV5 Small](./resources/detection_score_yolov5s.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.42317|   0.88552|   0.27801|
+MOT16-09            |   0.38627|   0.96926|    0.2412|
+MOT16-11            |   0.44964|   0.96379|   0.29322|
+PETS09-S2L1         |   0.58329|   0.94189|   0.42245|
+TUD-Campus          |   0.49933|      0.93|   0.34128|
+TUD-Stadtmitte      |   0.57476|   0.98747|   0.40535|
+COMBINED            |   0.48608|   0.94632|   0.33025|
+```
+
+**YoloV5M**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5m
+```
+
+Good quality of detections.
+
+![YoloV5 Medium](./resources/detection_score_yolov5m.png)
+
+Moreover, on **CPU-bounded** devices there are about ~4-5 FPS,
+which should be better on devices with available GPU and CUDA processing.
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.46701|   0.89744|   0.31563|
+MOT16-09            |   0.44857|   0.95901|   0.29275|
+MOT16-11            |   0.48969|   0.95564|   0.32919|
+PETS09-S2L1         |   0.60487|   0.92263|   0.44992|
+TUD-Campus          |   0.54074|   0.94397|   0.37889|
+TUD-Stadtmitte      |   0.59059|   0.98825|   0.42113|
+COMBINED            |   0.52358|   0.94449|   0.36459|
+```
+
+❗️ It seems that this model _outperforms_ the original algorithm by **all metrics**.
+
+**YoloV5L**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5l
+```
+
+Outperforms all other `YOLO` models. However, not applicable in runtime
+**at least on CPU-bounded** devices. Yet, some techniques as resizing or
+buffering can help to improve performance if this model is required for usage.
+
+![YoloV5 Large](./resources/detection_score_yolov5l.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.48633|   0.91599|   0.33105|
+MOT16-09            |   0.48704|   0.95932|   0.32637|
+MOT16-11            |   0.50976|   0.95199|   0.34807|
+PETS09-S2L1         |   0.61367|    0.9125|   0.46228|
+TUD-Campus          |   0.54187|   0.94421|   0.37997|
+TUD-Stadtmitte      |    0.5951|   0.98066|   0.42716|
+COMBINED            |   0.53896|   0.94411|   0.37915|
+```
 
 #### NanodetDetectionsProvider
 

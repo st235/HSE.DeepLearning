@@ -1,13 +1,12 @@
 import numpy as np
 
-from dependencies.definitions import fetch_model
-
 from src.deep_sort.detector.detection import Detection
 from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.utils.geometry.rect import Rect
+from dependencies.definitions import fetch_model
+from enum import Enum
 
 _LABEL_PERSON = 0
-
 
 class YoloV5DetectionsProvider(DetectionsProvider):
     """
@@ -18,9 +17,18 @@ class YoloV5DetectionsProvider(DetectionsProvider):
     feature vector associated with each detection.
     """
 
-    def __init__(self):
+    class Checkpoint(Enum):
+        NANO = 0
+        NANO6 = 1
+        SMALL = 2
+        MEDIUM = 3
+        LARGE = 4
+
+    def __init__(self,
+                 checkpoint: Checkpoint):
+        path = self.__get_model_path_by_checkpoint(checkpoint)
         self.__model = fetch_model('yolov5',
-                                   model_path='yolov5_binaries/yolov5n.pt')
+                                   model_path=path)
 
     def load_detections(self,
                         image: np.ndarray,
@@ -45,3 +53,22 @@ class YoloV5DetectionsProvider(DetectionsProvider):
             detection_list.append(Detection(rect, confidence))
 
         return detection_list
+
+    @staticmethod
+    def __get_model_path_by_checkpoint(checkpoint: Checkpoint) -> str:
+        if checkpoint == YoloV5DetectionsProvider.Checkpoint.NANO:
+            return 'yolov5_binaries/yolov5n.pt'
+
+        if checkpoint == YoloV5DetectionsProvider.Checkpoint.NANO6:
+            return 'yolov5_binaries/yolov5n6.pt'
+
+        if checkpoint == YoloV5DetectionsProvider.Checkpoint.SMALL:
+            return 'yolov5_binaries/yolov5s.pt'
+
+        if checkpoint == YoloV5DetectionsProvider.Checkpoint.MEDIUM:
+            return 'yolov5_binaries/yolov5m.pt'
+
+        if checkpoint == YoloV5DetectionsProvider.Checkpoint.LARGE:
+            return 'yolov5_binaries/yolov5l.pt'
+
+        raise Exception(f"Cannot find checkpoint {checkpoint}")

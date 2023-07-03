@@ -150,7 +150,7 @@ def __run_sequence(sequence_directory: str,
 def get_supported_detectors() -> set[str]:
     """Returns supported detectors.
     """
-    return {'det', 'gt', 'hog', 'mmdet', 'nanodet', 'yolov5'}
+    return {'det', 'gt', 'hog', 'mmdet', 'nanodet', 'yolov5n', 'yolov5n6', 'yolov5s', 'yolov5m', 'yolov5l'}
 
 
 def __create_detector_by_name(detector: str,
@@ -170,8 +170,20 @@ def __create_detector_by_name(detector: str,
     if detector == 'nanodet':
         return NanodetDetectionsProvider()
 
-    if detector == 'yolov5':
-        return YoloV5DetectionsProvider()
+    if detector == 'yolov5n':
+        return YoloV5DetectionsProvider(checkpoint=YoloV5DetectionsProvider.Checkpoint.NANO)
+
+    if detector == 'yolov5n6':
+        return YoloV5DetectionsProvider(checkpoint=YoloV5DetectionsProvider.Checkpoint.NANO6)
+
+    if detector == 'yolov5s':
+        return YoloV5DetectionsProvider(checkpoint=YoloV5DetectionsProvider.Checkpoint.SMALL)
+
+    if detector == 'yolov5m':
+        return YoloV5DetectionsProvider(checkpoint=YoloV5DetectionsProvider.Checkpoint.MEDIUM)
+
+    if detector == 'yolov5l':
+        return YoloV5DetectionsProvider(checkpoint=YoloV5DetectionsProvider.Checkpoint.LARGE)
 
     raise Exception(f"Unknown detector type {detector}")
 
