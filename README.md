@@ -103,10 +103,33 @@ There are a few classes implementing __DetectionsProvider__.
 
 #### Original FileDetectionsProvider
 
-![FileDetectionsProvider](./resources/file_detections_provider.png
+![FileDetectionsProvider](./resources/file_detections_provider.png)
 
 _FileDetectionsProvider_ is the logic that **was used in the original DeepSORT** version of the project.
-It reads the 
+It reads the `det/det.txt` file and extract detections from it.
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall 
+```
+
+During the evaluation there is a noticeable amount of mis-detections.
+
+![FileDetectionProvider results](./resources/file_detections_provider.png)
+
+**Final score**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.52665|   0.88362|   0.37511|
+MOT16-09            |   0.41727|   0.94404|   0.26783|
+MOT16-11            |    0.4623|   0.98828|   0.30172|
+PETS09-S2L1         |   0.57651|   0.74787|   0.46904|
+TUD-Campus          |   0.53687|    0.8442|   0.39358|
+TUD-Stadtmitte      |   0.54371|   0.78402|   0.41616|
+COMBINED            |   0.51055|   0.86534|   0.37057|
+```
 
 
 #### NanodetDetectionsProvider
@@ -317,34 +340,6 @@ PETS09-S2L1         |    0.4469|   0.48727|   0.41129|   0.57651|   0.46904|   0
 TUD-Campus          |    0.4007|   0.44327|   0.36568|   0.53687|   0.39358|    0.8442|
 TUD-Stadtmitte      |    0.3568|   0.43991|   0.29182|   0.54371|   0.41616|   0.78402|
 COMBINED            |   0.38358|   0.39764|   0.37772|   0.51055|   0.37057|   0.86534|
-```
-
-## Results
-
-### Detections
-
-#### Original detection scores (from FileDetectionsProvider)
-
-Command to run the sequence in the given configuration
-
-```bash
-deep-sort run ./data/sequences -e F1 Precision Recall 
-```
-
-During the evaluation there are a noticeable amount of misdetections.
-
-![FileDetectionProvider results](./resources/file_detections_provider.png)
-
-
-```text
-                    |F1        |Precision |Recall    |
-KITTI-17            |   0.52665|   0.88362|   0.37511|
-MOT16-09            |   0.41727|   0.94404|   0.26783|
-MOT16-11            |    0.4623|   0.98828|   0.30172|
-PETS09-S2L1         |   0.57651|   0.74787|   0.46904|
-TUD-Campus          |   0.53687|    0.8442|   0.39358|
-TUD-Stadtmitte      |   0.54371|   0.78402|   0.41616|
-COMBINED            |   0.51055|   0.86534|   0.37057|
 ```
 
 ## Acknowledgement
