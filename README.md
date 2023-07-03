@@ -116,7 +116,7 @@ deep-sort run ./data/sequences -e F1 Precision Recall
 
 During the evaluation there is a noticeable amount of mis-detections.
 
-![FileDetectionProvider results](./resources/file_detections_provider.png)
+![FileDetectionProvider results](./resources/detection_score_file_detections_provider_1.png)
 
 **Final score**
 
