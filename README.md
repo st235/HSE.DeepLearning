@@ -101,6 +101,8 @@ i.e. where the particular detection is located in the frame, and a confidence sc
 
 There are a few classes implementing __DetectionsProvider__.
 
+_Please, do note, `--n_init 0` will be used during detections evaluation to initialise tracks as soon as possible._
+
 #### FileDetectionsProvider [from original DeepSORT algorithm]
 
 ![FileDetectionsProvider](./resources/file_detections_provider.png)
@@ -111,7 +113,7 @@ It reads the `det/det.txt` file and extract detections from it.
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall 
+deep-sort run ./data/sequences -e F1 Precision Recall --n_init 0
 ```
 
 During the evaluation there is a noticeable amount of mis-detections.
@@ -154,7 +156,7 @@ to locate some checkpoints, please, do check the links above or the YoloV5 offic
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5n
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5n --n_init 0
 ```
 
 A lot of people were not recognized correctly.
@@ -183,7 +185,7 @@ COMBINED            |   0.38268|   0.93417|    0.2434|
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5n6
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5n6 --n_init 0
 ```
 
 Seems like this implementation provides more detections.
@@ -212,7 +214,7 @@ COMBINED            |   0.39001|   0.95323|   0.24951|
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5s
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5s --n_init 0
 ```
 
 Much more accurate than `nano` models.
@@ -237,7 +239,7 @@ COMBINED            |   0.48608|   0.94632|   0.33025|
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5m
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5m --n_init 0
 ```
 
 Good quality of detections.
@@ -267,7 +269,7 @@ COMBINED            |   0.52358|   0.94449|   0.36459|
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5l
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5l --n_init 0
 ```
 
 Outperforms all other `YOLO` models. However, not applicable in runtime
@@ -313,7 +315,7 @@ _NanodetDetectionsProvider_ supports 3 different models:
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_legacy
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_legacy --n_init 0
 ```
 
 Runs bad on: `PETS09-S2L1` and `MOT16-11` almost not detecting anything
@@ -338,7 +340,7 @@ COMBINED            |   0.21341|   0.98006|  0.024762|
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm320
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm320 --n_init 0
 ```
 
 Still runs terrible on `PETS09-S2L1`
@@ -363,7 +365,7 @@ COMBINED            |    0.2285|   0.98947|  0.032891|
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm15x320
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm15x320 --n_init 0
 ```
 
 Performs better `PETS09-S2L1` but still far away from idea. Perhaps,
@@ -389,7 +391,7 @@ COMBINED            |   0.25032|   0.97974|  0.045712|
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm416
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm416 --n_init 0
 ```
 
 Cannot detect small objects
@@ -416,7 +418,7 @@ COMBINED            |   0.26768|    0.9865|  0.055275|
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm15x416
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm15x416 --n_init 0
 ```
 
 The best performance across all `nanodets`. However, the final quality is
@@ -445,24 +447,25 @@ COMBINED            |   0.30381|   0.97939|  0.077823|
 _GroundTruthDetectionsProvider_ returns ground truth as detections. It helps to check tracking metrics,
 and should result 1.0 for detections evaluation.
 
-⚠️ Though **tracking** is still slightly affecting the score as detections appears not immediately,
-and it takes some amount of iterations from tracks to initialise.
+⚠️ Though we are evaluating detections, **tracking** is still running and slightly affect
+the final score as detections appears not immediately. 
+It takes a little time (i.e. a few frames) from tracks to initialise.
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm15x416
+deep-sort run ./data/sequences -e F1 Precision Recall -d gt --n_init 0
 ```
 
 **Final scores**
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |   0.65842|   0.98958|   0.49332|
-MOT16-09            |   0.66369|   0.99674|   0.49747|
-MOT16-11            |   0.66208|   0.99428|   0.49627|
-PETS09-S2L1         |   0.66397|   0.99685|   0.49776|
-TUD-Campus          |   0.65396|   0.98847|    0.4886|
-TUD-Stadtmitte      |   0.65967|   0.99037|   0.49453|
-COMBINED            |    0.6603|   0.99272|   0.49466|
+KITTI-17            |   0.98827|   0.98972|   0.98682|
+MOT16-09            |   0.99581|   0.99676|   0.99486|
+MOT16-11            |    0.9934|   0.99432|   0.99248|
+PETS09-S2L1         |    0.9962|   0.99687|   0.99553|
+TUD-Campus          |   0.98319|   0.98873|   0.97772|
+TUD-Stadtmitte      |    0.9883|   0.99044|   0.98616|
+COMBINED            |   0.99086|   0.99281|   0.98893|
 ```
 
 ### REID
