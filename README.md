@@ -291,14 +291,152 @@ COMBINED            |   0.53896|   0.94411|   0.37915|
 
 #### NanodetDetectionsProvider
 
+![NanodetDetectionsProvider](./resources/nanodet_detections_provider.png)
+
 [NanodetDetectionsProvider](src/deep_sort/detector/nanodet_detections_provider.py)
 is using [Nanodet](https://github.com/RangiLyu/nanodet) model.
 
-Unfortunately, this library does not work on MacOS, therefore `Nanodet` used in this project is a _patched_ version.
+⚠️⚠️⚠️ Unfortunately, this library does not work on MacOS, therefore `Nanodet` used in this project is a _patched_ version.
 
 This is the patch that was sent to the authors of `Nanodet`:
 - [#516 Guard CUDA calls with an explicit check](https://github.com/RangiLyu/nanodet/pull/516)
 
+_NanodetDetectionsProvider_ supports 3 different models:
+- Legacy M
+- PlusM320
+- PlusM15X320
+- PlusM416
+- PlusM15X416 
+
+**Legacy M**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_legacy
+```
+
+Runs bad on: `PETS09-S2L1` and `MOT16-11` almost not detecting anything
+
+![Nanodet Legacy](./resources/detection_score_nanodet_legacy.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |       1.0|       1.0|       0.0|
+MOT16-09            |   0.04366|       1.0|  0.022317|
+MOT16-11            |  0.016079|    0.9375|  0.008109|
+PETS09-S2L1         |  0.014525|   0.94286| 0.0073187|
+TUD-Campus          |   0.16317|       1.0|  0.088832|
+TUD-Stadtmitte      |  0.043046|       1.0|  0.021997|
+COMBINED            |   0.21341|   0.98006|  0.024762|
+```
+
+**PlusM320**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm320
+```
+
+Still runs terrible on `PETS09-S2L1`
+
+![Nanodet Plus M 320](./resources/detection_score_nanodet_plusm320.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |       1.0|       1.0|       0.0|
+MOT16-09            |  0.027377|   0.98667|  0.013881|
+MOT16-11            |   0.06586|   0.95015|  0.034112|
+PETS09-S2L1         |0.00089286|       1.0|0.00044663|
+TUD-Campus          |   0.15529|       1.0|  0.084184|
+TUD-Stadtmitte      |   0.12158|       1.0|  0.064725|
+COMBINED            |    0.2285|   0.98947|  0.032891|
+```
+
+**PlusM1.5X320**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm15x320
+```
+
+Performs better `PETS09-S2L1` but still far away from idea. Perhaps,
+the objects in the frame are too small for this model.
+
+![Nanodet Plus M 1.5x 320](./resources/detection_score_nanodet_plusm15x320.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |       1.0|       1.0|       0.0|
+MOT16-09            |  0.055964|   0.96296|   0.02882|
+MOT16-11            |   0.11214|   0.93269|  0.059656|
+PETS09-S2L1         | 0.0035619|       1.0| 0.0017841|
+TUD-Campus          |   0.24051|   0.98276|   0.13702|
+TUD-Stadtmitte      |  0.089764|       1.0|  0.046991|
+COMBINED            |   0.25032|   0.97974|  0.045712|
+```
+
+**PlusM416**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm416
+```
+
+Cannot detect small objects
+
+| Small objects                                                               | Big objects                                                                |
+|-----------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| ![Nanodet Small ojects](./resources/detection_score_nanodet_plusm416_1.png) | ![Nanodet Big objects](./resources/detection_score_nanodet_plusm416_2.png) |
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |       1.0|       1.0|       0.0|
+MOT16-09            |  0.070696|   0.99502|   0.03665|
+MOT16-11            |   0.13443|   0.92397|   0.07249|
+PETS09-S2L1         |  0.003118|       1.0| 0.0015615|
+TUD-Campus          |   0.18962|       1.0|   0.10474|
+TUD-Stadtmitte      |   0.20822|       1.0|   0.11621|
+COMBINED            |   0.26768|    0.9865|  0.055275|
+```
+
+**PlusM1.5X416**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm15x416
+```
+
+The best performance across all `nanodets`. However, the final quality is
+still not enough. Though it is worth mentioning that frame rate is much
+better than using `Yolo`.
+
+![Nanodet Big objects](./resources/detection_score_nanodet_plusm416_2.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |       1.0|       1.0|       0.0|
+MOT16-09            |  0.088881|   0.95539|  0.046609|
+MOT16-11            |    0.1866|   0.95487|    0.1034|
+PETS09-S2L1         | 0.0088574|       1.0| 0.0044484|
+TUD-Campus          |      0.24|    0.9661|   0.13702|
+TUD-Stadtmitte      |   0.29854|       1.0|   0.17546|
+COMBINED            |   0.30381|   0.97939|  0.077823|
+```
 
 ### REID
 

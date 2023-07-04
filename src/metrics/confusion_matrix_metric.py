@@ -32,21 +32,36 @@ class ConfusionMatrixMetric(Metric):
             overall_fp += fp
             overall_fn += fn
 
+        precision: float = 0.0
         precision_denominator = overall_tp + overall_fp
+
+        recall: float = 0.0
         recall_denominator = overall_tp + overall_fn
 
-        precision: float = 1.0
-        recall: float = 1.0
+        f1_score: float = 0.0
+        f1_denominator = precision + recall
 
-        if precision_denominator > 0:
+        if overall_tp == 0 and precision_denominator == 0:
+            precision = 1.0
+        else:
+            # Precision_denominator == 0 and overall_tp != 0 is
+            # impossible as denominator contains overall_tp.
+            # The logic holds for if branches below.
             precision = overall_tp / precision_denominator
 
-        if recall_denominator > 0:
+        if overall_tp == 0 and recall_denominator == 0:
+            recall = 1.0
+        else:
             recall = overall_tp / recall_denominator
+
+        if 2 * precision * recall == 0 and f1_denominator == 0:
+            f1_score = 1.0
+        else:
+            f1_score = 2 * precision * recall / (precision + recall)
 
         result_metrics[ConfusionMatrixMetric.KEY_METRIC_PRECISION] = precision
         result_metrics[ConfusionMatrixMetric.KEY_METRIC_RECALL] = recall
-        result_metrics[ConfusionMatrixMetric.KEY_METRIC_F1] = 2 * precision * recall / (precision + recall)
+        result_metrics[ConfusionMatrixMetric.KEY_METRIC_F1] = f1_score
 
         return result_metrics
 

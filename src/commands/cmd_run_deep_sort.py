@@ -5,6 +5,7 @@ from typing import Optional
 
 import numpy as np
 
+from dependencies.nanodet_binaries.nanodet_model import NanoDetPaths
 from src.app.app import App
 from src.app.visualization import Visualization
 from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
@@ -150,7 +151,9 @@ def __run_sequence(sequence_directory: str,
 def get_supported_detectors() -> set[str]:
     """Returns supported detectors.
     """
-    return {'det', 'gt', 'hog', 'mmdet', 'nanodet', 'yolov5n', 'yolov5n6', 'yolov5s', 'yolov5m', 'yolov5l'}
+    return {'det', 'gt', 'hog', 'mmdet',
+            'nanodet_legacy', 'nanodet_plusm320', 'nanodet_plusm15x320', 'nanodet_plusm416', 'nanodet_plusm15x416',
+            'yolov5n', 'yolov5n6', 'yolov5s', 'yolov5m', 'yolov5l'}
 
 
 def __create_detector_by_name(detector: str,
@@ -167,8 +170,20 @@ def __create_detector_by_name(detector: str,
     if detector == 'mmdet':
         return MmdetectionDetectionsProvider()
 
-    if detector == 'nanodet':
-        return NanodetDetectionsProvider()
+    if detector == 'nanodet_legacy':
+        return NanodetDetectionsProvider(paths=NanoDetPaths.LegacyM)
+
+    if detector == 'nanodet_plusm320':
+        return NanodetDetectionsProvider(paths=NanoDetPaths.PlusM320)
+
+    if detector == 'nanodet_plusm15x320':
+        return NanodetDetectionsProvider(paths=NanoDetPaths.PlusM15X320)
+
+    if detector == 'nanodet_plusm416':
+        return NanodetDetectionsProvider(paths=NanoDetPaths.PlusM416)
+
+    if detector == 'nanodet_plusm15x416':
+        return NanodetDetectionsProvider(paths=NanoDetPaths.PlusM15X416)
 
     if detector == 'yolov5n':
         return YoloV5DetectionsProvider(checkpoint=YoloV5DetectionsProvider.Checkpoint.NANO)
