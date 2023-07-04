@@ -423,7 +423,7 @@ The best performance across all `nanodets`. However, the final quality is
 still not enough. Though it is worth mentioning that frame rate is much
 better than using `Yolo`.
 
-![Nanodet Big objects](./resources/detection_score_nanodet_plusm416_2.png)
+![Nanodet M 1.5X 416](./resources/detection_score_nanodet_plusm15x416.png)
 
 **Final scores**
 
@@ -436,6 +436,33 @@ PETS09-S2L1         | 0.0088574|       1.0| 0.0044484|
 TUD-Campus          |      0.24|    0.9661|   0.13702|
 TUD-Stadtmitte      |   0.29854|       1.0|   0.17546|
 COMBINED            |   0.30381|   0.97939|  0.077823|
+```
+
+#### GroundTruthDetectionsProvider
+
+![GroundTruthDetectionsProvider](./resources/ground_truth_detections_provider.png)
+
+_GroundTruthDetectionsProvider_ returns ground truth as detections. It helps to check tracking metrics,
+and should result 1.0 for detections evaluation.
+
+⚠️ Though **tracking** is still slightly affecting the score as detections appears not immediately,
+and it takes some amount of iterations from tracks to initialise.
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d nanodet_plusm15x416
+```
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.65842|   0.98958|   0.49332|
+MOT16-09            |   0.66369|   0.99674|   0.49747|
+MOT16-11            |   0.66208|   0.99428|   0.49627|
+PETS09-S2L1         |   0.66397|   0.99685|   0.49776|
+TUD-Campus          |   0.65396|   0.98847|    0.4886|
+TUD-Stadtmitte      |   0.65967|   0.99037|   0.49453|
+COMBINED            |    0.6603|   0.99272|   0.49466|
 ```
 
 ### REID
