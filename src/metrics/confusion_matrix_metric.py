@@ -99,6 +99,6 @@ class ConfusionMatrixMetric(Metric):
                 tp += 1
 
         fp = len(detection_ids) - tp
-        fn = len(ground_truth_ids) - fn
+        fn = len(ground_truth_ids) - tp
 
         return tp, fp, fn
