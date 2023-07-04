@@ -32,8 +32,17 @@ class ConfusionMatrixMetric(Metric):
             overall_fp += fp
             overall_fn += fn
 
-        precision = overall_tp / (overall_tp + overall_fp)
-        recall = overall_tp / (overall_tp + overall_fn)
+        precision_denominator = overall_tp + overall_fp
+        recall_denominator = overall_tp + overall_fn
+
+        precision: float = 1.0
+        recall: float = 1.0
+
+        if precision_denominator > 0:
+            precision = overall_tp / precision_denominator
+
+        if recall_denominator > 0:
+            recall = overall_tp / recall_denominator
 
         result_metrics[ConfusionMatrixMetric.KEY_METRIC_PRECISION] = precision
         result_metrics[ConfusionMatrixMetric.KEY_METRIC_RECALL] = recall
