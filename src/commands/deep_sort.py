@@ -49,12 +49,12 @@ def __parse_args():
                                   required=False,
                                   nargs='*')
     deep_sort_parser.add_argument('-d', '--detector',
-                                  help=f"Detector for finding people",
+                                  help=f"Detector for finding people.",
                                   default='det',
                                   choices=cmd_run_deep_sort.get_supported_detectors(),
                                   required=False)
     deep_sort_parser.add_argument('-fe', '--features_extractor',
-                                  help=f"Features extractor for ReID",
+                                  help=f"Features extractor for ReID.",
                                   default='tfv1',
                                   choices=cmd_run_deep_sort.get_supported_features_extractor(),
                                   required=False)
@@ -69,7 +69,7 @@ def __parse_args():
     deep_sort_parser.add_argument(
         "--min_detection_height", help="Threshold on the detection bounding "
                                        "box height. Detections with height smaller than this value are "
-                                       "disregarded", default=0, type=int)
+                                       "disregarded.", default=0, type=int)
     deep_sort_parser.add_argument(
         "--nms_max_overlap", help="Non-maxima suppression threshold: Maximum "
                                   "detection overlap.", default=1.0, type=float)
@@ -79,6 +79,12 @@ def __parse_args():
     deep_sort_parser.add_argument(
         "--nn_budget", help="Maximum size of the appearance descriptors "
                             "gallery. If None, no budget is enforced.", type=int, default=None)
+    deep_sort_parser.add_argument(
+        "--max_iou_distance", help="Gating threshold for iou distance metric.", type=float, default=0.7)
+    deep_sort_parser.add_argument(
+        "--max_age", help="Maximum number of missed detections before a track is deleted.", type=int, default=30)
+    deep_sort_parser.add_argument(
+        "--n_init", help="Number of frames that a track remains in initialization phase.", type=int, default=3)
     return parser.parse_args()
 
 
@@ -100,6 +106,9 @@ def main():
                               args.min_detection_height,
                               args.max_cosine_distance,
                               args.nn_budget,
+                              args.max_iou_distance,
+                              args.max_age,
+                              args.n_init,
                               args.eval)
 
 

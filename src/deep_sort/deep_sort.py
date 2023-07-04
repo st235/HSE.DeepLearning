@@ -51,7 +51,10 @@ class DeepSort(object):
         self.__detection_min_height = builder.detection_min_height
         self.__detection_nms_max_overlap = builder.detection_nms_max_overlap
 
-        self.__tracker = Tracker(metric=nn_matching.NearestNeighborDistanceMetric("cosine", 0.2))
+        self.__tracker = Tracker(metric=nn_matching.NearestNeighborDistanceMetric("cosine", 0.2),
+                                 max_iou_distance=builder.tracking_max_iou_distance,
+                                 max_age=builder.tracking_max_age,
+                                 n_init=builder.tracking_n_init)
 
     def update(self,
                frame_id: int, image: np.ndarray) -> list[Track]:
@@ -85,6 +88,10 @@ class DeepSort(object):
             self.__detection_min_confidence = 0.8
             self.__detection_min_height = 0
             self.__detection_nms_max_overlap = 1.0
+
+            self.__tracking_max_iou_distance: float = 0.7
+            self.__tracking_max_age: int = 30
+            self.__tracking_n_init: int = 3
 
         @property
         def database_descriptor(self) -> MotDatasetDescriptor:
@@ -134,6 +141,33 @@ class DeepSort(object):
         def detection_nms_max_overlap(self,
                                       detection_nms_max_overlap: float):
             self.__detection_nms_max_overlap = detection_nms_max_overlap
+
+        @property
+        def tracking_max_iou_distance(self) -> float:
+            return self.__tracking_max_iou_distance
+
+        @tracking_max_iou_distance.setter
+        def tracking_max_iou_distance(self,
+                                      tracking_max_iou_distance: float):
+            self.__tracking_max_iou_distance = tracking_max_iou_distance
+
+        @property
+        def tracking_max_age(self) -> int:
+            return self.__tracking_max_age
+
+        @tracking_max_age.setter
+        def tracking_max_age(self,
+                             tracking_max_age: int):
+            self.__tracking_max_age = tracking_max_age
+
+        @property
+        def tracking_n_init(self) -> float:
+            return self.__tracking_n_init
+
+        @tracking_n_init.setter
+        def tracking_n_init(self,
+                            tracking_n_init: float):
+            self.__tracking_n_init = tracking_n_init
 
         def build(self) -> DeepSort:
             return DeepSort(builder=self)

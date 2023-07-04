@@ -36,6 +36,9 @@ def run(sequence_directories: list[str],
         min_detection_height: int,
         max_cosine_distance: float,
         nn_budget: int,
+        max_iou_distance: float,
+        max_age: int,
+        n_init: int,
         metrics_to_track: Optional[list[str]]):
     metrics_printer: MetricsPrinter
     if metrics_to_track is not None:
@@ -56,6 +59,9 @@ def run(sequence_directories: list[str],
                                  min_detection_height,
                                  max_cosine_distance,
                                  nn_budget,
+                                 max_iou_distance,
+                                 max_age,
+                                 n_init,
                                  metrics_to_track)
 
         metrics_printer.add_sequence(sequence_name, metrics)
@@ -73,6 +79,9 @@ def __run_sequence(sequence_directory: str,
                    min_detection_height: int,
                    max_cosine_distance: float,
                    nn_budget: int,
+                   max_iou_distance: float,
+                   max_age: int,
+                   n_init: int,
                    metrics_to_track: Optional[list[str]]) -> dict[str, float]:
     """Run multi-target tracker on a particular sequence.
 
@@ -109,6 +118,10 @@ def __run_sequence(sequence_directory: str,
     deep_sort_builder.detection_min_confidence = min_confidence
     deep_sort_builder.detection_nms_max_overlap = nms_max_overlap
     deep_sort_builder.detection_min_height = min_detection_height
+
+    deep_sort_builder.tracking_max_iou_distance = max_iou_distance
+    deep_sort_builder.tracking_max_age = max_age
+    deep_sort_builder.tracking_n_init = n_init
 
     deep_sort = deep_sort_builder.build()
 
