@@ -24,14 +24,26 @@ class HogDetectionsProvider(DetectionsProvider):
         """
         detection_list = []
 
-        (humans, _) = self.__hog.detectMultiScale(image, winStride=(15, 15), padding=(32, 32), scale=1.1)
+        scale_factor = 0.6
+        width = int(image.shape[1] * scale_factor)
+        height = int(image.shape[0] * scale_factor)
+        dim = (width, height)
+
+        resized = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+        (humans, _) = self.__hog.detectMultiScale(resized, winStride=(24, 24))
 
         # loop over all detected humans
         for (x, y, w, h) in humans:
-            if h < min_height:
+            real_width = w / scale_factor
+            real_height = h / scale_factor
+
+            x /= scale_factor
+            y /= scale_factor
+
+            if real_height < min_height:
                 continue
 
-            bbox_origin = Rect(left=x, top=y, width=w, height=h)
+            bbox_origin = Rect(left=x, top=y, width=real_width, height=real_height)
             detection_list.append(Detection(bbox_origin, 1.0))
 
         return detection_list

@@ -1,12 +1,16 @@
+import os
 import numpy as np
 
+from enum import Enum
 from mmdet.apis import init_detector, inference_detector
 from mmdet.utils import register_all_modules
+from typing import Optional
 
 from dependencies.definitions import get_file_path
 from src.deep_sort.detector.detection import Detection
 from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.utils.geometry.rect import Rect
+from src.utils.torch_utils import get_available_device
 
 _LABEL_PERSON = 0
 
@@ -20,11 +24,22 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
     feature vector associated with each detection.
     """
 
-    def __init__(self):
+    class Config(Enum):
+        EfficientDet = 0
+        DynamicRcnnR50Coco = 1
+        CascadeRpnFaster = 2
+        MobileNetV2 = 3
+
+    def __init__(self,
+                 config: Config,
+                 model: str):
+        assert model is not None, \
+            'Model is required'
+
         register_all_modules()
-        self.__model = init_detector(
-            get_file_path('mmdetection', 'configs', 'dynamic_rcnn', 'dynamic-rcnn_r50_fpn_1x_coco.py'),
-            get_file_path('mmdetection_binaries', 'dynamic_rcnn_r50_fpn_1x.pth'), device='cpu')
+
+        config = get_file_path('mmdetection', 'configs', self.__get_config_and_weights(config))
+        self.__model = init_detector(config, model, device=get_available_device())
 
     def load_detections(self,
                         image: np.ndarray,
@@ -60,3 +75,19 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
             detection_list.append(Detection(rect, confidence))
 
         return detection_list
+
+    @staticmethod
+    def __get_config_and_weights(config: Config) -> str:
+        if config == MmdetectionDetectionsProvider.Config.EfficientDet:
+            return os.path.join('efficientnet', 'retinanet_effb3_fpn_8xb4-crop896-1x_coco.py')
+
+        if config == MmdetectionDetectionsProvider.Config.DynamicRcnnR50Coco:
+            return os.path.join('dynamic_rcnn', 'dynamic-rcnn_r50_fpn_1x_coco.py')
+
+        if config == MmdetectionDetectionsProvider.Config.CascadeRpnFaster:
+            return os.path.join('cascade_rpn', 'cascade-rpn_faster-rcnn_r50-caffe_fpn_1x_coco.py')
+
+        if config == MmdetectionDetectionsProvider.Config.MobileNetV2:
+            return os.path.join('yolo', 'yolov3_mobilenetv2_8xb24-ms-416-300e_coco.py')
+
+        raise Exception(f"Unknown config {config}")

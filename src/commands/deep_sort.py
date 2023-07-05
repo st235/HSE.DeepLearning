@@ -85,6 +85,8 @@ def __parse_args():
         "--max_age", help="Maximum number of missed detections before a track is deleted.", type=int, default=30)
     deep_sort_parser.add_argument(
         "--n_init", help="Number of frames that a track remains in initialization phase.", type=int, default=3)
+    deep_sort_parser.add_argument(
+        "--extra", help="Additional parameter that may be required by a model.", type=str, default=None)
     return parser.parse_args()
 
 
@@ -109,7 +111,8 @@ def main():
                               args.max_iou_distance,
                               args.max_age,
                               args.n_init,
-                              args.eval)
+                              args.eval,
+                              args.extra)
 
 
 if __name__ == "__main__":

@@ -8,15 +8,8 @@ from enum import Enum
 
 _LABEL_PERSON = 0
 
+
 class YoloV5DetectionsProvider(DetectionsProvider):
-    """
-    Reads detections from pre-baked file. No detections happen at real time.
-
-    The first 10 columns of the detection matrix are in the standard
-    MOTChallenge detection format. In the remaining columns store the
-    feature vector associated with each detection.
-    """
-
     class Checkpoint(Enum):
         NANO = 0
         NANO6 = 1

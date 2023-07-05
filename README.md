@@ -440,6 +440,174 @@ TUD-Stadtmitte      |   0.36723|       1.0|   0.22491|
 COMBINED            |   0.17041|   0.97631|  0.099929|
 ```
 
+#### MMDetectionDetectionsProvider
+
+![MMDetectionDetectionsProvider](./resources/mmdet_detections_provider.png)
+
+_MMDetectionDetectionsProvider_ uses [MMDetection](https://github.com/open-mmlab/mmdetection) toolbox.
+
+Supported models:
+- efficientdet
+
+⚠️ Please, do keep in mind that due to the large size of weights/checkpoints they won't be provided with this repo.
+Do download them from the `MMDetection` repository.
+
+
+#### YoloV8DetectionsProvider
+
+![YoloV8DetectionsProvider](./resources/yolov8_detections_provider.png)
+
+_MMDetectionDetectionsProvider_ uses [YoloV8](https://github.com/ultralytics/ultralytics) model.
+
+Model supports the following checkpoints:
+- nano
+- small
+- medium
+- large
+
+⚠️ YoloV8 downloads models automatically.
+
+**YoloV8N**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov8n --n_init 0
+```
+
+Good performance, runs about ~90-100% of the original speed, i.e. 10% FPS drop only.
+
+![YoloV8N](./resources/detection_score_yolov8n.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |    0.4572|   0.87917|   0.30893|
+MOT16-09            |   0.45476|   0.95668|   0.29827|
+MOT16-11            |    0.5959|    0.9555|   0.43296|
+PETS09-S2L1         |   0.69073|   0.93003|   0.54937|
+TUD-Campus          |   0.66906|   0.94416|   0.51811|
+TUD-Stadtmitte      |    0.7862|   0.99339|   0.65052|
+COMBINED            |   0.60898|   0.94316|   0.45969|
+```
+
+Metrics are impressive for `nano` model.
+
+**YoloV8S**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov8s --n_init 0
+```
+
+![YoloV8S 1](./resources/detection_score_yolov8s_1.png)
+
+A lot of detections for a small model as well.
+
+![YoloV8S 2](./resources/detection_score_yolov8s_1.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |    0.5957|   0.89443|   0.44656|
+MOT16-09            |   0.55655|   0.95773|   0.39224|
+MOT16-11            |   0.65238|    0.9521|   0.49618|
+PETS09-S2L1         |   0.75676|   0.93789|   0.63427|
+TUD-Campus          |   0.73129|   0.93886|   0.59889|
+TUD-Stadtmitte      |   0.82033|   0.98075|   0.70502|
+COMBINED            |    0.6855|   0.94363|   0.54553|
+```
+
+❗️ This model **outperforms** the original detections algorithm.
+Perhaps, bigger models as `medium`, `large` or `extra large` definitely works better than the original model.
+
+**YoloV8M**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov8m --n_init 0
+```
+
+The performance is a bit off, at least on **CPU-bounded** devices. Though, it seems
+it should be just fine on GPU ones.
+
+![YoloV8M](./resources/detection_score_yolov8m.png)
+
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.71159|   0.92093|    0.5798|
+MOT16-09            |    0.6543|   0.95852|   0.49667|
+MOT16-11            |   0.68223|   0.94571|   0.53357|
+PETS09-S2L1         |   0.86067|   0.92793|    0.8025|
+TUD-Campus          |    0.7743|   0.94758|    0.6546|
+TUD-Stadtmitte      |   0.83913|   0.98485|   0.73097|
+COMBINED            |    0.7537|   0.94759|   0.63302|
+```
+
+**YoloV8L**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d yolov8m --n_init 0
+```
+
+It seems real-time performance would not be amazing even on GPU ones.
+
+![YoloV8L](./resources/detection_score_yolov8l.png)
+
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.73033|   0.92188|   0.60469|
+MOT16-09            |   0.68475|   0.95729|     0.533|
+MOT16-11            |    0.6989|   0.94912|   0.55308|
+PETS09-S2L1         |   0.87608|    0.9032|   0.85054|
+TUD-Campus          |   0.79808|   0.93962|   0.69359|
+TUD-Stadtmitte      |    0.8595|   0.98113|   0.76471|
+COMBINED            |   0.77461|   0.94204|    0.6666|
+```
+
+#### HogDetectionsProvider
+
+![HogDetectionsProvider](./resources/hog_detections_provider.png)
+
+_HogDetectionsProvider_ uses [HOGDescriptor](https://docs.opencv.org/4.x/d5/d33/structcv_1_1HOGDescriptor.html) and
+[detectMultiScale](https://docs.opencv.org/4.8.0/d1/de5/classcv_1_1CascadeClassifier.html#aaf8181cb63968136476ec4204ffca498)
+from [OpenCV](https://opencv.org/).
+
+This provider was made to check whether "classic" algorithm can offer comparable results. Spoiler:
+it is working not that bad as you may expect. Actually, quite surprising for a classical algorithm.
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d hog --n_init 0
+```
+
+![Hog 1](./resources/detection_score_hog_1.png)
+![Hog 2](./resources/detection_score_hog_2.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |       0.0|       1.0|       0.0|
+MOT16-09            |  0.083475|   0.39967|  0.046605|
+MOT16-11            |  0.028998|   0.33656|  0.015152|
+PETS09-S2L1         |       0.0|       1.0|       0.0|
+TUD-Campus          |  0.026316|    0.2381|  0.013928|
+TUD-Stadtmitte      | 0.0014378| 0.0042553|0.00086505|
+COMBINED            |  0.023371|   0.49643|  0.012758|
+```
+
 #### GroundTruthDetectionsProvider
 
 ![GroundTruthDetectionsProvider](./resources/ground_truth_detections_provider.png)

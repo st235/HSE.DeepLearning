@@ -17,6 +17,7 @@ from src.deep_sort.detector.hog_detections_provider import HogDetectionsProvider
 from src.deep_sort.detector.mmdetection_detections_provider import MmdetectionDetectionsProvider
 from src.deep_sort.detector.nanodet_detections_provider import NanodetDetectionsProvider
 from src.deep_sort.detector.yolov5_detections_provider import YoloV5DetectionsProvider
+from src.deep_sort.detector.yolov8_detections_provider import YoloV8DetectionsProvider
 from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
 from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
 from src.deep_sort.features_extractor.torchreid_features_extractor import TorchReidFeaturesExtractor
@@ -39,7 +40,8 @@ def run(sequence_directories: list[str],
         max_iou_distance: float,
         max_age: int,
         n_init: int,
-        metrics_to_track: Optional[list[str]]):
+        metrics_to_track: Optional[list[str]],
+        extra_param: Optional[str]):
     metrics_printer: MetricsPrinter
     if metrics_to_track is not None:
         metrics_printer = StdMetricsPrinter(metrics_to_track=metrics_to_track)
@@ -62,7 +64,8 @@ def run(sequence_directories: list[str],
                                  max_iou_distance,
                                  max_age,
                                  n_init,
-                                 metrics_to_track)
+                                 metrics_to_track,
+                                 extra_param)
 
         metrics_printer.add_sequence(sequence_name, metrics)
 
@@ -82,7 +85,8 @@ def __run_sequence(sequence_directory: str,
                    max_iou_distance: float,
                    max_age: int,
                    n_init: int,
-                   metrics_to_track: Optional[list[str]]) -> dict[str, float]:
+                   metrics_to_track: Optional[list[str]],
+                   extra_param: Optional[str]) -> dict[str, float]:
     """Run multi-target tracker on a particular sequence.
 
     Parameters
@@ -112,7 +116,7 @@ def __run_sequence(sequence_directory: str,
     app = App(dataset_descriptor)
 
     deep_sort_builder = DeepSort.Builder(dataset_descriptor=dataset_descriptor)
-    deep_sort_builder.detections_provider = __create_detector_by_name(detector, dataset_descriptor)
+    deep_sort_builder.detections_provider = __create_detector_by_name(detector, dataset_descriptor, extra_param)
     deep_sort_builder.features_extractor = __create_features_extractor_by_name(features_extractor)
 
     deep_sort_builder.detection_min_confidence = min_confidence
@@ -164,13 +168,16 @@ def __run_sequence(sequence_directory: str,
 def get_supported_detectors() -> set[str]:
     """Returns supported detectors.
     """
-    return {'det', 'gt', 'hog', 'mmdet',
+    return {'det', 'gt', 'hog',
+            'mmdet_efficientnet', 'mmdet_dynamic_rcnn', 'mmdet_cascade_rpn', 'mmdet_mobilenetv2',
             'nanodet_legacy', 'nanodet_plusm320', 'nanodet_plusm15x320', 'nanodet_plusm416', 'nanodet_plusm15x416',
-            'yolov5n', 'yolov5n6', 'yolov5s', 'yolov5m', 'yolov5l'}
+            'yolov5n', 'yolov5n6', 'yolov5s', 'yolov5m', 'yolov5l',
+            'yolov8n', 'yolov8s', 'yolov8m', 'yolov8l'}
 
 
 def __create_detector_by_name(detector: str,
-                              dataset_descriptor: MotDatasetDescriptor) -> DetectionsProvider:
+                              dataset_descriptor: MotDatasetDescriptor,
+                              extra_param: Optional[str]) -> DetectionsProvider:
     if detector == 'det':
         return FileDetectionsProvider(detections=dataset_descriptor.detections)
 
@@ -179,9 +186,6 @@ def __create_detector_by_name(detector: str,
 
     if detector == 'hog':
         return HogDetectionsProvider()
-
-    if detector == 'mmdet':
-        return MmdetectionDetectionsProvider()
 
     if detector == 'nanodet_legacy':
         return NanodetDetectionsProvider(paths=NanoDetPaths.LegacyM)
@@ -198,6 +202,22 @@ def __create_detector_by_name(detector: str,
     if detector == 'nanodet_plusm15x416':
         return NanodetDetectionsProvider(paths=NanoDetPaths.PlusM15X416)
 
+    if detector == 'mmdet_efficientnet':
+        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.EfficientDet,
+                                             model=extra_param)
+
+    if detector == 'mmdet_dynamic_rcnn':
+        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.DynamicRcnnR50Coco,
+                                             model=extra_param)
+
+    if detector == 'mmdet_cascade_rpn':
+        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.CascadeRpnFaster,
+                                             model=extra_param)
+
+    if detector == 'mmdet_mobilenetv2':
+        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.MobileNetV2,
+                                             model=extra_param)
+
     if detector == 'yolov5n':
         return YoloV5DetectionsProvider(checkpoint=YoloV5DetectionsProvider.Checkpoint.NANO)
 
@@ -212,6 +232,18 @@ def __create_detector_by_name(detector: str,
 
     if detector == 'yolov5l':
         return YoloV5DetectionsProvider(checkpoint=YoloV5DetectionsProvider.Checkpoint.LARGE)
+
+    if detector == 'yolov8n':
+        return YoloV8DetectionsProvider(checkpoint=YoloV8DetectionsProvider.Checkpoint.NANO)
+
+    if detector == 'yolov8s':
+        return YoloV8DetectionsProvider(checkpoint=YoloV8DetectionsProvider.Checkpoint.SMALL)
+
+    if detector == 'yolov8m':
+        return YoloV8DetectionsProvider(checkpoint=YoloV8DetectionsProvider.Checkpoint.MEDIUM)
+
+    if detector == 'yolov8l':
+        return YoloV8DetectionsProvider(checkpoint=YoloV8DetectionsProvider.Checkpoint.LARGE)
 
     raise Exception(f"Unknown detector type {detector}")
 
