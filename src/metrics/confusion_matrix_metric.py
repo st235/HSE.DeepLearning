@@ -38,9 +38,6 @@ class ConfusionMatrixMetric(Metric):
         recall: float = 0.0
         recall_denominator = overall_tp + overall_fn
 
-        f1_score: float = 0.0
-        f1_denominator = precision + recall
-
         if overall_tp == 0 and precision_denominator == 0:
             precision = 1.0
         else:
@@ -53,6 +50,9 @@ class ConfusionMatrixMetric(Metric):
             recall = 1.0
         else:
             recall = overall_tp / recall_denominator
+
+        f1_score: float = 0.0
+        f1_denominator = precision + recall
 
         if 2 * precision * recall == 0 and f1_denominator == 0:
             f1_score = 1.0
