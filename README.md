@@ -124,13 +124,13 @@ During the evaluation there is a noticeable amount of mis-detections.
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |   0.52665|   0.88362|   0.37511|
-MOT16-09            |   0.41727|   0.94404|   0.26783|
-MOT16-11            |    0.4623|   0.98828|   0.30172|
-PETS09-S2L1         |   0.57651|   0.74787|   0.46904|
-TUD-Campus          |   0.53687|    0.8442|   0.39358|
-TUD-Stadtmitte      |   0.54371|   0.78402|   0.41616|
-COMBINED            |   0.51055|   0.86534|   0.37057|
+KITTI-17            |   0.72068|    0.8506|   0.62518|
+MOT16-09            |   0.54102|   0.93847|   0.38006|
+MOT16-11            |   0.60966|   0.98326|   0.44179|
+PETS09-S2L1         |    0.7887|   0.70876|   0.88896|
+TUD-Campus          |   0.72296|   0.77215|   0.67967|
+TUD-Stadtmitte      |   0.72562|   0.72719|   0.72405|
+COMBINED            |   0.68477|   0.83007|   0.62329|
 ```
 
 #### YoloV5DetectionsProvider
@@ -171,13 +171,13 @@ is CPU-bounded as does not support CUDA**.
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |   0.24921|   0.80822|   0.14732|
-MOT16-09            |   0.29334|   0.96658|   0.17291|
-MOT16-11            |   0.38864|   0.97384|   0.24276|
-PETS09-S2L1         |   0.46029|   0.94319|   0.30443|
-TUD-Campus          |    0.4127|   0.92199|   0.26585|
-TUD-Stadtmitte      |    0.4919|   0.99118|   0.32712|
-COMBINED            |   0.38268|   0.93417|    0.2434|
+KITTI-17            |   0.34803|   0.83799|   0.21962|
+MOT16-09            |   0.35138|   0.96578|   0.21476|
+MOT16-11            |    0.4939|   0.97401|   0.33083|
+PETS09-S2L1         |   0.61212|   0.94028|   0.45375|
+TUD-Campus          |   0.57418|   0.93125|   0.41504|
+TUD-Stadtmitte      |   0.66321|   0.99139|   0.49827|
+COMBINED            |   0.50714|   0.94012|   0.35538|
 ```
 
 **YoloV5N6**
@@ -200,13 +200,13 @@ Performs really badly on [`KITTI17`](./data/sequences/KITTI-17)
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |   0.25214|   0.87407|   0.14732|
-MOT16-09            |   0.28806|   0.97536|   0.16899|
-MOT16-11            |   0.37966|   0.96694|    0.2362|
-PETS09-S2L1         |   0.39286|   0.94852|   0.24773|
-TUD-Campus          |   0.50606|   0.95918|   0.34369|
-TUD-Stadtmitte      |   0.52127|   0.99527|   0.35311|
-COMBINED            |   0.39001|   0.95323|   0.24951|
+KITTI-17            |   0.38761|   0.89418|   0.24744|
+MOT16-09            |   0.34508|   0.97522|   0.20963|
+MOT16-11            |   0.48004|   0.96793|   0.31916|
+PETS09-S2L1         |   0.51717|   0.94104|   0.35657|
+TUD-Campus          |   0.69272|   0.95588|   0.54318|
+TUD-Stadtmitte      |   0.71792|    0.9954|   0.56142|
+COMBINED            |   0.52342|   0.95494|    0.3729|
 ```
 
 **YoloV5S**
@@ -225,13 +225,13 @@ Much more accurate than `nano` models.
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |   0.42317|   0.88552|   0.27801|
-MOT16-09            |   0.38627|   0.96926|    0.2412|
-MOT16-11            |   0.44964|   0.96379|   0.29322|
-PETS09-S2L1         |   0.58329|   0.94189|   0.42245|
-TUD-Campus          |   0.49933|      0.93|   0.34128|
-TUD-Stadtmitte      |   0.57476|   0.98747|   0.40535|
-COMBINED            |   0.48608|   0.94632|   0.33025|
+KITTI-17            |   0.56972|   0.89097|   0.41874|
+MOT16-09            |   0.48913|   0.96685|   0.32737|
+MOT16-11            |   0.58584|   0.96238|   0.42108|
+PETS09-S2L1         |   0.82626|   0.93609|    0.7395|
+TUD-Campus          |    0.6831|   0.92823|   0.54039|
+TUD-Stadtmitte      |   0.81384|   0.98765|   0.69204|
+COMBINED            |   0.66131|   0.94536|   0.52319|
 ```
 
 **YoloV5M**
@@ -253,13 +253,13 @@ which should be better on devices with available GPU and CUDA processing.
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |   0.46701|   0.89744|   0.31563|
-MOT16-09            |   0.44857|   0.95901|   0.29275|
-MOT16-11            |   0.48969|   0.95564|   0.32919|
-PETS09-S2L1         |   0.60487|   0.92263|   0.44992|
-TUD-Campus          |   0.54074|   0.94397|   0.37889|
-TUD-Stadtmitte      |   0.59059|   0.98825|   0.42113|
-COMBINED            |   0.52358|   0.94449|   0.36459|
+KITTI-17            |   0.63188|   0.89757|   0.48755|
+MOT16-09            |   0.58421|   0.95429|   0.42096|
+MOT16-11            |   0.65607|   0.95539|   0.49956|
+PETS09-S2L1         |   0.87007|   0.92026|   0.82507|
+TUD-Campus          |   0.75042|   0.94118|   0.62396|
+TUD-Stadtmitte      |   0.84325|   0.98837|   0.73529|
+COMBINED            |   0.72265|   0.94284|   0.59873|
 ```
 
 ❗️ It seems that this model _outperforms_ the original algorithm by **all metrics**.
@@ -282,13 +282,13 @@ buffering can help to improve performance if this model is required for usage.
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |   0.48633|   0.91599|   0.33105|
-MOT16-09            |   0.48704|   0.95932|   0.32637|
-MOT16-11            |   0.50976|   0.95199|   0.34807|
-PETS09-S2L1         |   0.61367|    0.9125|   0.46228|
-TUD-Campus          |   0.54187|   0.94421|   0.37997|
-TUD-Stadtmitte      |    0.5951|   0.98066|   0.42716|
-COMBINED            |   0.53896|   0.94411|   0.37915|
+KITTI-17            |    0.6747|   0.91919|   0.53294|
+MOT16-09            |   0.64809|   0.94463|   0.49325|
+MOT16-11            |   0.68928|   0.95127|   0.54044|
+PETS09-S2L1         |   0.88497|    0.9073|   0.86372|
+TUD-Campus          |   0.75208|   0.93388|   0.62953|
+TUD-Stadtmitte      |   0.85617|   0.98101|   0.75952|
+COMBINED            |   0.75088|   0.93955|   0.63657|
 ```
 
 #### NanodetDetectionsProvider
@@ -303,7 +303,7 @@ is using [Nanodet](https://github.com/RangiLyu/nanodet) model.
 This is the patch that was sent to the authors of `Nanodet`:
 - [#516 Guard CUDA calls with an explicit check](https://github.com/RangiLyu/nanodet/pull/516)
 
-_NanodetDetectionsProvider_ supports 3 different models:
+_NanodetDetectionsProvider_ supports the following checkpoints:
 - Legacy M
 - PlusM320
 - PlusM15X320
@@ -326,13 +326,13 @@ Runs bad on: `PETS09-S2L1` and `MOT16-11` almost not detecting anything
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |       1.0|       1.0|       0.0|
-MOT16-09            |   0.04366|       1.0|  0.022317|
-MOT16-11            |  0.016079|    0.9375|  0.008109|
-PETS09-S2L1         |  0.014525|   0.94286| 0.0073187|
-TUD-Campus          |   0.16317|       1.0|  0.088832|
-TUD-Stadtmitte      |  0.043046|       1.0|  0.021997|
-COMBINED            |   0.21341|   0.98006|  0.024762|
+KITTI-17            |       0.0|       1.0|       0.0|
+MOT16-09            |  0.047177|       1.0|  0.024158|
+MOT16-11            |  0.021341|   0.95192|  0.010791|
+PETS09-S2L1         |  0.025127|   0.93443|  0.012735|
+TUD-Campus          |     0.205|       1.0|   0.11421|
+TUD-Stadtmitte      |  0.055509|       1.0|  0.028547|
+COMBINED            |  0.059026|   0.98106|   0.03174|
 ```
 
 **PlusM320**
@@ -351,13 +351,13 @@ Still runs terrible on `PETS09-S2L1`
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |       1.0|       1.0|       0.0|
-MOT16-09            |  0.027377|   0.98667|  0.013881|
-MOT16-11            |   0.06586|   0.95015|  0.034112|
-PETS09-S2L1         |0.00089286|       1.0|0.00044663|
-TUD-Campus          |   0.15529|       1.0|  0.084184|
-TUD-Stadtmitte      |   0.12158|       1.0|  0.064725|
-COMBINED            |    0.2285|   0.98947|  0.032891|
+KITTI-17            |       0.0|       1.0|       0.0|
+MOT16-09            |   0.03329|   0.98889|   0.01693|
+MOT16-11            |  0.076786|   0.95325|  0.040004|
+PETS09-S2L1         | 0.0013396|       1.0|0.00067024|
+TUD-Campus          |   0.19598|       1.0|   0.10864|
+TUD-Stadtmitte      |    0.1563|       1.0|  0.084775|
+COMBINED            |  0.077283|   0.99036|  0.041836|
 ```
 
 **PlusM1.5X320**
@@ -377,13 +377,13 @@ the objects in the frame are too small for this model.
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |       1.0|       1.0|       0.0|
-MOT16-09            |  0.055964|   0.96296|   0.02882|
-MOT16-11            |   0.11214|   0.93269|  0.059656|
-PETS09-S2L1         | 0.0035619|       1.0| 0.0017841|
-TUD-Campus          |   0.24051|   0.98276|   0.13702|
-TUD-Stadtmitte      |  0.089764|       1.0|  0.046991|
-COMBINED            |   0.25032|   0.97974|  0.045712|
+KITTI-17            | 0.0029197|       0.5| 0.0014641|
+MOT16-09            |  0.062581|   0.96591|  0.032338|
+MOT16-11            |    0.1272|   0.93572|  0.068236|
+PETS09-S2L1         | 0.0080107|       1.0| 0.0040214|
+TUD-Campus          |   0.30189|   0.98462|   0.17827|
+TUD-Stadtmitte      |   0.11111|       1.0|  0.058824|
+COMBINED            |   0.10228|   0.89771|  0.057193|
 ```
 
 **PlusM416**
@@ -404,13 +404,13 @@ Cannot detect small objects
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |       1.0|       1.0|       0.0|
-MOT16-09            |  0.070696|   0.99502|   0.03665|
-MOT16-11            |   0.13443|   0.92397|   0.07249|
-PETS09-S2L1         |  0.003118|       1.0| 0.0015615|
-TUD-Campus          |   0.18962|       1.0|   0.10474|
-TUD-Stadtmitte      |   0.20822|       1.0|   0.11621|
-COMBINED            |   0.26768|    0.9865|  0.055275|
+KITTI-17            |       0.0|       1.0|       0.0|
+MOT16-09            |  0.082771|   0.99561|  0.043181|
+MOT16-11            |   0.15543|   0.92951|  0.084805|
+PETS09-S2L1         | 0.0071238|       1.0| 0.0035746|
+TUD-Campus          |   0.26087|   0.98182|   0.15042|
+TUD-Stadtmitte      |    0.2445|       1.0|   0.13927|
+COMBINED            |   0.12511|   0.98449|  0.070209|
 ```
 
 **PlusM1.5X416**
@@ -431,13 +431,13 @@ better than using `Yolo`.
 
 ```text
                     |F1        |Precision |Recall    |
-KITTI-17            |       1.0|       1.0|       0.0|
-MOT16-09            |  0.088881|   0.95539|  0.046609|
-MOT16-11            |    0.1866|   0.95487|    0.1034|
-PETS09-S2L1         | 0.0088574|       1.0| 0.0044484|
-TUD-Campus          |      0.24|    0.9661|   0.13702|
-TUD-Stadtmitte      |   0.29854|       1.0|   0.17546|
-COMBINED            |   0.30381|   0.97939|  0.077823|
+KITTI-17            | 0.0058394|       1.0| 0.0029283|
+MOT16-09            |   0.10261|   0.95638|  0.054213|
+MOT16-11            |   0.21776|   0.95752|   0.12285|
+PETS09-S2L1         |  0.015954|   0.97297| 0.0080429|
+TUD-Campus          |   0.31308|   0.97101|   0.18663|
+TUD-Stadtmitte      |   0.36723|       1.0|   0.22491|
+COMBINED            |   0.17041|   0.97631|  0.099929|
 ```
 
 #### GroundTruthDetectionsProvider
