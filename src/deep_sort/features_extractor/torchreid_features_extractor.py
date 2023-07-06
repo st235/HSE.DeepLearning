@@ -30,20 +30,5 @@ class TorchReidFeaturesExtractor(FeaturesExtractor):
                 raise Exception(f"Cannot extract detection {box} from the image.")
             image_patches.append(patch)
 
-        out: np.ndarray = None
-
-        for i in range(len(image_patches)):
-            patch = image_patches[i]
-
-            features = self.__torchreid_extractor(patch)
-
-            if out is None:
-                shape = features.shape
-                out = np.zeros((len(image_patches), shape[1]), np.float32)
-
-            out[i, :] = features
-
-        if out is None:
-            return np.zeros((0, 0))
-
-        return out
+        out = self.__torchreid_extractor(image_patches)
+        return out.cpu().detach().numpy()
