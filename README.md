@@ -780,12 +780,32 @@ The API of the class looks like:
 |-----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
 | **extract(image: np.ndarray, boxes: list[Rect]) -> np.ndarray** | it accepts original image and found detections, and returns a list of features vectors. Feature vectors go in the same order as detections. |
 
-#### Tensorflow V1
+#### Tensorflow V1 [from original DeepSORT work]
 
 ![TFV1 Features extractor](./resources/tfv1_features_extractor.png)
 
 [TensorflowV1FeaturesExtractor](./src/deep_sort/features_extractor/tensorflow_v1_features_extractor.py) provides
 a tensorflow model to extract feature vectors from detections.
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -d gt
+```
+
+
+**Scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.71602|   0.78332|     0.655|
+MOT16-09            |   0.83054|   0.91735|   0.75269|
+MOT16-11            |   0.90087|   0.90305|   0.90062|
+PETS09-S2L1         |   0.78951|   0.85509|   0.73012|
+TUD-Campus          |   0.81401|   0.80881|   0.81978|
+TUD-Stadtmitte      |   0.87434|   0.89017|   0.86596|
+COMBINED            |   0.82088|   0.85963|   0.78736|
+```
 
 ### Misc
 
