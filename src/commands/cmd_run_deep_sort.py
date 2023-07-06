@@ -169,7 +169,7 @@ def get_supported_detectors() -> set[str]:
     """Returns supported detectors.
     """
     return {'det', 'gt', 'hog',
-            'mmdet_efficientnet', 'mmdet_dynamic_rcnn', 'mmdet_cascade_rpn', 'mmdet_mobilenetv2',
+            'mmdet_darknet', 'mmdet_mobilenetv2', 'mmdet_yoloxt', 'mmdet_yoloxs', 'mmdet_yoloxl',
             'nanodet_legacy', 'nanodet_plusm320', 'nanodet_plusm15x320', 'nanodet_plusm416', 'nanodet_plusm15x416',
             'yolov5n', 'yolov5n6', 'yolov5s', 'yolov5m', 'yolov5l',
             'yolov8n', 'yolov8s', 'yolov8m', 'yolov8l'}
@@ -202,20 +202,24 @@ def __create_detector_by_name(detector: str,
     if detector == 'nanodet_plusm15x416':
         return NanodetDetectionsProvider(paths=NanoDetPaths.PlusM15X416)
 
-    if detector == 'mmdet_efficientnet':
-        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.EfficientDet,
-                                             model=extra_param)
-
-    if detector == 'mmdet_dynamic_rcnn':
-        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.DynamicRcnnR50Coco,
-                                             model=extra_param)
-
-    if detector == 'mmdet_cascade_rpn':
-        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.CascadeRpnFaster,
+    if detector == 'mmdet_darknet':
+        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.DarkNet53608,
                                              model=extra_param)
 
     if detector == 'mmdet_mobilenetv2':
         return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.MobileNetV2,
+                                             model=extra_param)
+
+    if detector == 'mmdet_yoloxt':
+        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.YoloXT,
+                                             model=extra_param)
+
+    if detector == 'mmdet_yoloxs':
+        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.YoloXS,
+                                             model=extra_param)
+
+    if detector == 'mmdet_yoloxl':
+        return MmdetectionDetectionsProvider(config=MmdetectionDetectionsProvider.Config.YoloXL,
                                              model=extra_param)
 
     if detector == 'yolov5n':

@@ -447,17 +447,147 @@ COMBINED            |   0.17041|   0.97631|  0.099929|
 _MMDetectionDetectionsProvider_ uses [MMDetection](https://github.com/open-mmlab/mmdetection) toolbox.
 
 Supported models:
-- efficientdet
+- [YoloXT](https://github.com/open-mmlab/mmdetection/blob/main/configs/yolox/README.md)
+- [YoloXS](https://github.com/open-mmlab/mmdetection/blob/main/configs/yolox/README.md)
+- [YoloXL](https://github.com/open-mmlab/mmdetection/blob/main/configs/yolox/README.md)
+- [MobileNetV2](https://github.com/open-mmlab/mmdetection/blob/main/configs/yolo/README.md)
+- [DarkNet53608](https://github.com/open-mmlab/mmdetection/blob/main/configs/yolo/README.md)
+
 
 ⚠️ Please, do keep in mind that due to the large size of weights/checkpoints they won't be provided with this repo.
 Do download them from the `MMDetection` repository.
 
+⚠️⚠️ Use `--extra` flag to pass path to the model weights.
+
+**DarkNet-53**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d mmdet_darknet --n_init 0 --extra path_to_darknet_model
+```
+
+Detections quality is amazing but performance has some space for improvements.
+
+![DarkNet-53](./resources/detection_score_mmdet_darknet_1.png)
+
+![DarkNet-53](./resources/detection_score_mmdet_darknet_2.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.72853|    0.7649|   0.69546|
+MOT16-09            |   0.69262|   0.92555|   0.55336|
+MOT16-11            |   0.67816|    0.9424|   0.52965|
+PETS09-S2L1         |   0.84404|    0.8882|   0.80407|
+TUD-Campus          |   0.76066|    0.9243|   0.64624|
+TUD-Stadtmitte      |   0.82335|   0.99631|   0.70156|
+COMBINED            |   0.75456|   0.90694|   0.65506|
+```
+
+**MobileNet V2**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d mmdet_mobilenetv2 --n_init 0 --extra path_to_mobilenet_model
+```
+
+![MobileNet V2](./resources/detection_score_mmdet_mobilenetv2.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.61736|   0.94562|   0.45827|
+MOT16-09            |   0.49639|   0.97225|   0.33327|
+MOT16-11            |   0.50458|   0.95879|   0.34238|
+PETS09-S2L1         |   0.67898|   0.87549|   0.55451|
+TUD-Campus          |   0.60232|   0.98113|   0.43454|
+TUD-Stadtmitte      |   0.62722|   0.99251|   0.45848|
+COMBINED            |   0.58781|    0.9543|   0.43024|
+```
+
+
+**YoloXT**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d mmdet_yoloxt --n_init 0 --extra path_to_yolox_model
+```
+
+Super impressive for a `tiny` model as it performs better than the original algorithm.
+
+![YoloXT](./resources/detection_score_mmdet_yoloxt.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.56888|   0.88037|    0.4202|
+MOT16-09            |   0.53987|   0.96521|   0.37474|
+MOT16-11            |   0.62991|    0.9569|   0.46948|
+PETS09-S2L1         |   0.85424|   0.93142|   0.78887|
+TUD-Campus          |   0.74333|   0.92531|   0.62117|
+TUD-Stadtmitte      |   0.85867|   0.98326|   0.76211|
+COMBINED            |   0.69915|   0.94041|   0.57276|
+```
+
+**YoloXS**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d mmdet_yoloxs --n_init 0 --extra path_to_yolox_model
+```
+
+Performance is a bit worse but still _tolerable_ on the **CPU-bounded** devices. 
+
+![YoloXS](./resources/detection_score_mmdet_yoloxs.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |   0.75043|   0.91932|   0.63397|
+MOT16-09            |   0.67437|   0.97275|   0.51607|
+MOT16-11            |    0.6938|   0.96175|   0.54262|
+PETS09-S2L1         |   0.88307|   0.89234|   0.87399|
+TUD-Campus          |   0.79808|   0.93962|   0.69359|
+TUD-Stadtmitte      |   0.87458|   0.98378|    0.7872|
+COMBINED            |   0.77905|   0.94493|   0.67457|
+```
+
+**YoloXL**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e F1 Precision Recall -d mmdet_yoloxl --n_init 0 --extra path_to_yolox_model
+```
+
+![YoloXL](./resources/detection_score_mmdet_yoloxl.png)
+
+**Final scores**
+
+```text
+                    |F1        |Precision |Recall    |
+KITTI-17            |    0.8263|   0.92714|   0.74524|
+MOT16-09            |   0.77234|   0.95103|   0.65018|
+MOT16-11            |    0.7321|   0.93389|   0.60203|
+PETS09-S2L1         |   0.89697|   0.88497|   0.90929|
+TUD-Campus          |   0.85542|   0.93115|   0.79109|
+TUD-Stadtmitte      |   0.87992|   0.97476|    0.8019|
+COMBINED            |   0.82718|   0.93382|   0.74996|
+```
 
 #### YoloV8DetectionsProvider
 
 ![YoloV8DetectionsProvider](./resources/yolov8_detections_provider.png)
 
-_MMDetectionDetectionsProvider_ uses [YoloV8](https://github.com/ultralytics/ultralytics) model.
+_YoloV8DetectionsProvider_ uses [YoloV8](https://github.com/ultralytics/ultralytics) model.
 
 Model supports the following checkpoints:
 - nano

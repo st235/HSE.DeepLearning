@@ -25,10 +25,11 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
     """
 
     class Config(Enum):
-        EfficientDet = 0
-        DynamicRcnnR50Coco = 1
-        CascadeRpnFaster = 2
-        MobileNetV2 = 3
+        DarkNet53608 = 0
+        YoloXT = 1
+        YoloXS = 2
+        YoloXL = 3
+        MobileNetV2 = 4
 
     def __init__(self,
                  config: Config,
@@ -62,8 +63,8 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
             confidence = scores[i]
             label = labels[i]
 
-            # if label != _LABEL_PERSON:
-            #     continue
+            if label != _LABEL_PERSON:
+                continue
 
             width = x1 - x0
             height = y1 - y0
@@ -78,14 +79,17 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
 
     @staticmethod
     def __get_config_and_weights(config: Config) -> str:
-        if config == MmdetectionDetectionsProvider.Config.EfficientDet:
-            return os.path.join('efficientnet', 'retinanet_effb3_fpn_8xb4-crop896-1x_coco.py')
+        if config == MmdetectionDetectionsProvider.Config.DarkNet53608:
+            return os.path.join('yolo', 'yolov3_d53_8xb8-ms-608-273e_coco.py')
 
-        if config == MmdetectionDetectionsProvider.Config.DynamicRcnnR50Coco:
-            return os.path.join('dynamic_rcnn', 'dynamic-rcnn_r50_fpn_1x_coco.py')
+        if config == MmdetectionDetectionsProvider.Config.YoloXT:
+            return os.path.join('yolox', 'yolox_tiny_8xb8-300e_coco.py')
 
-        if config == MmdetectionDetectionsProvider.Config.CascadeRpnFaster:
-            return os.path.join('cascade_rpn', 'cascade-rpn_faster-rcnn_r50-caffe_fpn_1x_coco.py')
+        if config == MmdetectionDetectionsProvider.Config.YoloXS:
+            return os.path.join('yolox', 'yolox_s_8xb8-300e_coco.py')
+
+        if config == MmdetectionDetectionsProvider.Config.YoloXL:
+            return os.path.join('yolox', 'yolox_l_8xb8-300e_coco.py')
 
         if config == MmdetectionDetectionsProvider.Config.MobileNetV2:
             return os.path.join('yolo', 'yolov3_mobilenetv2_8xb24-ms-416-300e_coco.py')
