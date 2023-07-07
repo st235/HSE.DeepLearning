@@ -766,15 +766,14 @@ TUD-Stadtmitte      |    0.9883|   0.99044|   0.98616|
 COMBINED            |   0.99086|   0.99281|   0.98893|
 ```
 
-### REID
-
-#### Features extraction
+### Features extraction
 
 ![Features extractor](./resources/features_extractor.png)
 
-Features extractor is the main abstraction for converting a detection area into a feature vector.
+Features extractor is the main abstraction for converting a detection area into a feature vector. Those features play
+important role for **REID**.
 
-The API of the class looks like:
+The API of a features extractor:
 
 | Method                                                          | Description                                                                                                                                 |
 |-----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
@@ -793,7 +792,6 @@ Command to run the sequence in the given configuration is:
 deep-sort run ./data/sequences -e HOTA DetA AssA -d gt
 ```
 
-
 **Scores**
 
 ```text
@@ -805,6 +803,210 @@ PETS09-S2L1         |   0.78951|   0.85509|   0.73012|
 TUD-Campus          |   0.81401|   0.80881|   0.81978|
 TUD-Stadtmitte      |   0.87434|   0.89017|   0.86596|
 COMBINED            |   0.82088|   0.85963|   0.78736|
+```
+
+#### Torchreid V1
+
+_TorchreidFeaturesExtractor_ is using [torchreid](https://github.com/KaiyangZhou/deep-person-reid). 
+
+`Torchreid` supports multiple models, including:
+- Shufflenet
+- Mobilenet
+- Mobilenet 1.4x
+- Mlfn
+- Osnet
+- Osnet 0.75x
+- OsnetIbn
+- OsnetAin
+- OsnetAin 0.75x
+
+**Shufflenet**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_shufflenet -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.71939|   0.78704|   0.65796|
+MOT16-09            |   0.73834|   0.91089|   0.59933|
+MOT16-11            |   0.82107|   0.90406|   0.74789|
+PETS09-S2L1         |   0.69533|   0.85152|   0.56885|
+TUD-Campus          |   0.79351|   0.81319|   0.77497|
+TUD-Stadtmitte      |   0.70441|   0.88508|   0.56317|
+COMBINED            |   0.74534|   0.85863|   0.65203|
+```
+
+**Mobilenet**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_mobilenet -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.78148|   0.78184|   0.78177|
+MOT16-09            |   0.80455|   0.91886|    0.7054|
+MOT16-11            |   0.83794|   0.90429|    0.7786|
+PETS09-S2L1         |   0.72293|   0.85423|   0.61308|
+TUD-Campus          |   0.79351|   0.81319|   0.77497|
+TUD-Stadtmitte      |   0.79706|    0.8877|   0.72372|
+COMBINED            |   0.78958|   0.86002|   0.72959|
+```
+
+**Mobilenet 1.4x**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_mobilenet14x -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.78385|   0.78226|   0.78584|
+MOT16-09            |   0.78386|   0.91873|   0.66944|
+MOT16-11            |   0.83769|   0.90423|    0.7782|
+PETS09-S2L1         |   0.68079|   0.85129|   0.54559|
+TUD-Campus          |   0.78999|   0.81248|   0.76877|
+TUD-Stadtmitte      |   0.79706|    0.8877|   0.72372|
+COMBINED            |   0.77887|   0.85945|   0.71193|
+```
+
+**MLFN**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_mlfn -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.75342|   0.78811|   0.72059|
+MOT16-09            |   0.75076|    0.9163|   0.61606|
+MOT16-11            |   0.82203|   0.90421|   0.74948|
+PETS09-S2L1         |   0.67928|   0.84723|   0.54672|
+TUD-Campus          |   0.79351|   0.81319|   0.77497|
+TUD-Stadtmitte      |   0.70249|   0.88332|   0.56154|
+COMBINED            |   0.75025|   0.85873|   0.66156|
+```
+
+**Osnet**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_osnet -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.70801|   0.78305|   0.64132|
+MOT16-09            |   0.84397|   0.91597|   0.77847|
+MOT16-11            |   0.89317|   0.90303|   0.88547|
+PETS09-S2L1         |   0.82948|   0.85326|   0.80744|
+TUD-Campus          |   0.75041|   0.80596|   0.69969|
+TUD-Stadtmitte      |   0.84106|   0.88805|   0.80391|
+COMBINED            |   0.81102|   0.85822|   0.76938|
+```
+
+**Osnet 0.75x**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_osnet075 -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.72316|    0.7851|   0.66727|
+MOT16-09            |   0.84918|    0.9173|   0.78692|
+MOT16-11            |   0.89959|   0.90285|   0.89838|
+PETS09-S2L1         |   0.73093|   0.85319|   0.62715|
+TUD-Campus          |   0.81401|   0.80881|   0.81978|
+TUD-Stadtmitte      |   0.84109|   0.88814|   0.80387|
+COMBINED            |   0.80966|   0.85923|   0.76723|
+```
+
+**Osnet Ibn**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_osnetibn -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.76833|   0.77976|   0.75796|
+MOT16-09            |   0.89489|    0.9175|   0.87357|
+MOT16-11            |   0.90365|   0.90325|   0.90603|
+PETS09-S2L1         |   0.81309|   0.85437|   0.77482|
+TUD-Campus          |   0.81401|   0.80881|   0.81978|
+TUD-Stadtmitte      |   0.79701|   0.88758|   0.72371|
+COMBINED            |   0.83183|   0.85855|   0.80931|
+```
+
+**Osnet Ain**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_osnetain -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.74956|   0.77895|   0.72198|
+MOT16-09            |   0.83505|   0.91511|   0.76292|
+MOT16-11            |   0.90592|   0.90228|   0.91166|
+PETS09-S2L1         |   0.79118|    0.8518|   0.73624|
+TUD-Campus          |   0.81401|   0.80881|   0.81978|
+TUD-Stadtmitte      |   0.84233|   0.88567|    0.8084|
+COMBINED            |   0.82301|    0.8571|    0.7935|
+```
+
+**Osnet Ain 0.75**
+
+Command to run the sequence in the given configuration is:
+
+```bash
+deep-sort run ./data/sequences -e HOTA DetA AssA -fe torchreid_osnetain075 -d gt
+```
+
+**Final scores**
+
+```text
+                    |HOTA      |DetA      |AssA      |
+KITTI-17            |   0.77272|   0.78178|   0.76444|
+MOT16-09            |   0.89956|   0.91725|   0.88296|
+MOT16-11            |   0.91164|   0.90272|   0.92269|
+PETS09-S2L1         |   0.78861|   0.85357|   0.72973|
+TUD-Campus          |   0.81401|   0.80881|   0.81978|
+TUD-Stadtmitte      |   0.89911|   0.88842|   0.91666|
+COMBINED            |   0.84761|   0.85876|   0.83938|
 ```
 
 ### Misc

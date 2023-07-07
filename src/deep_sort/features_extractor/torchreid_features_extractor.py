@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
-import torchvision.transforms as T
+from enum import Enum
 from torchreid.utils import FeatureExtractor
 
 from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
@@ -14,9 +14,21 @@ class TorchReidFeaturesExtractor(FeaturesExtractor):
     """Feature extractor based on torchreid.
     """
 
-    def __init__(self):
+    class Model(Enum):
+        Shufflenet = 0
+        Mobilenet = 1
+        Mobilenet14x = 2
+        Mlfn = 3
+        Osnet = 4
+        Osnet075 = 5
+        OsnetIbn = 6
+        OsnetAin = 7
+        OsnetAin075 = 8
+
+    def __init__(self,
+                 model: Model):
         self.__torchreid_extractor = FeatureExtractor(
-            model_name='mobilenetv2_x1_4',
+            model_name=self.__get_model_name(model),
             device=get_available_device()
         )
 
@@ -32,3 +44,35 @@ class TorchReidFeaturesExtractor(FeaturesExtractor):
 
         out = self.__torchreid_extractor(image_patches)
         return out.cpu().detach().numpy()
+
+    @staticmethod
+    def __get_model_name(model: Model) -> str:
+        if model == TorchReidFeaturesExtractor.Model.Shufflenet:
+            return 'shufflenet'
+
+        if model == TorchReidFeaturesExtractor.Model.Mobilenet:
+            return 'mobilenetv2_x1_0'
+
+        if model == TorchReidFeaturesExtractor.Model.Mobilenet14x:
+            return 'mobilenetv2_x1_4'
+
+        if model == TorchReidFeaturesExtractor.Model.Mlfn:
+            return 'mlfn'
+
+        if model == TorchReidFeaturesExtractor.Model.Osnet:
+            return 'osnet_x1_0'
+
+        if model == TorchReidFeaturesExtractor.Model.Osnet075:
+            return 'osnet_x0_75'
+
+        if model == TorchReidFeaturesExtractor.Model.OsnetIbn:
+            return 'osnet_ibn_x1_0'
+
+        if model == TorchReidFeaturesExtractor.Model.OsnetAin:
+            return 'osnet_ain_x1_0'
+
+        if model == TorchReidFeaturesExtractor.Model.OsnetAin075:
+            return 'osnet_ain_x0_75'
+
+        raise Exception(f"Cannot find corresponding model name for {model}")
+

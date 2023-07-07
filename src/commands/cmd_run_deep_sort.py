@@ -255,14 +255,41 @@ def __create_detector_by_name(detector: str,
 def get_supported_features_extractor() -> set[str]:
     """Returns supported features extractor.
     """
-    return {'ftv1', 'torchreid'}
+    return {'ftv1',
+            'torchreid_shufflenet', 'torchreid_mobilenet', 'torchreid_mobilenet14x',
+            'torchreid_mlfn', 'torchreid_osnet', 'torchreid_osnet075', 'torchreid_osnetibn',
+            'torchreid_osnetain', 'torchreid_osnetain075'}
 
 
 def __create_features_extractor_by_name(features_extractor: str) -> FeaturesExtractor:
     if features_extractor == 'tfv1':
         return TensorflowV1FeaturesExtractor.create_default()
 
-    if features_extractor == 'torchreid':
-        return TorchReidFeaturesExtractor()
+    if features_extractor == 'torchreid_shufflenet':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.Shufflenet)
+
+    if features_extractor == 'torchreid_mobilenet':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.Mobilenet)
+
+    if features_extractor == 'torchreid_mobilenet14x':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.Mobilenet14x)
+
+    if features_extractor == 'torchreid_mlfn':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.Mlfn)
+
+    if features_extractor == 'torchreid_osnet':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.Osnet)
+
+    if features_extractor == 'torchreid_osnet075':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.Osnet075)
+
+    if features_extractor == 'torchreid_osnetibn':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.OsnetIbn)
+
+    if features_extractor == 'torchreid_osnetain':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.OsnetAin)
+
+    if features_extractor == 'torchreid_osnetain075':
+        return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.OsnetAin075)
 
     raise Exception(f"Unknown features extractor {features_extractor}")
