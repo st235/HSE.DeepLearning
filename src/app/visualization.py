@@ -13,10 +13,10 @@ class Visualization(object):
     def __init__(self,
                  image: np.ndarray):
         self.__paint = Paint()
-        self.__drawing_context = DrawingContext(image=image)
+        self.__drawing_context = DrawingContext(image=image.copy())
 
     @property
-    def image(self) -> np.ndarray:
+    def output_image(self) -> np.ndarray:
         return self.__drawing_context.image
 
     def __draw_label_with_bounding_box(self,

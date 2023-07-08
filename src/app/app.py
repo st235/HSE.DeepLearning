@@ -61,7 +61,7 @@ class App(object):
         if self.__display_fps:
             visualisation.draw_info(f"FPS: {frames_per_second}\nFrame: {frame_id}")
 
-        self.__window.update(visualisation.image)
+        self.__window.update(visualisation.output_image)
 
         self.__last_update_time = current_time
 
