@@ -1,8 +1,10 @@
+import torch
 import numpy as np
 
 from src.deep_sort.detector.detection import Detection
 from src.deep_sort.detector.detections_provider import DetectionsProvider
 from src.utils.geometry.rect import Rect
+from src.utils.torch_utils import get_available_device
 from dependencies.definitions import fetch_model
 from enum import Enum
 
@@ -20,8 +22,11 @@ class YoloV5DetectionsProvider(DetectionsProvider):
     def __init__(self,
                  checkpoint: Checkpoint):
         path = self.__get_model_path_by_checkpoint(checkpoint)
+
+        device = torch.device(get_available_device())
         self.__model = fetch_model('yolov5',
                                    model_path=path)
+        self.__model.to(device)
 
     def load_detections(self,
                         image: np.ndarray,

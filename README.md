@@ -1187,6 +1187,31 @@ TUD-Stadtmitte      |    0.3568|   0.43991|   0.29182|   0.54371|   0.41616|   0
 COMBINED            |   0.38358|   0.39764|   0.37772|   0.51055|   0.37057|   0.86534|
 ```
 
+## Results
+
+The main evaluation stages are published in [this _Colab_](https://colab.research.google.com/drive/1ie-1zJHsmBvdABeDZ1WxEGkbmMGSmr6j#scrollTo=K9Q7Uic6F0XP).
+Local copy of this Colab is available under [`demo` folder.](./demo)
+
+![Colab screenshot](./resources/colab_screenshot.png)
+
+Moreover, video records for sequences are available under [`results` folder.](./results)
+
+### Original DeepSORT
+
+```text
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
+KITTI-17            |   0.39411|   0.38431|    0.4061|   0.71491|   0.60029|   0.88362|
+MOT16-09            |   0.30053|   0.33223|   0.27235|   0.52728|    0.3658|   0.94404|
+MOT16-11            |   0.40245|   0.48102|   0.33696|   0.60129|   0.43209|   0.98828|
+PETS09-S2L1         |    0.4469|   0.41129|   0.48727|      0.81|   0.88338|   0.74787|
+TUD-Campus          |    0.4007|   0.36568|   0.44327|   0.73386|   0.64903|    0.8442|
+TUD-Stadtmitte      |    0.3568|   0.29182|   0.43991|   0.74671|    0.7128|   0.78402|
+COMBINED            |   0.38358|   0.37772|   0.39764|   0.68901|   0.60723|   0.86534|
+```
+
+### Yolo V5 Medium + Mobilenet
+
+
 ## Acknowledgement
 
 Project is based on a [DeepSort algorithm implementation](https://github.com/nwojke/deep_sort) originally proposed in ["Simple Online and Realtime Tracking with a Deep Association Metric"](https://arxiv.org/abs/1703.07402).
