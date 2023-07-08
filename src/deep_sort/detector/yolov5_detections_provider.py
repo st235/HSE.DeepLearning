@@ -36,7 +36,7 @@ class YoloV5DetectionsProvider(DetectionsProvider):
         detection_list = []
 
         for obj in results.pred[0]:
-            x0, y0, x1, y1, confidence, label = obj.numpy()
+            x0, y0, x1, y1, confidence, label = obj.cpu().detach().numpy()
 
             if label != _LABEL_PERSON:
                 continue
