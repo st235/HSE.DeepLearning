@@ -1,0 +1,16 @@
+numpy==1.23.5
+scipy==1.10.1
+pytest==7.3.1
+opencv-python==4.7.0.72
+torch==1.13.1
+terminaltables==3.1.10
+shapely==2.0.1
+tensorflow==2.12.0
+pycocotools==2.0.6
+pytorch_lightning==2.0.4
+torchvision==0.14.1
+pandas==2.0.3
+psutil==5.9.5
+ultralytics==8.0.124
+GitPython==3.1.30
+torchaudio==0.13.1
