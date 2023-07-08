@@ -3,7 +3,7 @@
 	url = https://github.com/ultralytics/yolov5
 [submodule "dependencies/nanodet"]
 	path = dependencies/nanodet
-	url = git@github.com:st235/nanodet.git
+	url = https://github.com/st235/nanodet
 [submodule "dependencies/mmdetection"]
 	path = dependencies/mmdetection
 	url = https://github.com/open-mmlab/mmdetection.git
