@@ -35,6 +35,10 @@ class TorchReidFeaturesExtractor(FeaturesExtractor):
     def extract(self,
                 image: np.ndarray,
                 boxes: list[Rect]) -> np.ndarray:
+        if len(boxes) == 0:
+            # No detections found, early return.
+            return np.empty(shape=(0, 1))
+
         image_patches = []
         for box in boxes:
             patch = extract_image_patch(image, box)
