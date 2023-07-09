@@ -30,7 +30,7 @@ def iou(bbox: Rect, candidates: list[Rect]) -> np.ndarray[float]:
 
 
 def iou_cost(tracks: list[Track],
-             detections: list[Detection],
+             detections_bboxes: list[Rect],
              features: np.ndarray,
              track_indices: list[int],
              detection_indices: list[int]):
@@ -40,10 +40,11 @@ def iou_cost(tracks: list[Track],
     ----------
     tracks: list[Track]
         A list of tracks.
-    detections: list[Detection]
+    detections_bboxes: list[Rect]
         A list of detections.
     features: np.ndarray
-        2 Dimensional array of detections features.
+        An array of feature vectors for corresponding detections.
+        Added here for parameters compatibility with linear assignments methods.
     track_indices: list[int]
         A list of indices to tracks that should be matched. Defaults to
         all `tracks`.
@@ -65,10 +66,10 @@ def iou_cost(tracks: list[Track],
     cost_matrix = np.zeros((len(track_indices), len(detection_indices)))
     for row, track_idx in enumerate(track_indices):
         if tracks[track_idx].time_since_update > 1:
-            cost_matrix[row, :] = linear_assignment.INFTY_COST
+            cost_matrix[row, :] = linear_assignment.COST_INFINITY
             continue
 
         bbox = tracks[track_idx].bounding_box
-        candidates = [detections[i].origin for i in detection_indices]
+        candidates = [detections_bboxes[i] for i in detection_indices]
         cost_matrix[row, :] = 1. - iou(bbox, candidates)
     return cost_matrix

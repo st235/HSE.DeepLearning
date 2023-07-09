@@ -1,8 +1,11 @@
 import numpy as np
-import cv2
+
+from typing import Optional
 
 
-def non_max_suppression(boxes, max_bbox_overlap, scores=None):
+def non_max_suppression(boxes: np.ndarray,
+                        max_bbox_overlap: float,
+                        scores: Optional[np.ndarray] = None):
     """Suppress overlapping detections.
 
     Original code from [1]_ has been adapted to include confidence score.
@@ -23,7 +26,7 @@ def non_max_suppression(boxes, max_bbox_overlap, scores=None):
     boxes : ndarray
         Array of ROIs (x, y, width, height).
     max_bbox_overlap : float
-        ROIs that overlap more than this values are suppressed.
+        ROIs that overlap more than these values are suppressed.
     scores : Optional[array_like]
         Detector confidence score.
 

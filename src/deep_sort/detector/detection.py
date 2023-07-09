@@ -1,21 +1,19 @@
-import numpy as np
-
 from src.utils.geometry.rect import Rect
 
 
 class Detection(object):
     """
-    This class represents a bounding box detection in a single image.
+    This class represents a single detection in an image.
 
     Attributes
     ----------
-    __origin : Rect
+    __origin: Rect
         Bounding box origin rect.
-    __confidence : float
+    __confidence: float
         Detector confidence score.
     """
 
-    def __init__(self, origin: Rect, confidence):
+    def __init__(self, origin: Rect, confidence: float):
         self.__origin = origin
         self.__confidence = float(confidence)
 

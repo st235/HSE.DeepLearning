@@ -1,19 +1,19 @@
 import numpy as np
 
 from abc import ABC, abstractmethod
-from src.deep_sort.detector.detection import Detection
+from src.deep_sort.segmentation.segmentation import Segmentation
 
 
-class DetectionsProvider(ABC):
-    """Detects people int the given image.
+class SegmentationsProvider(ABC):
+    """Segments image and finds human on it.
     """
 
     @abstractmethod
-    def load_detections(self,
-                        image: np.ndarray,
-                        frame_id: int,
-                        min_height: int = 0) -> list[Detection]:
-        """Creates detections for the given frame.
+    def load_segmentations(self,
+                           image: np.ndarray,
+                           frame_id: int,
+                           min_height: int = 0) -> list[Segmentation]:
+        """Creates segmentations for the given frame.
 
         Parameters
         ----------
@@ -27,7 +27,7 @@ class DetectionsProvider(ABC):
 
         Returns
         -------
-        list[detector.Detection]
-            Returns detection responses at given frame index.
+        list[Segmentation]
+            Returns segmentation results for a given frame.
         """
         ...
