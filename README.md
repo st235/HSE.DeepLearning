@@ -121,7 +121,7 @@ It reads the `det/det.txt` file and extract detections from it.
 Command to run the sequence in the given configuration is:
 
 ```bash
-deep-sort run ./data/sequences -e F1 Precision Recall --n_init 0
+deep-sort run ./data/sequences -d det -e F1 Precision Recall --n_init 0
 ```
 
 During the evaluation there is a noticeable amount of mis-detections.
@@ -813,7 +813,9 @@ TUD-Stadtmitte      |   0.87434|   0.89017|   0.86596|
 COMBINED            |   0.82088|   0.85963|   0.78736|
 ```
 
-#### Torchreid V1
+#### Torchreid
+
+![TorchReidFeatures Extractor](./resources/torchreid_features_extractor.png)
 
 _TorchreidFeaturesExtractor_ is using [torchreid](https://github.com/KaiyangZhou/deep-person-reid). 
 
