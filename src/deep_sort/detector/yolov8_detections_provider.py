@@ -26,7 +26,7 @@ class YoloV8DetectionsProvider(DetectionsProvider):
                         image: np.ndarray,
                         frame_id: int,
                         min_height: int = 0) -> list[Detection]:
-        results = self.__model(image)
+        results = self.__model(image, verbose=False)
         detection_list = []
 
         for result in results:
