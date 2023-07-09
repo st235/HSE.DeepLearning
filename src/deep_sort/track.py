@@ -120,7 +120,7 @@ class Track:
 
     def update(self,
                kf,
-               detection: Detection,
+               detection_bbox: Rect,
                feature: np.ndarray):
         """Perform Kalman filter measurement update step and update the feature
         cache.
@@ -129,13 +129,13 @@ class Track:
         ----------
         kf: kalman_filter.KalmanFilter
             The Kalman filter.
-        detection: Detection
+        detection_bbox: Rect
             The associated detection.
         feature: np.ndarray
             1 Dimensional array with a feature vector for the given detection.
         """
-        xyah = np.array([detection.origin.center_x, detection.origin.center_y,
-                         detection.origin.aspect_ratio, detection.origin.height])
+        xyah = np.array([detection_bbox.center_x, detection_bbox.center_y,
+                         detection_bbox.aspect_ratio, detection_bbox.height])
 
         self.mean, self.covariance = kf.update(self.mean, self.covariance, xyah)
         self.features.append(feature)

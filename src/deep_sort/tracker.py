@@ -7,6 +7,7 @@ from src.deep_sort.detector.detection import Detection
 from src.deep_sort.kalman_filter import KalmanFilter
 from src.deep_sort.track import Track
 from src.utils.geometry import iou_utils
+from src.utils.geometry.rect import Rect
 
 
 class Tracker:
@@ -74,14 +75,14 @@ class Tracker:
             track.predict(self.__kalman_filter)
 
     def update(self,
-               detections: list[Detection],
+               detections: list[Rect],
                features: np.ndarray):
         """Perform measurement update and track management.
 
         Parameters
         ----------
-        detections: List[deep_sort.detection.Detection]
-            A list of detections at the current time step.
+        detections: List[Rect]
+            A list of detections bounding boxes at the current time step.
         features: np.ndarray
             Features associated with the detections.
         """
@@ -113,14 +114,18 @@ class Tracker:
         self.__metric.partial_fit(
             np.asarray(features), np.asarray(targets), active_targets)
 
-    def __match(self, detections, features):
+    def __match(self, detections: list[Rect], features: np.ndarray):
 
-        def gated_metric(tracks, dets, fts, track_indices, detection_indices):
-            features = np.array([fts[i, :] for i in detection_indices])
+        def gated_metric(tracks: list[Track],
+                         gated_detections_bboxes: list[Rect],
+                         gated_features: np.ndarray,
+                         track_indices: list[int],
+                         detection_indices: list[int]):
+            feature_vector = np.array([gated_features[i, :] for i in detection_indices])
             targets = np.array([tracks[i].track_id for i in track_indices])
-            cost_matrix = self.__metric.distance(features, targets)
+            cost_matrix = self.__metric.distance(feature_vector, targets)
             cost_matrix = linear_assignment.gate_cost_matrix(
-                self.__kalman_filter, cost_matrix, tracks, dets, track_indices,
+                self.__kalman_filter, cost_matrix, tracks, gated_detections_bboxes, track_indices,
                 detection_indices)
 
             return cost_matrix
@@ -154,10 +159,10 @@ class Tracker:
         return matches, unmatched_tracks, unmatched_detections
 
     def __initiate_track(self,
-                         detection: Detection,
+                         detection_bbox: Rect,
                          feature: np.ndarray):
-        xyah = np.array([detection.origin.center_x, detection.origin.center_y,
-                         detection.origin.aspect_ratio, detection.origin.height])
+        xyah = np.array([detection_bbox.center_x, detection_bbox.center_y,
+                         detection_bbox.aspect_ratio, detection_bbox.height])
         mean, covariance = self.__kalman_filter.initiate(xyah)
         self.__tracks.append(Track(mean, covariance, self.__next_id, self.__n_init, self.__max_age, feature))
         self.__next_id += 1

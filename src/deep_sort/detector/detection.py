@@ -1,5 +1,3 @@
-import numpy as np
-
 from src.utils.geometry.rect import Rect
 
 

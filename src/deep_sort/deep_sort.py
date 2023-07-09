@@ -66,14 +66,16 @@ class DeepSort(object):
         bounding_boxes = np.array([list(detection.origin) for detection in detections])
         confidence_scores = np.array([d.confidence for d in detections])
         indices = preprocessing.non_max_suppression(bounding_boxes, self.__detection_nms_max_overlap, confidence_scores)
-        detections = [detections[i] for i in indices]
+
+        # We don't need confidence scores anymore and can disregard them after non-maxima suppression is done.
+        filtered_detections_bboxes = [detections[i].origin for i in indices]
 
         # Run people identification on detected boxes.
-        extracted_features = self.__features_extractor.extract(image, [detection.origin for detection in detections])
+        extracted_features = self.__features_extractor.extract(image, filtered_detections_bboxes)
 
         # Update tracker.
         self.__tracker.predict()
-        self.__tracker.update(detections, extracted_features)
+        self.__tracker.update(filtered_detections_bboxes, extracted_features)
 
         return self.__tracker.tracks
 
