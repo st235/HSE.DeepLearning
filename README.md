@@ -1017,6 +1017,33 @@ TUD-Stadtmitte      |   0.89911|   0.88842|   0.91666|
 COMBINED            |   0.84761|   0.85876|   0.83938|
 ```
 
+### Segmentation
+
+![Segmentations Provider](./resources/segmentations_provider.png)
+
+Implementation details of segmentation logic is located under [`deep_sort/segmentation` folder.](./src/deep_sort/segmentation)
+
+The idea is similar to [Detections Provider](#detection), the only difference that [Segmentation](./src/deep_sort/segmentation/segmentation.py)
+has an additional method to provide **a segmentation mask**.
+
+#### Detectron2SegmentationsProvider
+
+![Detectron2 Segmentation Provider](./resources/detectron2_segmentations_provider.png)
+
+_Detectron2SegmentationsProvider_ relies on [detectron2 by Facebook](https://github.com/facebookresearch/detectron2).
+
+Example, of the command that runs segmentation:
+
+```text
+deep-sort run ./data/sequences -e HOTA DetA AssA FPS -s detectron2 -fe torchreid_osnet075
+```
+
+Just remember to run segmentation you need to specify `-s` instead of `-d`.
+
+| Screen 1                                                           | Screen 2                                                           | Screen 3                                                           |
+|--------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|
+| ![Detectron2 #1](./resources/detectron2_segmentation_screen_1.png) | ![Detectron2 #1](./resources/detectron2_segmentation_screen_2.png) | ![Detectron2 #1](./resources/detectron2_segmentation_screen_3.png) |
+ 
 ### Misc
 
 #### Geometry, Rect
