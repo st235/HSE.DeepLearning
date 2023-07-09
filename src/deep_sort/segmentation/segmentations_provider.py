@@ -9,10 +9,10 @@ class SegmentationsProvider(ABC):
     """
 
     @abstractmethod
-    def load_detections(self,
-                        image: np.ndarray,
-                        frame_id: int,
-                        min_height: int = 0) -> list[Segmentation]:
+    def load_segmentations(self,
+                           image: np.ndarray,
+                           frame_id: int,
+                           min_height: int = 0) -> list[Segmentation]:
         """Creates segmentations for the given frame.
 
         Parameters

@@ -6,6 +6,7 @@ from detectron2.config import get_cfg
 
 from src.deep_sort.segmentation.segmentation import Segmentation
 from src.deep_sort.segmentation.segmentations_provider import SegmentationsProvider
+from src.utils.geometry.rect import Rect
 from src.utils.torch_utils import get_available_device
 
 _LABEL_PERSON = 0
@@ -24,10 +25,10 @@ class Detectron2SegmentationsProvider(SegmentationsProvider):
         self.__config = config
         self.__predictor = DefaultPredictor(config)
 
-    def load_detections(self,
-                        image: np.ndarray,
-                        frame_id: int,
-                        min_height: int = 0) -> list[Segmentation]:
+    def load_segmentations(self,
+                           image: np.ndarray,
+                           frame_id: int,
+                           min_height: int = 0) -> list[Segmentation]:
         result: list[Segmentation] = list()
 
         output = self.__predictor(image)
@@ -43,6 +44,12 @@ class Detectron2SegmentationsProvider(SegmentationsProvider):
             if label != _LABEL_PERSON:
                 continue
 
-            result.append(Segmentation(bbox=bbox, mask=mask, confidence=score))
+            x0, y0, x1, y1 = bbox
+
+            width = x1 - x0
+            height = y1 - y0
+
+            rect = Rect(left=x0, top=y0, width=width, height=height)
+            result.append(Segmentation(bbox=rect, mask=mask * 255.0, confidence=score))
 
         return result

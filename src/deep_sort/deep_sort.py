@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import numpy as np
 
+from typing import Any
+
 from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
 from src.deep_sort import nn_matching, preprocessing
 from src.deep_sort.detector.detections_provider import DetectionsProvider
+from src.deep_sort.segmentation.segmentations_provider import SegmentationsProvider
 from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
 from src.deep_sort.track import Track
 from src.deep_sort.tracker import Tracker
+from src.utils.geometry.rect import Rect
 
 
 class DeepSort(object):
@@ -39,13 +43,15 @@ class DeepSort(object):
 
     def __init__(self,
                  builder: DeepSort.Builder):
-        assert builder.database_descriptor is not None
-        assert builder.detections_provider is not None
+        assert builder.dataset_descriptor is not None
+        assert (builder.detections_provider is not None) \
+               or (builder.segmentations_provider is not None)
         assert builder.features_extractor is not None
 
-        self.__dataset_descriptor = builder.database_descriptor
-        self.__detections_provider = builder.detections_provider
-        self.__features_extractor = builder.features_extractor
+        self.__dataset_descriptor = builder.dataset_descriptor
+        self.__detections_provider: DetectionsProvider = builder.detections_provider
+        self.__segmentations_provider: SegmentationsProvider = builder.segmentations_provider
+        self.__features_extractor: FeaturesExtractor = builder.features_extractor
 
         self.__detection_min_confidence = builder.detection_min_confidence
         self.__detection_min_height = builder.detection_min_height
@@ -57,18 +63,45 @@ class DeepSort(object):
                                  n_init=builder.tracking_n_init)
 
     def update(self,
-               frame_id: int, image: np.ndarray) -> list[Track]:
-        detections = self.__detections_provider.load_detections(image, frame_id)
-        # Filter detections with low confidence.
-        detections = [detection for detection in detections if detection.confidence >= self.__detection_min_confidence]
+               frame_id: int, image: np.ndarray) -> tuple[list[Track], list[Any]]:
+        is_in_detections_mode = self.__detections_provider is not None
 
-        # Run non-maxima suppression.
-        bounding_boxes = np.array([list(detection.origin) for detection in detections])
-        confidence_scores = np.array([d.confidence for d in detections])
-        indices = preprocessing.non_max_suppression(bounding_boxes, self.__detection_nms_max_overlap, confidence_scores)
+        filtered_detections_bboxes: list[Rect]
+        first_stage_results: list[Any]
 
-        # We don't need confidence scores anymore and can disregard them after non-maxima suppression is done.
-        filtered_detections_bboxes = [detections[i].origin for i in indices]
+        if is_in_detections_mode:
+            detections = self.__detections_provider.load_detections(image, frame_id)
+            first_stage_results = detections
+
+            # Filter detections with low confidence.
+            detections = [detection for detection in detections if
+                          detection.confidence >= self.__detection_min_confidence]
+            bounding_boxes = np.array([list(detection.origin) for detection in detections])
+            confidence_scores = np.array([d.confidence for d in detections])
+
+            # Run non-maxima suppression.
+            indices = preprocessing.non_max_suppression(bounding_boxes, self.__detection_nms_max_overlap,
+                                                        confidence_scores)
+
+            # We don't need confidence scores anymore and can disregard them after non-maxima suppression is done.
+            filtered_detections_bboxes = [detections[i].origin for i in indices]
+        else:
+            # In segmentation mode.
+            segmentations = self.__segmentations_provider.load_segmentations(image, frame_id)
+            first_stage_results = segmentations
+
+            # Filter segmentations with low confidence.
+            segmentations = [segmentation for segmentation in segmentations if
+                             segmentation.confidence >= self.__detection_min_confidence]
+            bounding_boxes = np.array([list(segmentation.bbox) for segmentation in segmentations])
+            confidence_scores = np.array([segmentation.confidence for segmentation in segmentations])
+
+            # Run non-maxima suppression.
+            indices = preprocessing.non_max_suppression(bounding_boxes, self.__detection_nms_max_overlap,
+                                                        confidence_scores)
+
+            # We don't need confidence scores anymore and can disregard them after non-maxima suppression is done.
+            filtered_detections_bboxes = [segmentations[i].bbox for i in indices]
 
         # Run people identification on detected boxes.
         extracted_features = self.__features_extractor.extract(image, filtered_detections_bboxes)
@@ -77,7 +110,7 @@ class DeepSort(object):
         self.__tracker.predict()
         self.__tracker.update(filtered_detections_bboxes, extracted_features)
 
-        return self.__tracker.tracks
+        return self.__tracker.tracks, first_stage_results
 
     class Builder(object):
         def __init__(self,
@@ -85,6 +118,7 @@ class DeepSort(object):
             self.__dataset_descriptor = dataset_descriptor
 
             self.__detections_provider = None
+            self.__segmentations_provider = None
             self.__features_extractor = None
 
             self.__detection_min_confidence = 0.8
@@ -96,7 +130,7 @@ class DeepSort(object):
             self.__tracking_n_init: int = 3
 
         @property
-        def database_descriptor(self) -> MotDatasetDescriptor:
+        def dataset_descriptor(self) -> MotDatasetDescriptor:
             return self.__dataset_descriptor
 
         @property
@@ -106,7 +140,18 @@ class DeepSort(object):
         @detections_provider.setter
         def detections_provider(self,
                                 detections_provider: DetectionsProvider):
+            assert self.__segmentations_provider is None
             self.__detections_provider = detections_provider
+
+        @property
+        def segmentations_provider(self) -> SegmentationsProvider:
+            return self.__segmentations_provider
+
+        @segmentations_provider.setter
+        def segmentations_provider(self,
+                                   segmentations_provider: SegmentationsProvider):
+            assert self.__detections_provider is None
+            self.__segmentations_provider = segmentations_provider
 
         @property
         def features_extractor(self) -> FeaturesExtractor:

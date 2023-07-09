@@ -5,12 +5,7 @@ from src.deep_sort.detector.detection import Detection
 
 
 class DetectionsProvider(ABC):
-    """
-    Finds humans on the given image.
-
-    The first 10 columns of the detection matrix are in the standard
-    MOTChallenge detection format. In the remaining columns store the
-    feature vector associated with each detection.
+    """Detects people int the given image.
     """
 
     @abstractmethod
@@ -18,7 +13,7 @@ class DetectionsProvider(ABC):
                         image: np.ndarray,
                         frame_id: int,
                         min_height: int = 0) -> list[Detection]:
-        """Creates detections for given frame index from the file on disk.
+        """Creates detections for the given frame.
 
         Parameters
         ----------
@@ -32,8 +27,7 @@ class DetectionsProvider(ABC):
 
         Returns
         -------
-        List[detector.Detection]
+        list[detector.Detection]
             Returns detection responses at given frame index.
-
         """
         ...

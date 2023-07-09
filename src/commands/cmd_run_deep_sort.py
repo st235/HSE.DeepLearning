@@ -140,7 +140,7 @@ def __run_sequence(sequence_directory: str,
         metrics_mixer = NoOpMetricsMixer()
 
     def frame_callback(frame_id: int, image: np.ndarray, visualisation: Visualization):
-        tracks = deep_sort.update(frame_id, image)
+        tracks, detections = deep_sort.update(frame_id, image)
 
         visualisation.draw_trackers(tracks)
 
