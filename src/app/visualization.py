@@ -3,6 +3,9 @@ import numpy as np
 from src.app.drawing.color import Color
 from src.app.drawing.drawing_context import DrawingContext
 from src.app.drawing.paint import Paint
+from src.deep_sort.detector.detection import Detection
+from src.deep_sort.track import Track
+from src.deep_sort.segmentation.segmentation import Segmentation
 from src.utils.geometry.rect import Rect
 
 
@@ -73,17 +76,30 @@ class Visualization(object):
         for track_id, box in tracks.items():
             self.__draw_track(track_id, box)
 
-    def draw_detections(self, detections):
+    def draw_detections(self, detections: list[Detection]):
         self.__paint.style = Paint.Style.STROKE
         self.__paint.thickness = 3
         self.__paint.color = Color(red=0, green=0, blue=255)
-        for i, detection in enumerate(detections):
-            detection_origin = detection.origin
-            self.__drawing_context.rectangle(int(detection_origin.left), int(detection_origin.top),
-                                             int(detection_origin.width), int(detection_origin.height),
+        for detection in detections:
+            detection_bbox = detection.origin
+            self.__drawing_context.rectangle(int(detection_bbox.left), int(detection_bbox.top),
+                                             int(detection_bbox.width), int(detection_bbox.height),
                                              self.__paint)
 
-    def draw_trackers(self, tracks):
+    def draw_segmentation(self, segmentations: list[Segmentation]):
+        self.__paint.style = Paint.Style.STROKE
+        self.__paint.thickness = 3
+        self.__paint.color = Color(red=0, green=0, blue=255)
+
+        for segmentation in segmentations:
+            segmentation_bbox = segmentation.bbox
+            self.__drawing_context.rectangle(int(segmentation_bbox.left), int(segmentation_bbox.top),
+                                             int(segmentation_bbox.width), int(segmentation_bbox.height),
+                                             self.__paint)
+
+            self.__drawing_context.draw_mask(segmentation.mask)
+
+    def draw_trackers(self, tracks: list[Track]):
         for track in tracks:
             if not track.is_confirmed() or track.time_since_update > 0:
                 continue

@@ -14,8 +14,8 @@ class DrawingContext(object):
         return self.__image
 
     def point(self,
-               x: int, y: int,
-               paint: Paint):
+              x: int, y: int,
+              paint: Paint):
         """Draw a point.
 
         Parameters
@@ -107,3 +107,14 @@ class DrawingContext(object):
 
             cv2.putText(self.__image, line, (x, y), cv2.FONT_HERSHEY_PLAIN, text_size, color.raw, thickness)
             y -= line_height
+
+    def draw_mask(self,
+                  mask: np.ndarray):
+        """Draws a mask on top of the original image.
+
+        Parameters
+        ----------
+        mask: np.ndarray
+            Mask.
+        """
+        cv2.addWeighted(self.__image, 0.9, mask, 0.4, 0)
