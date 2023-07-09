@@ -1049,6 +1049,27 @@ the bounding boxes are calculated incorrectly which _may affect detection and me
 This is the Pull Request that fixes the issue:
 - [#314 Fix bbox bottom right corner calculation](https://github.com/nwojke/deep_sort/pull/314)
 
+#### App, Window
+
+![Window](./resources/windows.png)
+
+App provides flexible windows control system.
+
+The API of a [`Window` class](./src/app/window/window.py is shown at the table below:
+
+| Method                        | Description                         |
+|-------------------------------|-------------------------------------|
+| **title: str**                | returns the window title            |
+| **size: tuple[int, int]**     | returns the window size             |
+| **update(image: np.ndarray)** | draws the given image in the window |
+| **destroy()**                 | destoys window                      |
+
+There are a few windows implementations avilable in the project:
+- [`VirtualWindow`](./src/app/window/virtual_window.py): provides no window
+- [`OpenCVWindow`](./src/app/window/opencv_window.py): a desktop window provided using OpenCV
+- `ColabWindow`: saves a video to a file, _available in Colab snippet_ 
+
+**It is important to know that all Windows operations are excluded from FPS counting.**
 
 ## Metric
 
@@ -1233,39 +1254,42 @@ COMBINED            |   0.38358|   0.37772|   0.39764|   0.68901|   0.60723|   0
 
 ### Yolo V5 Small + Mobilenet
 
-**Average FPS:** ~5-6 FPS
-**Verdict:** 👎, the model works slightly worse than original DeepSORT
+**Average FPS:** ~19 FPS
+
+**Verdict:** 👍, the model works slightly better than original DeepSORT
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.29229|   0.29075|   0.29399|   0.54434|   0.39092|   0.89597|
-MOT16-09            |   0.27824|   0.28326|   0.27413|   0.49284|   0.33061|   0.96771|
-MOT16-11            |   0.37847|   0.40197|   0.35839|   0.58548|   0.42163|   0.95766|
-PETS09-S2L1         |   0.38424|   0.28812|   0.51658|   0.82515|   0.73749|   0.93645|
-TUD-Campus          |   0.43408|   0.47445|   0.39799|   0.68078|    0.5376|   0.92788|
-TUD-Stadtmitte      |   0.50898|   0.51141|   0.50779|    0.8096|   0.68599|   0.98755|
-COMBINED            |   0.37939|   0.37499|   0.39148|   0.65636|   0.51737|   0.94554|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.27871|    0.2694|   0.28906|   0.53524|    0.3836|   0.88514|    26.655|
+MOT16-09            |   0.28191|   0.29082|   0.27403|   0.49284|   0.33061|   0.96771|    17.356|
+MOT16-11            |   0.38404|   0.41388|   0.35823|   0.58527|   0.42141|   0.95764|    14.641|
+PETS09-S2L1         |   0.43707|   0.37079|   0.51746|   0.82657|    0.7395|   0.93688|    16.328|
+TUD-Campus          |   0.43408|   0.47445|   0.39799|   0.68078|    0.5376|   0.92788|    23.085|
+TUD-Stadtmitte      |   0.50828|   0.51012|   0.50762|    0.8096|   0.68599|   0.98755|    18.978|
+COMBINED            |   0.38735|   0.38824|   0.39073|   0.65505|   0.51645|    0.9438|    19.507|
 ```
 
-# Yolo V5 Small + OS Net 0.75x
+### Yolo V5 Small + OS Net 0.75x
 
-**Average FPS:** ~5-6 FPS
+**Average FPS:** 14 FPS
+
 **Verdict:** 👍
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.28327|   0.28244|   0.28461|   0.53141|   0.37775|   0.89583|
-MOT16-09            |   0.33695|   0.42715|    0.2661|   0.48177|   0.32053|   0.96951|
-MOT16-11            |   0.44738|   0.56581|   0.35447|    0.5812|   0.41661|   0.96078|
-PETS09-S2L1         |   0.50412|   0.49909|   0.51076|    0.8235|   0.73123|   0.94241|
-TUD-Campus          |   0.46485|    0.5625|   0.38484|   0.66667|   0.52089|   0.92574|
-TUD-Stadtmitte      |   0.47007|   0.43868|   0.50501|   0.80594|    0.6808|   0.98745|
-COMBINED            |   0.41777|   0.46261|    0.3843|   0.64842|   0.50797|   0.94696|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.28327|   0.28244|   0.28461|   0.53141|   0.37775|   0.89583|    19.317|
+MOT16-09            |   0.33695|   0.42715|    0.2661|   0.48177|   0.32053|   0.96951|    13.895|
+MOT16-11            |   0.44738|   0.56581|   0.35447|    0.5812|   0.41661|   0.96078|    11.796|
+PETS09-S2L1         |   0.50412|   0.49909|   0.51076|    0.8235|   0.73123|   0.94241|    12.881|
+TUD-Campus          |   0.46485|    0.5625|   0.38484|   0.66667|   0.52089|   0.92574|    12.845|
+TUD-Stadtmitte      |   0.47007|   0.43868|   0.50501|   0.80594|    0.6808|   0.98745|    14.296|
+COMBINED            |   0.41777|   0.46261|    0.3843|   0.64842|   0.50797|   0.94696|    14.172|
 ```
 
 ### Yolo V5 Medium + Mobilenet
 
 **Average FPS:** ~4-5 FPS
+
 **Verdict:** 👍, borderline
 
 ```text
@@ -1279,9 +1303,10 @@ TUD-Stadtmitte      |   0.54274|   0.54945|   0.53737|   0.83807|   0.72751|   0
 COMBINED            |   0.41121|   0.38671|   0.44467|    0.7186|   0.59393|   0.94142|
 ```
 
-# Yolo V5 Medium + OS Net 0.75x
+### Yolo V5 Medium + OS Net 0.75x
 
 **Average FPS:** ~4 FPS
+
 **Verdict:** 👎, works a little bit slow
 
 ```text
@@ -1295,9 +1320,10 @@ TUD-Stadtmitte      |   0.54143|   0.54776|   0.53656|   0.83633|   0.72491|   0
 COMBINED            |   0.44298|   0.44978|   0.43933|    0.7145|   0.58719|   0.94604|
 ```
 
-# Yolo V8 Small + Mobilenet 1.4x
+### Yolo V8 Small + Mobilenet 1.4x
 
 **Average FPS:** ~5-6 FPS, though it seems a bit unstable
+
 **Verdict:** 👎, HOTA is slightly worse
 
 ```text
@@ -1311,9 +1337,10 @@ TUD-Stadtmitte      |   0.49059|   0.47176|   0.51284|   0.81174|   0.69377|   0
 COMBINED            |   0.38147|   0.36243|   0.40482|   0.67431|   0.53303|   0.94013|
 ```
 
-# Yolo V8 Small + OSNet 0.75x
+### Yolo V8 Small + OSNet 0.75x
 
 **Average FPS:** ~5-6 FPS on average
+
 **Verdict:** 👍, HOTA is better than in original work
 
 ```text
@@ -1327,9 +1354,10 @@ TUD-Stadtmitte      |   0.52672|   0.54985|   0.50687|   0.80611|   0.68512|   0
 COMBINED            |   0.42785|   0.46294|   0.39912|    0.6685|   0.52491|   0.94472|
 ```
 
-# Yolo V8 Nano + OSNet 0.75x
+### Yolo V8 Nano + OSNet 0.75x
 
 **Average FPS:** ~6-7 FPS on average
+
 **Verdict:** 👎
 
 ```text
@@ -1343,9 +1371,10 @@ TUD-Stadtmitte      |   0.51076|   0.54776|    0.4782|   0.77854|   0.64014|   0
 COMBINED            |   0.37312|   0.41773|   0.33713|   0.59219|   0.44233|   0.94269|
 ```
 
-# Yolo V8 Medium + Mobilenet
+### Yolo V8 Medium + Mobilenet
 
 **Average FPS:** on average ~5 FPS
+
 **Verdict:** 👍
 
 ```text
@@ -1359,9 +1388,10 @@ TUD-Stadtmitte      |   0.51227|   0.49368|   0.53573|   0.83624|   0.72664|   0
 COMBINED            |   0.42384|   0.38736|   0.46947|    0.7463|   0.62407|   0.94509|
 ```
 
-# Yolo V8 Medium + OSNet 0.75x
+### Yolo V8 Medium + OSNet 0.75x
 
 **Average FPS:** on average ~5 FPS
+
 **Verdict:** 👍
 
 ```text
@@ -1375,9 +1405,10 @@ TUD-Stadtmitte      |   0.49544|    0.4634|   0.53177|      0.83|   0.71799|   0
 COMBINED            |   0.46682|   0.47399|   0.46353|   0.73992|   0.61544|   0.94555|
 ```
 
-# MMDetection Yolo X Small + MobileNet
+### MMDetection Yolo X Small + MobileNet
 
 **Average FPS:** on average ~3-4 FPS
+
 **Verdict:** 👎
 
 ```text
@@ -1391,9 +1422,10 @@ TUD-Stadtmitte      |   0.50477|   0.44397|   0.57598|   0.87133|   0.78201|   0
 COMBINED            |   0.45101|   0.41487|    0.4931|   0.77441|   0.66715|   0.94579|
 ```
 
-# Nanodet Plus 1.5x 320 + Mobilenet
+### Nanodet Plus 1.5x 320 + Mobilenet
 
 **Average FPS:** on average ~3-4 FPS
+
 **Verdict:** 👎, HOTA is too bad as the detection quality is low
 
 ```text
