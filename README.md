@@ -1028,11 +1028,25 @@ Implementation details of segmentation logic is located under [`deep_sort/segmen
 The idea is similar to [Detections Provider](#detection), the only difference that [Segmentation](./src/deep_sort/segmentation/segmentation.py)
 has an additional method to provide **a segmentation mask**.
 
-#### Detectron2SegmentationsProvider
+#### Detectron2
 
 ![Detectron2 Segmentation Provider](./resources/detectron2_segmentations_provider.png)
 
 _Detectron2SegmentationsProvider_ relies on [detectron2 by Facebook](https://github.com/facebookresearch/detectron2).
+
+To install `detectron2` you need to run the command below:
+
+```bash
+python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'
+# (add --user if you don't have permission)
+
+# Or, to install it from a local clone:
+git clone https://github.com/facebookresearch/detectron2.git
+python -m pip install -e detectron2
+
+# On macOS, you may need to prepend the above commands with a few environment variables:
+CC=clang CXX=clang++ ARCHFLAGS="-arch x86_64" python -m pip install ...
+```
 
 Example, of the command that runs segmentation:
 
