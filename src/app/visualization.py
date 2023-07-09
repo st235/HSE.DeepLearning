@@ -86,18 +86,24 @@ class Visualization(object):
                                              int(detection_bbox.width), int(detection_bbox.height),
                                              self.__paint)
 
-    def draw_segmentation(self, segmentations: list[Segmentation]):
-        self.__paint.style = Paint.Style.STROKE
-        self.__paint.thickness = 3
-        self.__paint.color = Color(red=0, green=0, blue=255)
-
+    def draw_segmentation(self,
+                          segmentations: list[Segmentation],
+                          should_draw_bbox: bool = False):
         for segmentation in segmentations:
-            segmentation_bbox = segmentation.bbox
-            self.__drawing_context.rectangle(int(segmentation_bbox.left), int(segmentation_bbox.top),
-                                             int(segmentation_bbox.width), int(segmentation_bbox.height),
-                                             self.__paint)
+            if should_draw_bbox:
+                self.__paint.style = Paint.Style.STROKE
+                self.__paint.thickness = 3
+                self.__paint.color = Color(red=255, green=0, blue=0)
 
-            self.__drawing_context.draw_mask(segmentation.mask)
+                segmentation_bbox = segmentation.bbox
+                self.__drawing_context.rectangle(int(segmentation_bbox.left), int(segmentation_bbox.top),
+                                                 int(segmentation_bbox.width), int(segmentation_bbox.height),
+                                                 self.__paint)
+
+            self.__paint.style = Paint.Style.FILL
+            self.__paint.color = Color(red=253, green=231, blue=36)
+
+            self.__drawing_context.draw_mask(segmentation.mask, self.__paint)
 
     def draw_trackers(self, tracks: list[Track]):
         for track in tracks:

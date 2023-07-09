@@ -30,7 +30,7 @@ class Segmentation(object):
         return self.__bbox
 
     @property
-    def mask(self) -> np.ndarray:
+    def mask(self) -> np.ndarray[bool]:
         return self.__mask
 
     @property

@@ -109,12 +109,20 @@ class DrawingContext(object):
             y -= line_height
 
     def draw_mask(self,
-                  mask: np.ndarray):
+                  mask: np.ndarray,
+                  paint: Paint):
         """Draws a mask on top of the original image.
 
         Parameters
         ----------
         mask: np.ndarray
             Mask.
+        paint : Paint
+            An object that defines drawing style.
         """
-        cv2.addWeighted(self.__image, 0.9, mask, 0.4, 0)
+        assert len(mask.shape) == 2
+        assert paint.style == Paint.Style.FILL
+
+        color = paint.color
+
+        self.__image[mask] = color.raw

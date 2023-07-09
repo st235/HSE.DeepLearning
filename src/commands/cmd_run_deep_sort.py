@@ -21,6 +21,8 @@ from src.deep_sort.detector.yolov8_detections_provider import YoloV8DetectionsPr
 from src.deep_sort.features_extractor.features_extractor import FeaturesExtractor
 from src.deep_sort.features_extractor.tensorflow_v1_features_extractor import TensorflowV1FeaturesExtractor
 from src.deep_sort.features_extractor.torchreid_features_extractor import TorchReidFeaturesExtractor
+from src.deep_sort.segmentation.segmentations_provider import SegmentationsProvider
+from src.deep_sort.segmentation.detectron2_segmentations_provider import Detectron2SegmentationsProvider
 from src.metrics.metrics_mixer import MetricsMixer
 from src.metrics.metrics_printer import MetricsPrinter
 from src.metrics.no_op_metrics_mixer import NoOpMetricsMixer
@@ -29,7 +31,8 @@ from src.metrics.std_metrics_printer import StdMetricsPrinter
 
 
 def run(sequence_directories: list[str],
-        detector: str,
+        detections_provider: Optional[str],
+        segmentations_provider: Optional[str],
         features_extractor: str,
         output_file: str,
         min_confidence: float,
@@ -53,7 +56,8 @@ def run(sequence_directories: list[str],
         print(f"Running {sequence_name} sequence")
 
         metrics = __run_sequence(sequence_path,
-                                 detector,
+                                 detections_provider,
+                                 segmentations_provider,
                                  features_extractor,
                                  output_file,
                                  min_confidence,
@@ -74,7 +78,8 @@ def run(sequence_directories: list[str],
 
 
 def __run_sequence(sequence_directory: str,
-                   detector: str,
+                   detections_provider: Optional[str],
+                   segmentations_provider: Optional[str],
                    features_extractor: str,
                    output_file: str,
                    min_confidence: float,
@@ -111,12 +116,24 @@ def __run_sequence(sequence_directory: str,
         is enforced.
     """
 
+    assert (detections_provider is not None)\
+        or (segmentations_provider is not None)
+
+    is_detections_mode = detections_provider is not None
+
     dataset_descriptor = MotDatasetDescriptor.load(sequence_directory)
 
     app = App(dataset_descriptor)
 
     deep_sort_builder = DeepSort.Builder(dataset_descriptor=dataset_descriptor)
-    deep_sort_builder.detections_provider = __create_detector_by_name(detector, dataset_descriptor, extra_param)
+
+    if is_detections_mode:
+        deep_sort_builder.detections_provider = __create_detector_by_name(detections_provider,
+                                                                          dataset_descriptor,
+                                                                          extra_param)
+    else:
+        deep_sort_builder.segmentations_provider = __create_segmentations_provider_by_name(segmentations_provider)
+
     deep_sort_builder.features_extractor = __create_features_extractor_by_name(features_extractor)
 
     deep_sort_builder.detection_min_confidence = min_confidence
@@ -294,3 +311,16 @@ def __create_features_extractor_by_name(features_extractor: str) -> FeaturesExtr
         return TorchReidFeaturesExtractor(model=TorchReidFeaturesExtractor.Model.OsnetAin075)
 
     raise Exception(f"Unknown features extractor {features_extractor}")
+
+
+def get_supported_segmentation_providers() -> set[str]:
+    """Returns supported segmentations providers.
+    """
+    return {'detectron2'}
+
+
+def __create_segmentations_provider_by_name(segmentations_provider: str) -> SegmentationsProvider:
+    if segmentations_provider == 'detectron2':
+        return Detectron2SegmentationsProvider()
+
+    raise Exception(f"Unknown features extractor {segmentations_provider}")

@@ -36,7 +36,7 @@ class Detectron2SegmentationsProvider(SegmentationsProvider):
         instances = output["instances"]
 
         labels = instances.pred_classes.cpu().detach().numpy()
-        bboxes = instances.pred_boxes.cpu().detach().numpy()
+        bboxes = instances.pred_boxes
         masks = instances.pred_masks.cpu().detach().numpy()
         scores = instances.scores.cpu().detach().numpy()
 
@@ -44,12 +44,12 @@ class Detectron2SegmentationsProvider(SegmentationsProvider):
             if label != _LABEL_PERSON:
                 continue
 
-            x0, y0, x1, y1 = bbox
+            x0, y0, x1, y1 = bbox.cpu().detach().numpy()
 
             width = x1 - x0
             height = y1 - y0
 
             rect = Rect(left=x0, top=y0, width=width, height=height)
-            result.append(Segmentation(bbox=rect, mask=mask * 255.0, confidence=score))
+            result.append(Segmentation(bbox=rect, mask=mask, confidence=score))
 
         return result

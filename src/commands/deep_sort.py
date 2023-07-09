@@ -48,11 +48,19 @@ def __parse_args():
                                   choices=MetricsMixer.supported_metrics(),
                                   required=False,
                                   nargs='*')
-    deep_sort_parser.add_argument('-d', '--detector',
-                                  help=f"Detector for finding people.",
-                                  default='det',
+
+    mode_group = deep_sort_parser.add_mutually_exclusive_group()
+    mode_group.add_argument('-d', '--detections_provider',
+                                  help="Detections provider for finding human.",
+                                  default=None,
                                   choices=cmd_run_deep_sort.get_supported_detectors(),
                                   required=False)
+    mode_group.add_argument('-s', '--segmentations_provider',
+                                  help=f"Segmentations provider for finding human.",
+                                  default=None,
+                                  choices=cmd_run_deep_sort.get_supported_segmentation_providers(),
+                                  required=False)
+
     deep_sort_parser.add_argument('-fe', '--features_extractor',
                                   help=f"Features extractor for ReID.",
                                   default='tfv1',
@@ -100,7 +108,8 @@ def main():
         cmd_show_ground_truth.run(sequences)
     elif args.cmd == 'run':
         cmd_run_deep_sort.run(sequences,
-                              args.detector,
+                              args.detections_provider,
+                              args.segmentations_provider,
                               args.features_extractor,
                               args.output_file,
                               args.min_confidence,
