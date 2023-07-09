@@ -30,12 +30,14 @@ class YoloV8DetectionsProvider(DetectionsProvider):
         detection_list = []
 
         for result in results:
-            for box in result.boxes:
+            result = result
 
-                rect = box.xyxy[0]
+            for box in result.boxes:
+                rect = box.xyxy[0].cpu().detach().numpy()
                 x0, y0, x1, y1 = rect[0], rect[1], rect[2], rect[3]
-                confidence = box.conf
-                label = box.cls
+
+                confidence = box.conf.cpu().detach().numpy()[0]
+                label = box.cls.cpu().detach().numpy()[0]
 
                 if label != _LABEL_PERSON:
                     continue
