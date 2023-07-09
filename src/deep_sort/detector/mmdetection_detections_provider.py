@@ -51,9 +51,9 @@ class MmdetectionDetectionsProvider(DetectionsProvider):
 
         predictions = results.pred_instances
 
-        bboxes = predictions.bboxes
-        scores = predictions.scores
-        labels = predictions.labels
+        bboxes = predictions.bboxes.cpu().detach().numpy()
+        scores = predictions.scores.cpu().detach().numpy()
+        labels = predictions.labels.cpu().detach().numpy()
 
         assert len(bboxes) == len(scores)
         assert len(bboxes) == len(labels)
