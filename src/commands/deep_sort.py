@@ -50,16 +50,28 @@ def __parse_args():
                                   nargs='*')
 
     mode_group = deep_sort_parser.add_mutually_exclusive_group()
-    mode_group.add_argument('-d', '--detections_provider',
+
+    detections_mode_parser = mode_group.add_argument_group('detections')
+    detections_mode_parser.add_argument('-d', '--detections_provider',
                                   help="Detections provider for finding human.",
                                   default=None,
                                   choices=cmd_run_deep_sort.get_supported_detectors(),
                                   required=False)
-    mode_group.add_argument('-s', '--segmentations_provider',
+    detections_mode_parser.add_argument('--visualise_detections',
+                            help="Visualises detections bounding boxes.",
+                            default=False,
+                            action='store_true')
+
+    segmentations_mode_parser = mode_group.add_argument_group('segmentations')
+    segmentations_mode_parser.add_argument('-s', '--segmentations_provider',
                                   help=f"Segmentations provider for finding human.",
                                   default=None,
                                   choices=cmd_run_deep_sort.get_supported_segmentation_providers(),
                                   required=False)
+    segmentations_mode_parser.add_argument('--visualise_segmentations',
+                            help="Visualises segmentations.",
+                            default=False,
+                            action='store_true')
 
     deep_sort_parser.add_argument('-fe', '--features_extractor',
                                   help=f"Features extractor for ReID.",
@@ -109,7 +121,9 @@ def main():
     elif args.cmd == 'run':
         cmd_run_deep_sort.run(sequences,
                               args.detections_provider,
+                              args.visualise_detections,
                               args.segmentations_provider,
+                              args.visualise_segmentations,
                               args.features_extractor,
                               args.output_file,
                               args.min_confidence,

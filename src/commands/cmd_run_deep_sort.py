@@ -32,7 +32,9 @@ from src.metrics.std_metrics_printer import StdMetricsPrinter
 
 def run(sequence_directories: list[str],
         detections_provider: Optional[str],
+        visualise_detection: bool,
         segmentations_provider: Optional[str],
+        visualise_segmentation: bool,
         features_extractor: str,
         output_file: str,
         min_confidence: float,
@@ -57,7 +59,9 @@ def run(sequence_directories: list[str],
 
         metrics = __run_sequence(sequence_path,
                                  detections_provider,
+                                 visualise_detection,
                                  segmentations_provider,
+                                 visualise_segmentation,
                                  features_extractor,
                                  output_file,
                                  min_confidence,
@@ -79,7 +83,9 @@ def run(sequence_directories: list[str],
 
 def __run_sequence(sequence_directory: str,
                    detections_provider: Optional[str],
+                   visualise_detection: bool,
                    segmentations_provider: Optional[str],
+                   visualise_segmentation: bool,
                    features_extractor: str,
                    output_file: str,
                    min_confidence: float,
@@ -158,6 +164,11 @@ def __run_sequence(sequence_directory: str,
 
     def frame_callback(frame_id: int, image: np.ndarray, visualisation: Visualization):
         tracks, detections = deep_sort.update(frame_id, image)
+
+        if visualise_detection:
+            visualisation.draw_detections(detections)
+        elif visualise_segmentation:
+            visualisation.draw_segmentation(detections)
 
         visualisation.draw_trackers(tracks)
 

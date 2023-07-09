@@ -1051,10 +1051,12 @@ CC=clang CXX=clang++ ARCHFLAGS="-arch x86_64" python -m pip install ...
 Example, of the command that runs segmentation:
 
 ```text
-deep-sort run ./data/sequences -e HOTA DetA AssA FPS -s detectron2 -fe torchreid_osnet075
+deep-sort run ./data/sequences -e HOTA DetA AssA FPS -s detectron2 -fe torchreid_osnet075 --visualise_segmentations
 ```
 
 Just remember to run segmentation you need to specify `-s` instead of `-d`.
+
+Use `--visualise_segmentations` to see segmentation visualised on the image.
 
 | Screen 1                                                           | Screen 2                                                           | Screen 3                                                           |
 |--------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|
