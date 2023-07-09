@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+from src.app.app import App
 from src.dataset.mot.mot_ground_truth import MotGroundTruth
 from src.deep_sort.track import Track
 from src.metrics.metric import Metric
 from src.metrics.confusion_matrix_metric import ConfusionMatrixMetric
+from src.metrics.fps_metric import FPSMetric
 from src.metrics.hota_metric import HotaMetric
 
 _ID_METRIC_HOTA = 0
 _ID_METRIC_CONFUSION = 1
+_ID_METRIC_FPS = 2
 
 
 class MetricsMixer(object):
@@ -25,7 +28,8 @@ class MetricsMixer(object):
             HotaMetric.KEY_METRIC_DETA: _ID_METRIC_HOTA,
             ConfusionMatrixMetric.KEY_METRIC_F1: _ID_METRIC_CONFUSION,
             ConfusionMatrixMetric.KEY_METRIC_RECALL: _ID_METRIC_CONFUSION,
-            ConfusionMatrixMetric.KEY_METRIC_PRECISION: _ID_METRIC_CONFUSION
+            ConfusionMatrixMetric.KEY_METRIC_PRECISION: _ID_METRIC_CONFUSION,
+            FPSMetric.KEY_METRIC_FPS: _ID_METRIC_FPS,
         }
 
         if metric not in lookup:
@@ -37,10 +41,11 @@ class MetricsMixer(object):
     def supported_metrics(cls) -> set[str]:
         return {HotaMetric.KEY_METRIC_HOTA, HotaMetric.KEY_METRIC_ASSA, HotaMetric.KEY_METRIC_DETA,
                 ConfusionMatrixMetric.KEY_METRIC_F1, ConfusionMatrixMetric.KEY_METRIC_RECALL,
-                ConfusionMatrixMetric.KEY_METRIC_PRECISION}
+                ConfusionMatrixMetric.KEY_METRIC_PRECISION, FPSMetric.KEY_METRIC_FPS}
 
     @classmethod
     def create_for_metrics(cls,
+                           app: App,
                            ground_truth: MotGroundTruth,
                            metrics_to_track: set[str]) -> MetricsMixer:
         used_metrics: set[int] = set()
@@ -57,6 +62,8 @@ class MetricsMixer(object):
                 metric = HotaMetric(ground_truth=ground_truth)
             elif metric_id == _ID_METRIC_CONFUSION:
                 metric = ConfusionMatrixMetric(ground_truth=ground_truth)
+            elif metric_id == _ID_METRIC_FPS:
+                metric = FPSMetric(app=app, ground_truth=ground_truth)
             else:
                 raise Exception(f"Unknown metric id {metric_id}")
 

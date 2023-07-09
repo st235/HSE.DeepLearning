@@ -21,3 +21,35 @@ def benchmark(function: Callable) -> Callable:
         return return_value
 
     return wrapper
+
+
+def measure(function: Callable) -> float:
+    """Measures time that the execution of the given function takes.
+
+    Parameters
+    ----------
+    function: Callable
+        The callback to measure. Should take no arguments and return no value,
+        as the value will be ignored anyway.
+
+    Returns
+    -------
+    float
+        Time in seconds taken by the function execution.
+    """
+
+    start_sec = time.time()
+
+    function()
+
+    finish_sec = time.time()
+    return finish_sec - start_sec
+
+
+def convert_time_to_fps(elapsed_time: float) -> float:
+    """Converts the time in seconds to frames per seconds.
+
+    The result value is always rounded to the closest integer.
+    """
+
+    return round(1.0 / elapsed_time)

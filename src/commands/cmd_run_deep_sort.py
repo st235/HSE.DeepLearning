@@ -133,7 +133,8 @@ def __run_sequence(sequence_directory: str,
 
     metrics_mixer: MetricsMixer
     if metrics_to_track is not None:
-        metrics_mixer = MetricsMixer.create_for_metrics(ground_truth=dataset_descriptor.ground_truth,
+        metrics_mixer = MetricsMixer.create_for_metrics(app=app,
+                                                        ground_truth=dataset_descriptor.ground_truth,
                                                         metrics_to_track=set(metrics_to_track))
     else:
         metrics_mixer = NoOpMetricsMixer()

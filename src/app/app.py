@@ -7,6 +7,7 @@ from src.app.player.images_media_sequence import ImagesMediaSequence
 from src.app.window.window import Window
 from src.app.window.opencv_window import OpenCVWindow
 from src.dataset.mot.mot_dataset_descriptor import MotDatasetDescriptor
+from src.utils.benchmarking import convert_time_to_fps, measure
 from typing import Callable, Optional
 
 
@@ -35,7 +36,11 @@ class App(object):
         self.__window = window if window is not None else OpenCVWindow(title=challenge_descriptor.name,
                                                                        size=window_shape)
 
-        self.__last_update_time = None
+        self.__fps_records: list[float] = list()
+
+    @property
+    def fps_records(self) -> list[float]:
+        return self.__fps_records
 
     def start(self, frame_callback: Callable[[int, np.ndarray, Visualization], None]):
         self.__media_player.play(lambda image, frame_id: self.__on_frame_changed(image, frame_id, frame_callback))
@@ -47,23 +52,16 @@ class App(object):
             self.__window.destroy()
             return
 
-        frames_per_second: int = 0
-        current_time = time.time()
-
-        if self.__last_update_time is not None:
-            elapsed_time = current_time - self.__last_update_time
-            frames_per_second = int(round(1.0 / elapsed_time))
-
         visualisation = Visualization(image=image)
 
-        frame_callback(frame_id, image, visualisation)
+        elapsed_time = measure(lambda: frame_callback(frame_id, image, visualisation))
 
+        frames_per_second = convert_time_to_fps(elapsed_time)
         if self.__display_fps:
             visualisation.draw_info(f"FPS: {frames_per_second}\nFrame: {frame_id}")
 
+        self.__fps_records.append(frames_per_second)
         self.__window.update(visualisation.output_image)
-
-        self.__last_update_time = current_time
 
     def display_fps(self):
         self.__display_fps = True
