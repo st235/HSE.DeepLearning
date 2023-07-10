@@ -4,7 +4,7 @@
 
 This repository contains code for *Simple Online and Realtime Tracking with a Deep Association Metric* (Deep SORT).
 
-It extends [the original DeepSORT](https://github.com/nwojke/deep_sort) algorithm to integrate
+It extends [the original DeepSORT](https://github.com/nwojke/deep_sort) algorithm to provide
 improved detections and Deep REID mechanisms.
 
 ## Data
@@ -19,7 +19,7 @@ The project is using the following videos:
 - TUD-Campus
 - TUD-Stadtmitte
 
-MOT is published under [ Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
+MOT is published under [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
 | MOT16-11                                   | MOT16-06                                   | MOT16-13                                   | MOT16-01                                   | MOT16-14                                   |
 |--------------------------------------------|--------------------------------------------|--------------------------------------------|--------------------------------------------|--------------------------------------------|
@@ -27,89 +27,90 @@ MOT is published under [ Creative Commons Attribution-NonCommercial-ShareAlike 3
 
 ## Dependencies
 
-The code is compatible with Python 3.9+. 
-The following dependencies are needed to run the tracker:
+The code is compatible with **Python 3.9+**.
+
+The following dependencies are required to run the tracker:
 
 * NumPy
-* sklearn
+* Sklearn
 * OpenCV
 * TensorFlow
 * Pandas
 * Torchvision
 
-The full list of requirements can be found in [requirements.txt](./requirements.txt).
-Moreover, the project depends on other projects via [git sumbodules system](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
+The full list of requirements can be found at [requirements.txt](./requirements.txt).
 
-Those projects are:
+Moreover, the project depends on other projects, like:
 - [MMDetection](https://github.com/open-mmlab/mmdetection)
 - [Nanodet](https://github.com/RangiLyu/nanodet)
 - [YoloV5](https://github.com/ultralytics/yolov5)
 - [YoloV8](https://github.com/ultralytics/ultralytics)
 - [Torchreid](https://github.com/KaiyangZhou/deep-person-reid)
 
-You can find all declared submodules in [.gitmodules](./.gitmodules) or under [the dependencies folder](./dependencies).
+Some of them are not published in `pip` and integrated via [git sumbodules system](https://git-scm.com/book/en/v2/Git-Tools-Submodules). You can find all declared submodules in [.gitmodules](./.gitmodules) or under [the dependencies folder](./dependencies).
 
 ## Running
 
 ### Setup
 
-First of all, it is necessary to **install** the project.
+First of all, it is necessary to **clone and setup** the project.
 
-To do so just run the following commands:
+Running the commands from below will help you to achieve it:
 
 ```bash
 pip install -r requirements.txt
 python setup.py develop
 ```
 
-We are good to go and run the project! Yay 🎉
+After some time (about 20 - 30 minutes) the dependencies installation should be done.
+Yay 🎉 We are good to start experimenting!
 
 ### Commands
 
-There are 2 modes to run the app:
-- **Ground truth visualisation** that does not start the tracker but visualise ground truth from `gt` folder
-- **Tracker** runs the algorithm and this is _the main part of the project_
+The app supports 2 working modes:
+- **Ground truth visualisation** that **does not start** the tracker but visualise ground truth from `gt` folder;
+- **Tracker** runs the DeepSORT algorithm; this is _the main part of the project_.
 
-This is an example of how to run `ground truth visualisation`.
+Below is the example of how to run `ground truth visualisation`.
 
 ```bash
 deep-sort ground-truth ./data/sequences/MOT16-11
 ```
 
-You will see something similar to the image below:
+You, most likely, will see something similar to the image below:
 
 ![Ground truth visualisation](./resources/ground_truth_visualisation.png)
 
-The following example runs the tracker:
+The next example runs the `tracker`:
 
 ```bash
-deep-sort run ./data/sequences -e HOTA DetA AssA F1 Precision Recall 
+deep-sort run ./data/sequences -d det -e HOTA DetA AssA F1 Precision Recall 
 ```
 
-In this case you will see something similar to the next image:
+You should see a picture similar to the next image:
 
 ![Run DeepSORT](./resources/run_deep_sort.png)
 
-Check `deep-sort -h` for an overview of available options.
+_Note:_ Check out `deep-sort -h` for a detailed overview of available options.
 
-## Overview of source files
+## Source files overview
 
 ### Detection
 
-![Detections Provider and Detection diagram](./resources/detections_provider.png)
+![Detections Provider and Detection classes diagram](./resources/detections_provider.png)
 
-Detections logic is located in [the detector folder](./src/deep_sort/detector) under **deep_sort**.
-There are 2 central abstractions in the project: _Detection_ and _DetectionsProvider_.
+Detections logic is located under [the `deep_sort.detector` package](./src/deep_sort/detector).
+There are 2 central abstractions in detections mechanism: _Detection_ and _DetectionsProvider_.
 
-_DetectionsProvider_ helps to abstract a specific detections logic under a unified interface.
-Every provider should return _a lift of Detections_ in a given sequence frame.
-A frame is described by the image matrix (np.ndarray) and a frame id.
-The provided list of detections helps to identify an origin of every detection,
+_DetectionsProvider_ helps to abstract a specific detections logic under a single facade.
+Every provider should return _a list of Detections_ in a frame.
+The frame is described by an image (raw _np.ndarray_ matrix) and a frame id.
+A list of detections helps to identify an origin of every detection,
 i.e. where the particular detection is located in the frame, and a confidence score.
 
-There are a few classes implementing __DetectionsProvider__.
+There are a few classes implementing __DetectionsProvider__. Let's take a look at them.
 
-_Please, do note, `--n_init 0` will be used during detections evaluation to initialise tracks as soon as possible._
+_Please, do note, `--n_init 0` is used during the evaluation stage to initialise tracks as soon as possible._
 
 #### FileDetectionsProvider [from original DeepSORT algorithm]
 
@@ -149,15 +150,15 @@ This _DetectionsProvider_ implements [Yolo V5](https://github.com/ultralytics/yo
 
 This project implements `YoloV5` as a submodule.
 
-Detector supports models:
+Detector supports the following checkpoints:
 - Nano, aka [YOLOv5n](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5n.pt)
 - Small, aka [YOLOv5s](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5s.pt)
 - Medium, aka [YOLOv5m](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5m.pt)
 - Large, aka [YOLOv5l](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5l.pt)
 - Nano6, aka [YOLOv5n6](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5n6.pt)
 
-All models are available in [`data/yolov5_binaries`](./dependencies/yolov5_binaries). However, if you were not able
-to locate some checkpoints, please, do check the links above or the YoloV5 official repository.
+All checkpoints are available in [`data/yolov5_binaries`](./dependencies/yolov5_binaries). However, if you were not able
+to locate some checkpoints, please, do visit the links above or YoloV5 official repository.
 
 **YoloV5N**
 
@@ -167,13 +168,14 @@ Command to run the sequence in the given configuration is:
 deep-sort run ./data/sequences -e F1 Precision Recall -d yolov5n --n_init 0
 ```
 
-A lot of people were not recognized correctly.
+A lot of people have not been recognized.
 
 ![YoloV5 Nano](./resources/detection_score_yolov5n.png)
 
-FPS score has also dropped dramatically across the whole dataset (almost twice). Though, please, approach this and
-any further notices about FPS drops with a reasonable pragmatism: **the local setup which is used for this project
-is CPU-bounded as does not support CUDA**.
+FPS score also dropped dramatically across the whole dataset (almost twice). Though, please, approach this and
+any further notes about FPS drops with a reasonable pragmatism: **the local setup which is used for this project
+is CPU-bounded as does not support CUDA**. Only side-by-side comparison is performed locally, the final scores
+are measured on _Google Colab_ to utilise GPU.
 
 **Final scores**
 
@@ -1287,210 +1289,213 @@ _Hyperparameters_ were the same for all runs:
 ### Original DeepSORT (Status QUO)
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.39411|   0.38431|    0.4061|   0.71491|   0.60029|   0.88362|
-MOT16-09            |   0.30053|   0.33223|   0.27235|   0.52728|    0.3658|   0.94404|
-MOT16-11            |   0.40245|   0.48102|   0.33696|   0.60129|   0.43209|   0.98828|
-PETS09-S2L1         |    0.4469|   0.41129|   0.48727|      0.81|   0.88338|   0.74787|
-TUD-Campus          |    0.4007|   0.36568|   0.44327|   0.73386|   0.64903|    0.8442|
-TUD-Stadtmitte      |    0.3568|   0.29182|   0.43991|   0.74671|    0.7128|   0.78402|
-COMBINED            |   0.38358|   0.37772|   0.39764|   0.68901|   0.60723|   0.86534|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.39411|   0.38431|    0.4061|   0.71491|   0.60029|   0.88362|    59.676|
+MOT16-09            |   0.30053|   0.33223|   0.27235|   0.52728|    0.3658|   0.94404|    55.869|
+MOT16-11            |   0.40245|   0.48102|   0.33696|   0.60129|   0.43209|   0.98828|    49.777|
+PETS09-S2L1         |    0.4469|   0.41129|   0.48727|      0.81|   0.88338|   0.74787|    38.635|
+TUD-Campus          |    0.4007|   0.36568|   0.44327|   0.73386|   0.64903|    0.8442|    57.563|
+TUD-Stadtmitte      |    0.3568|   0.29182|   0.43991|   0.74671|    0.7128|   0.78402|    44.961|
+COMBINED            |   0.38358|   0.37772|   0.39764|   0.68901|   0.60723|   0.86534|     51.08|
 ```
 
 ### Yolo V5 Small + Mobilenet
 
 **Average FPS:** ~19 FPS
 
-**Verdict:** 👍, the model works slightly better than original DeepSORT
+**Verdict:** 👎, the model works slightly worse than original DeepSORT
 
 ```text
                     |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
-KITTI-17            |   0.27871|    0.2694|   0.28906|   0.53524|    0.3836|   0.88514|    26.655|
-MOT16-09            |   0.28191|   0.29082|   0.27403|   0.49284|   0.33061|   0.96771|    17.356|
-MOT16-11            |   0.38404|   0.41388|   0.35823|   0.58527|   0.42141|   0.95764|    14.641|
-PETS09-S2L1         |   0.43707|   0.37079|   0.51746|   0.82657|    0.7395|   0.93688|    16.328|
-TUD-Campus          |   0.43408|   0.47445|   0.39799|   0.68078|    0.5376|   0.92788|    23.085|
-TUD-Stadtmitte      |   0.50828|   0.51012|   0.50762|    0.8096|   0.68599|   0.98755|    18.978|
-COMBINED            |   0.38735|   0.38824|   0.39073|   0.65505|   0.51645|    0.9438|    19.507|
+KITTI-17            |   0.26456|   0.24383|   0.28771|   0.53265|   0.38214|   0.87879|    27.034|
+MOT16-09            |   0.28191|   0.29082|   0.27403|   0.49284|   0.33061|   0.96771|    17.297|
+MOT16-11            |   0.38404|   0.41388|   0.35823|   0.58527|   0.42141|   0.95764|     14.91|
+PETS09-S2L1         |   0.41396|   0.33301|   0.51742|   0.82628|   0.73905|   0.93685|    16.619|
+TUD-Campus          |   0.43408|   0.47445|   0.39799|   0.68078|    0.5376|   0.92788|    20.859|
+TUD-Stadtmitte      |   0.50898|   0.51141|   0.50779|    0.8096|   0.68599|   0.98755|    19.899|
+COMBINED            |   0.38126|    0.3779|   0.39053|   0.65457|   0.51613|   0.94274|    19.437|
 ```
 
 ### Yolo V5 Small + OS Net 0.75x
 
-**Average FPS:** 14 FPS
+**Average FPS:** ~14 FPS
 
 **Verdict:** 👍
 
 ```text
                     |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
-KITTI-17            |   0.28327|   0.28244|   0.28461|   0.53141|   0.37775|   0.89583|    19.317|
-MOT16-09            |   0.33695|   0.42715|    0.2661|   0.48177|   0.32053|   0.96951|    13.895|
-MOT16-11            |   0.44738|   0.56581|   0.35447|    0.5812|   0.41661|   0.96078|    11.796|
-PETS09-S2L1         |   0.50412|   0.49909|   0.51076|    0.8235|   0.73123|   0.94241|    12.881|
-TUD-Campus          |   0.46485|    0.5625|   0.38484|   0.66667|   0.52089|   0.92574|    12.845|
-TUD-Stadtmitte      |   0.47007|   0.43868|   0.50501|   0.80594|    0.6808|   0.98745|    14.296|
-COMBINED            |   0.41777|   0.46261|    0.3843|   0.64842|   0.50797|   0.94696|    14.172|
+KITTI-17            |   0.28327|   0.28244|   0.28461|   0.53141|   0.37775|   0.89583|    17.276|
+MOT16-09            |   0.33695|   0.42715|    0.2661|   0.48177|   0.32053|   0.96951|    13.608|
+MOT16-11            |   0.44738|   0.56581|   0.35447|    0.5812|   0.41661|   0.96078|    12.167|
+PETS09-S2L1         |   0.50412|   0.49909|   0.51076|    0.8235|   0.73123|   0.94241|     12.59|
+TUD-Campus          |   0.46485|    0.5625|   0.38484|   0.66667|   0.52089|   0.92574|    16.268|
+TUD-Stadtmitte      |   0.47007|   0.43868|   0.50501|   0.80594|    0.6808|   0.98745|    12.508|
+COMBINED            |   0.41777|   0.46261|    0.3843|   0.64842|   0.50797|   0.94696|    14.069|
 ```
 
 ### Yolo V5 Medium + Mobilenet
 
-**Average FPS:** ~4-5 FPS
+**Average FPS:** ~15 FPS
 
-**Verdict:** 👍, borderline
+**Verdict:** 👍, borderline go
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.35139|   0.35116|   0.35193|   0.61553|   0.46999|   0.89167|
-MOT16-09            |     0.321|   0.29696|   0.34817|   0.58628|   0.42267|   0.95652|
-MOT16-11            |   0.39488|     0.373|    0.4211|   0.65713|   0.50055|   0.95627|
-PETS09-S2L1         |   0.41002|   0.30163|   0.56228|   0.86756|   0.82172|   0.91881|
-TUD-Campus          |   0.44722|   0.44803|   0.44714|   0.74707|   0.62117|   0.93697|
-TUD-Stadtmitte      |   0.54274|   0.54945|   0.53737|   0.83807|   0.72751|   0.98825|
-COMBINED            |   0.41121|   0.38671|   0.44467|    0.7186|   0.59393|   0.94142|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.35139|   0.35116|   0.35193|   0.61553|   0.46999|   0.89167|    21.759|
+MOT16-09            |   0.32178|   0.29805|    0.3486|   0.58662|   0.42286|   0.95736|    13.699|
+MOT16-11            |   0.39488|     0.373|    0.4211|   0.65713|   0.50055|   0.95627|    12.291|
+PETS09-S2L1         |   0.37044|    0.2475|   0.56204|   0.86719|   0.82127|   0.91854|    13.208|
+TUD-Campus          |   0.44722|   0.44803|   0.44714|   0.74707|   0.62117|   0.93697|     17.31|
+TUD-Stadtmitte      |   0.54273|   0.54885|   0.53791|   0.83906|   0.72837|   0.98942|    15.827|
+COMBINED            |   0.40474|   0.37777|   0.44479|   0.71877|   0.59403|   0.94171|    15.682|
 ```
 
-### Yolo V5 Medium + OS Net 0.75x
+### Yolo V5 Medium + OSNet 0.75x
 
-**Average FPS:** ~4 FPS
+**Average FPS:** ~12 FPS
 
-**Verdict:** 👎, works a little bit slow
+**Verdict:** 👍, works really nice
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.36228|   0.37535|   0.34992|   0.61449|   0.46559|   0.90341|
-MOT16-09            |   0.38652|   0.43429|    0.3445|   0.58114|   0.41621|    0.9626|
-MOT16-11            |   0.44308|   0.47411|   0.41554|   0.65065|   0.49313|   0.95604|
-PETS09-S2L1         |   0.51778|   0.48084|   0.55944|   0.86756|   0.81881|   0.92248|
-TUD-Campus          |   0.40679|   0.38632|   0.43003|   0.73684|   0.60446|   0.94348|
-TUD-Stadtmitte      |   0.54143|   0.54776|   0.53656|   0.83633|   0.72491|   0.98821|
-COMBINED            |   0.44298|   0.44978|   0.43933|    0.7145|   0.58719|   0.94604|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.36228|   0.37535|   0.34992|   0.61449|   0.46559|   0.90341|    15.345|
+MOT16-09            |   0.38652|   0.43429|    0.3445|   0.58114|   0.41621|    0.9626|     11.64|
+MOT16-11            |   0.44308|   0.47411|   0.41554|   0.65065|   0.49313|   0.95604|    10.497|
+PETS09-S2L1         |   0.51778|   0.48084|   0.55944|   0.86756|   0.81881|   0.92248|    10.707|
+TUD-Campus          |   0.40679|   0.38632|   0.43003|   0.73684|   0.60446|   0.94348|    13.958|
+TUD-Stadtmitte      |   0.54143|   0.54776|   0.53656|   0.83633|   0.72491|   0.98821|     12.19|
+COMBINED            |   0.44298|   0.44978|   0.43933|    0.7145|   0.58719|   0.94604|    12.389|
 ```
 
 ### Yolo V8 Small + Mobilenet 1.4x
 
-**Average FPS:** ~5-6 FPS, though it seems a bit unstable
+**Average FPS:** ~17 FPS, though it seems a bit unstable
 
 **Verdict:** 👎, HOTA is slightly worse
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.31209|   0.31215|   0.31233|   0.55767|   0.40703|   0.88535|
-MOT16-09            |    0.3137|   0.29887|   0.32999|   0.56176|   0.39623|    0.9648|
-MOT16-11            |   0.40071|   0.38192|   0.42307|   0.65263|   0.49673|   0.95116|
-PETS09-S2L1         |   0.37013|    0.3138|   0.44055|   0.75194|   0.62779|   0.93729|
-TUD-Campus          |   0.40161|   0.39608|   0.41014|   0.71012|    0.5766|   0.92411|
-TUD-Stadtmitte      |   0.49059|   0.47176|   0.51284|   0.81174|   0.69377|   0.97805|
-COMBINED            |   0.38147|   0.36243|   0.40482|   0.67431|   0.53303|   0.94013|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.31209|   0.31215|   0.31233|   0.55767|   0.40703|   0.88535|      22.6|
+MOT16-09            |   0.31903|   0.30911|   0.32989|   0.56176|   0.39623|    0.9648|    14.383|
+MOT16-11            |   0.40477|   0.38946|   0.42326|   0.65277|   0.49684|   0.95137|    12.242|
+PETS09-S2L1         |    0.3623|   0.30088|   0.44064|   0.75194|   0.62779|   0.93729|    16.081|
+TUD-Campus          |   0.43168|   0.45225|   0.41317|   0.71698|   0.58217|   0.93304|     17.31|
+TUD-Stadtmitte      |     0.449|   0.39554|    0.5118|   0.81275|   0.69464|   0.97927|     17.43|
+COMBINED            |   0.37981|    0.3599|   0.40518|   0.67565|   0.53412|   0.94185|    16.674|
 ```
 
 ### Yolo V8 Small + OSNet 0.75x
 
-**Average FPS:** ~5-6 FPS on average
+**Average FPS:** ~13 FPS on average
 
 **Verdict:** 👍, HOTA is better than in original work
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.31467|    0.3314|   0.29912|   0.54582|   0.39239|   0.89632|
-MOT16-09            |    0.3802|   0.45054|   0.32144|   0.54918|   0.38444|   0.96101|
-MOT16-11            |    0.4827|   0.55692|   0.41915|   0.64812|   0.49128|   0.95205|
-PETS09-S2L1         |   0.40245|   0.37643|    0.4334|   0.74451|   0.61685|    0.9388|
-TUD-Campus          |   0.46037|    0.5125|   0.41472|   0.71724|   0.57939|   0.94118|
-TUD-Stadtmitte      |   0.52672|   0.54985|   0.50687|   0.80611|   0.68512|   0.97899|
-COMBINED            |   0.42785|   0.46294|   0.39912|    0.6685|   0.52491|   0.94472|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.31467|    0.3314|   0.29912|   0.54582|   0.39239|   0.89632|    16.924|
+MOT16-09            |    0.3802|   0.45054|   0.32144|   0.54918|   0.38444|   0.96101|    12.339|
+MOT16-11            |    0.4827|   0.55692|   0.41915|   0.64812|   0.49128|   0.95205|    10.874|
+PETS09-S2L1         |   0.40245|   0.37643|    0.4334|   0.74451|   0.61685|    0.9388|    12.564|
+TUD-Campus          |   0.46037|    0.5125|   0.41472|   0.71724|   0.57939|   0.94118|    15.085|
+TUD-Stadtmitte      |   0.52672|   0.54985|   0.50687|   0.80611|   0.68512|   0.97899|    13.547|
+COMBINED            |   0.42785|   0.46294|   0.39912|    0.6685|   0.52491|   0.94472|    13.556|
 ```
 
 ### Yolo V8 Nano + OSNet 0.75x
 
-**Average FPS:** ~6-7 FPS on average
+**Average FPS:** ~14 FPS on average
 
 **Verdict:** 👎
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.21688|   0.23078|   0.20402|   0.41341|   0.27086|   0.87264|
-MOT16-09            |   0.30585|   0.38025|   0.24643|   0.44467|   0.28933|   0.96023|
-MOT16-11            |   0.42355|    0.4921|   0.36579|   0.58878|   0.42544|   0.95568|
-PETS09-S2L1         |   0.35368|   0.33704|   0.37388|   0.67439|   0.52681|   0.93683|
-TUD-Campus          |     0.428|   0.51847|   0.35442|   0.65336|   0.50139|    0.9375|
-TUD-Stadtmitte      |   0.51076|   0.54776|    0.4782|   0.77854|   0.64014|   0.99329|
-COMBINED            |   0.37312|   0.41773|   0.33713|   0.59219|   0.44233|   0.94269|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.21688|   0.23078|   0.20402|   0.41341|   0.27086|   0.87264|    19.172|
+MOT16-09            |   0.30585|   0.38025|   0.24643|   0.44467|   0.28933|   0.96023|    13.145|
+MOT16-11            |   0.42355|    0.4921|   0.36579|   0.58878|   0.42544|   0.95568|    11.919|
+PETS09-S2L1         |   0.35368|   0.33704|   0.37388|   0.67439|   0.52681|   0.93683|    13.679|
+TUD-Campus          |     0.428|   0.51847|   0.35442|   0.65336|   0.50139|    0.9375|    14.521|
+TUD-Stadtmitte      |   0.51076|   0.54776|    0.4782|   0.77854|   0.64014|   0.99329|    13.101|
+COMBINED            |   0.37312|   0.41773|   0.33713|   0.59219|   0.44233|   0.94269|    14.256|
 ```
 
 ### Yolo V8 Medium + Mobilenet
 
-**Average FPS:** on average ~5 FPS
+**Average FPS:** on average ~14 FPS
 
 **Verdict:** 👍
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.40996|   0.40435|   0.41607|   0.68801|   0.55051|   0.91707|
-MOT16-09            |    0.3686|    0.3341|   0.40839|   0.66032|   0.50143|   0.96663|
-MOT16-11            |    0.4043|   0.36651|   0.44906|   0.68104|   0.53216|   0.94557|
-PETS09-S2L1         |   0.42263|   0.32445|   0.55434|   0.85926|   0.80139|   0.92616|
-TUD-Campus          |   0.42528|   0.40108|    0.4532|    0.7529|   0.63231|   0.93033|
-TUD-Stadtmitte      |   0.51227|   0.49368|   0.53573|   0.83624|   0.72664|   0.98476|
-COMBINED            |   0.42384|   0.38736|   0.46947|    0.7463|   0.62407|   0.94509|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.40996|   0.40435|   0.41607|   0.68801|   0.55051|   0.91707|    18.579|
+MOT16-09            |   0.37118|   0.33868|    0.4084|   0.66032|   0.50143|   0.96663|    11.564|
+MOT16-11            |   0.41411|   0.38403|   0.44915|   0.68057|   0.53161|   0.94552|    10.253|
+PETS09-S2L1         |   0.41215|   0.30951|   0.55297|   0.85879|   0.80094|   0.92564|    12.108|
+TUD-Campus          |   0.42528|   0.40108|    0.4532|    0.7529|   0.63231|   0.93033|    15.817|
+TUD-Stadtmitte      |   0.51227|   0.49368|   0.53573|   0.83624|   0.72664|   0.98476|    13.866|
+COMBINED            |   0.42416|   0.38855|   0.46925|   0.74614|   0.62391|   0.94499|    13.698|
 ```
 
 ### Yolo V8 Medium + OSNet 0.75x
 
-**Average FPS:** on average ~5 FPS
+**Average FPS:** on average ~11 FPS
 
 **Verdict:** 👍
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.41043|   0.41453|   0.40675|   0.67772|    0.5388|   0.91315|
-MOT16-09            |   0.42099|   0.44379|   0.40034|   0.64795|   0.48735|   0.96643|
-MOT16-11            |   0.50861|   0.58193|   0.44544|   0.67699|   0.52649|   0.94799|
-PETS09-S2L1         |   0.51519|   0.48399|   0.55056|    0.8602|   0.79803|   0.93288|
-TUD-Campus          |   0.45027|   0.45634|   0.44632|   0.74667|   0.62396|   0.92946|
-TUD-Stadtmitte      |   0.49544|    0.4634|   0.53177|      0.83|   0.71799|   0.98341|
-COMBINED            |   0.46682|   0.47399|   0.46353|   0.73992|   0.61544|   0.94555|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.41043|   0.41453|   0.40675|   0.67772|    0.5388|   0.91315|    14.345|
+MOT16-09            |   0.42099|   0.44379|   0.40034|   0.64795|   0.48735|   0.96643|     10.16|
+MOT16-11            |   0.50861|   0.58193|   0.44544|   0.67699|   0.52649|   0.94799|    9.4233|
+PETS09-S2L1         |   0.51519|   0.48399|   0.55056|    0.8602|   0.79803|   0.93288|    10.362|
+TUD-Campus          |   0.45027|   0.45634|   0.44632|   0.74667|   0.62396|   0.92946|     12.93|
+TUD-Stadtmitte      |   0.49544|    0.4634|   0.53177|      0.83|   0.71799|   0.98341|    11.626|
+COMBINED            |   0.46682|   0.47399|   0.46353|   0.73992|   0.61544|   0.94555|    11.474|
 ```
 
 ### MMDetection Yolo X Small + MobileNet
 
-**Average FPS:** on average ~3-4 FPS
+**Average FPS:** on average ~14 FPS
 
-**Verdict:** 👎
+**Verdict:** 👍
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |   0.42455|   0.40232|   0.44829|   0.72823|   0.60615|   0.91189|
-MOT16-09            |   0.38441|    0.3518|   0.42149|   0.67957|   0.52102|   0.97682|
-MOT16-11            |   0.41272|   0.37841|   0.45282|   0.69277|   0.54186|   0.96021|
-PETS09-S2L1         |    0.5018|   0.43597|   0.58069|   0.88236|   0.87221|   0.89275|
-TUD-Campus          |    0.4778|   0.47677|   0.47931|   0.79221|   0.67967|   0.94942|
-TUD-Stadtmitte      |   0.50477|   0.44397|   0.57598|   0.87133|   0.78201|   0.98368|
-COMBINED            |   0.45101|   0.41487|    0.4931|   0.77441|   0.66715|   0.94579|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |    0.4312|   0.41448|   0.44898|   0.72663|   0.60322|   0.91353|    16.028|
+MOT16-09            |   0.38441|    0.3518|   0.42149|   0.67957|   0.52102|   0.97682|    13.175|
+MOT16-11            |   0.41272|   0.37841|   0.45282|   0.69277|   0.54186|   0.96021|    11.544|
+PETS09-S2L1         |   0.47079|   0.38458|   0.58041|   0.88236|   0.87221|   0.89275|    12.804|
+TUD-Campus          |   0.43409|   0.39723|   0.47589|   0.78571|   0.67409|   0.94163|    15.366|
+TUD-Stadtmitte      |   0.48884|   0.41606|   0.57654|   0.87229|   0.78287|   0.98477|    15.274|
+COMBINED            |   0.43701|   0.39042|   0.49269|   0.77322|   0.66588|   0.94495|    14.032|
 ```
 
 ### Nanodet Plus 1.5x 320 + Mobilenet
 
-**Average FPS:** on average ~3-4 FPS
+**Average FPS:** on average ~19 FPS
 
 **Verdict:** 👎, HOTA is too bad as the detection quality is low
 
 ```text
-                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |
-KITTI-17            |       0.0|       0.0|       0.0|       0.0|       0.0|       1.0|
-MOT16-09            |  0.056842|   0.12022|  0.027236|  0.062581|  0.032338|   0.96591|
-MOT16-11            |   0.12359|    0.2603|  0.059274|   0.12762|  0.068454|   0.94012|
-PETS09-S2L1         | 0.0033858| 0.0089577| 0.0012933| 0.0035682| 0.0017873|       1.0|
-TUD-Campus          |   0.15968|   0.22385|   0.11621|   0.28162|   0.16435|   0.98333|
-TUD-Stadtmitte      |  0.086014|   0.18891|  0.039207|  0.093982|  0.049308|       1.0|
-COMBINED            |  0.071584|   0.13371|  0.040537|  0.094895|  0.052705|   0.98156|
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |       0.0|       0.0|       0.0|       0.0|       0.0|       1.0|    22.972|
+MOT16-09            |  0.055641|   0.11566|  0.027197|  0.062581|  0.032338|   0.96591|     19.76|
+MOT16-11            |   0.12359|    0.2603|  0.059274|   0.12762|  0.068454|   0.94012|    17.429|
+PETS09-S2L1         | 0.0033858| 0.0089577| 0.0012933| 0.0035682| 0.0017873|       1.0|    21.311|
+TUD-Campus          |   0.15968|   0.22385|   0.11621|   0.28162|   0.16435|   0.98333|     15.93|
+TUD-Stadtmitte      |  0.086014|   0.18891|  0.039207|  0.093982|  0.049308|       1.0|      21.0|
+COMBINED            |  0.071384|   0.13295|   0.04053|  0.094895|  0.052705|   0.98156|    19.734|
 ```
 
 It seems that the major boost comes with the detection stage improvements.
 
 Though I would use models in the following combinations:
-- Yolo V5 Small + OS Net 0.75x
+- Yolo V5 Small + OSNet 0.75x
+- Yolo V5 Medium + Mobilenet
+- Yolo V5 Medium + OSNet 0.75x
 - Yolo V8 Small + OSNet 0.75x
 - Yolo V8 Medium + Mobilenet
 - Yolo V8 Medium + OSNet 0.75x
+- Yolo X Small + MobileNet
 
 
 ## Acknowledgement
