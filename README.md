@@ -1063,6 +1063,14 @@ Use `--visualise_segmentations` to see segmentation visualised on the image.
 | Screen 1                                                           | Screen 2                                                           | Screen 3                                                           |
 |--------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|
 | ![Detectron2 #1](./resources/detectron2_segmentation_screen_1.png) | ![Detectron2 #1](./resources/detectron2_segmentation_screen_2.png) | ![Detectron2 #1](./resources/detectron2_segmentation_screen_3.png) |
+
+**Scores for KITTI-17**
+
+```text
+                    |HOTA      |AssA      |DetA      |F1        |Recall    |Precision |FPS       |
+KITTI-17            |   0.48867|   0.49342|   0.48488|   0.75857|   0.82577|   0.70149|    6.2897|
+COMBINED            |   0.48867|   0.49342|   0.48488|   0.75857|   0.82577|   0.70149|    6.2897|
+```
  
 ### Misc
 
